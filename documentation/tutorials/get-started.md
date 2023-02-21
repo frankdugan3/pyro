@@ -4,7 +4,7 @@ Wow, you must be courageous! Be sure to [check out open issues](https://github.c
 
 ## Installation
 
-The installation process is currently pretty involved, and may be omitting some required steps. This will [improve over time](https://github.com/frankdugan3/phlegethon/issues/5), pinky-promise!
+The installation process is currently pretty involved, and may be omitting some required steps. This will [improve over time](https://github.com/frankdugan3/phlegethon/issues/2), pinky-promise!
 
 ### Requirements
 
