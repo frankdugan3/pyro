@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "jakebecker.elixir-ls",
+    "phoenixframework.phoenix",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "streetsidesoftware.code-spell-checker",
+    "gruntfuggly.todo-tree"
+  ]
+}
