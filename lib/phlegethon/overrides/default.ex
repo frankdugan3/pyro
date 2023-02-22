@@ -7,6 +7,10 @@ defmodule Phlegethon.Overrides.Default do
   It can be helpful to view the source of this override configuration to get an idea of how to write your own overrides.
   """
 
+  ##############################################################################
+  ####    S T Y L E    S E T T I N G S
+  ##############################################################################
+
   use Phlegethon.Overrides,
     makeup_light: &Makeup.Styles.HTML.StyleMap.autumn_style/0,
     makeup_dark: &Makeup.Styles.HTML.StyleMap.monokai_style/0,

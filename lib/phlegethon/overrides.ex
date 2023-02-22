@@ -162,6 +162,7 @@ defmodule Phlegethon.Overrides do
               module = Function.info(style)[:module]
               name = Function.info(style)[:name]
               "* `makeup_light`: [`#{name}/0`](`#{module}.#{name}/0`)\n"
+
             _ ->
               ""
           end <>
@@ -170,6 +171,7 @@ defmodule Phlegethon.Overrides do
               module = Function.info(style)[:module]
               name = Function.info(style)[:name]
               "* `makeup_dark`: [`#{name}/0`](`#{module}.#{name}/0`)\n"
+
             _ ->
               ""
           end
