@@ -36,13 +36,18 @@ defmodule Phlegethon.Overrides do
 
   The `Phlegethon.Overrides.Default` preset is a great example to dig in and see how the override system works. A `Phlegethon.Component` uses [`overridable`](`Phlegethon.Component.overridable/3`) props to reference overrides set in these presets/custom override modules, and loads them as defaults.
 
-  To get started quickly, Phlegethon defaults to using `Phlegethon.Overrides.Default` without any configuration, but you probably want to customize it, since that's the whole point!
-
-  To set your customized overrides, configure your app with:
+  To get started quickly, Phlegethon has a default style that can be used without any customization:
 
   ```
   config :phlegethon, :overrides,
-    [MyApp.CustomOverrides, Phlegethon.Overrides.Default]
+    [Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
+  ```
+
+  But you probably want to customize at least a few overrides. To do so, configure your app with:
+
+  ```
+  config :phlegethon, :overrides,
+    [MyApp.CustomOverrides, Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
   ```
 
   Then, define your overrides in your custom module:
@@ -66,13 +71,20 @@ defmodule Phlegethon.Overrides do
   - You can use any number of `:overrides` modules, though it is probably best to only use only 2-3 to keep things simple
   - If no modules define the value, it will simply be `nil`
   - If the `overridable` is defined on the component as `required: true`, an error will be raised at compile-time
+
+  > #### Note: {: .warning}
+  >
+  > If you want to *completely* omit default style, you should still include the `Phlegethon.Overrides.Essential` overrides, because it specially configures essential things components require unrelated to style. Some of them can be safely overridden, but they must be included and do not affect style directly, so you will still have a blank slate for your custom style overrides.
+  >
+  > ```
+  > config :phlegethon, :overrides,
+  >   [MyApp.CustomOverrides, Phlegethon.Overrides.Essential]
+  > ```
   """
 
   alias Phlegethon.Overrides
 
-  @configured_overrides Application.compile_env(:phlegethon, :overrides, [
-                          Overrides.Default
-                        ])
+  @configured_overrides Application.compile_env!(:phlegethon, :overrides)
 
   @doc false
   @spec __using__(any) :: Macro.t()

@@ -95,7 +95,7 @@ defmodule Phlegethon.MixProject do
       ],
       Overrides: [
         Phlegethon.Overrides,
-        Phlegethon.Overrides.Default
+        ~r/\.Overrides\./
       ],
       "Resource Extension": [
         Phlegethon.Resource.Form.Action,

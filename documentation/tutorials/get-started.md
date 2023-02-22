@@ -31,6 +31,7 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
 
    ```elixir
    config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")
+   config :phlegethon, :overrides, [Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
    config :phlegethon, :gettext, MyAppWeb.Gettext
    ```
 

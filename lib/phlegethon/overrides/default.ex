@@ -1,10 +1,8 @@
 defmodule Phlegethon.Overrides.Default do
   @moduledoc """
-  This is the default configuration for Phlegethon components.
+  This is the default style configuration for Phlegethon components.
 
-  If you provide no other configuration, this is what Phlegethon will use by default. You will likely want to merge it with your own custom overrides, see `Phlegethon.Overrides` for instructions on how to do that.
-
-  It can be helpful to view the source of this override configuration to get an idea of how to write your own overrides.
+  It can be helpful to view the source of this override configuration to get an idea of how to write your own style overrides.
   """
 
   ##############################################################################
@@ -216,24 +214,18 @@ defmodule Phlegethon.Overrides.Default do
   @flash_kinds ~w[info error warning success]
 
   override Core, :flash do
-    set :autoshow, true
     set :class, &__MODULE__.flash_class/1
-    set :close, true
     set :close_button_class, "absolute top-2 right-1 p-2"
     set :close_icon_class, "h-5 w-5 stroke-current opacity-40 group-hover:opacity-70"
     set :close_icon_name, :x_mark
-    set :icon_kind, :mini
     set :icon_name, &__MODULE__.flash_icon_name/1
-    set :style_for_kind, &__MODULE__.flash_style_for_kind/1
     set :kind, "info"
     set :kinds, @flash_kinds
+    set :icon_kind, :mini
     set :message_class, "text-sm whitespace-pre-wrap"
     set :progress_class, "absolute top-1 left-0 w-full h-1"
     set :title, &__MODULE__.flash_title/1
     set :title_class, "flex items-center gap-1.5 text-sm font-semibold leading-6"
-    set :ttl, 10_000
-    set :show_js, &__MODULE__.flash_show_js/2
-    set :hide_js, &__MODULE__.flash_hide_js/2
   end
 
   def flash_title(assigns) do
@@ -254,31 +246,6 @@ defmodule Phlegethon.Overrides.Default do
       "success" -> :check_circle
       _ -> :information_circle
     end
-  end
-
-  def flash_style_for_kind(assigns) do
-    assigns[:kind]
-  end
-
-  def flash_show_js(js, selector) do
-    JS.show(js,
-      to: selector,
-      transition:
-        {"transition-all transform ease-out duration-300",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
-         "opacity-100 translate-y-0 sm:scale-100"}
-    )
-  end
-
-  def flash_hide_js(js, selector) do
-    JS.hide(js,
-      to: selector,
-      time: 200,
-      transition:
-        {"transition-all transform ease-in duration-200",
-         "opacity-100 translate-y-0 sm:scale-100",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
-    )
   end
 
   def flash_class(assigns) do
@@ -328,7 +295,6 @@ defmodule Phlegethon.Overrides.Default do
     set :class, "grid gap-1 content-start"
     set :input_class, &__MODULE__.input_class/1
     set :description_class, "text-xs"
-    set :clear_on_escape, true
   end
 
   def input_class(assigns) do
@@ -377,45 +343,6 @@ defmodule Phlegethon.Overrides.Default do
 
   override Core, :modal do
     set :class, "relative z-50 hidden"
-    set :show_js, &__MODULE__.modal_show_js/2
-    set :hide_js, &__MODULE__.modal_hide_js/2
-  end
-
-  def modal_show_js(js, id) do
-    js
-    |> JS.show(to: "##{id}")
-    |> JS.show(
-      to: "##{id}-bg",
-      transition: {"transition-all transform ease-out duration-300", "opacity-0", "opacity-100"}
-    )
-    |> JS.show(
-      to: "##{id}-container",
-      transition:
-        {"transition-all transform ease-out duration-300",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
-         "opacity-100 translate-y-0 sm:scale-100"}
-    )
-    |> JS.add_class("overflow-hidden", to: "body")
-    |> JS.focus_first(to: "##{id}-content")
-  end
-
-  def modal_hide_js(js, id) do
-    js
-    |> JS.hide(
-      to: "##{id}-bg",
-      transition: {"transition-all transform ease-in duration-200", "opacity-100", "opacity-0"}
-    )
-    |> JS.hide(
-      to: "##{id}-container",
-      time: 200,
-      transition:
-        {"transition-all transform ease-in duration-200",
-         "opacity-100 translate-y-0 sm:scale-100",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
-    )
-    |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
-    |> JS.remove_class("overflow-hidden", to: "body")
-    |> JS.pop_focus()
   end
 
   override Core, :table do
@@ -487,11 +414,8 @@ defmodule Phlegethon.Overrides.Default do
   ##############################################################################
 
   override SmartForm, :smart_form do
-    set :action_info, &__MODULE__.smart_form_action_info/1
-    set :autocomplete, "off"
-    set :actions_class, "mt-2 flex items-center justify-between gap-6"
     set :class, &__MODULE__.smart_form_class/1
-    set :phlegethon_form, &__MODULE__.smart_form_phlegethon_form/1
+    set :actions_class, "mt-2 flex items-center justify-between gap-6"
   end
 
   def smart_form_class(assigns) do
@@ -501,18 +425,9 @@ defmodule Phlegethon.Overrides.Default do
     ]
   end
 
-  def smart_form_phlegethon_form(assigns) do
-    UI.form_for(assigns[:resource], assigns[:action])
-  end
-
-  def smart_form_action_info(assigns) do
-    UI.action(assigns[:resource], assigns[:action])
-  end
-
   override SmartForm, :render_field do
     set :field_group_class, &__MODULE__.smart_form_field_group_class/1
     set :field_group_label_class, "font-black col-span-full"
-    set :attribute, &__MODULE__.smart_form_field_attribute/1
   end
 
   def smart_form_field_group_class(assigns) do
@@ -521,13 +436,4 @@ defmodule Phlegethon.Overrides.Default do
       get_by_path(assigns, [:field, :class])
     ]
   end
-
-  def smart_form_field_attribute(%{
-        resource: resource,
-        field: %Phlegethon.Resource.Form.Field{name: name}
-      }) do
-    UI.attribute(resource, name)
-  end
-
-  def smart_form_field_attribute(_assigns), do: nil
 end

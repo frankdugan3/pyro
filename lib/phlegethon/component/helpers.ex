@@ -99,7 +99,9 @@ defmodule Phlegethon.Component.Helpers do
     case String.split(classes) do
       [class] ->
         opts_remove_class = Keyword.update!(opts, :to, fn selector -> "#{selector}.#{class}" end)
-        opts_add_class = Keyword.update!(opts, :to, fn selector -> "#{selector}:not(.#{class})" end)
+
+        opts_add_class =
+          Keyword.update!(opts, :to, fn selector -> "#{selector}:not(.#{class})" end)
 
         js
         |> JS.remove_class(class, opts_remove_class)

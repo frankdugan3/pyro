@@ -21,9 +21,7 @@
 
 defmodule Phlegethon.Component.Declarative do
   @moduledoc false
-  @configured_overrides Application.compile_env(:phlegethon, :overrides, [
-                          Phlegethon.Overrides.Default
-                        ])
+  @configured_overrides Application.compile_env!(:phlegethon, :overrides)
 
   import Phoenix.Component.Declarative,
     only: [__reserved__: 0]

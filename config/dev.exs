@@ -1,6 +1,6 @@
 import Config
 
-config :phlegethon, :overrides, [Phlegethon.Overrides.Testing, Phlegethon.Overrides.Default]
+config :phlegethon, :overrides, [Phlegethon.Overrides.Testing, Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
 config :phlegethon, gettext: ComponentPreviewer.Gettext
 
 config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")
