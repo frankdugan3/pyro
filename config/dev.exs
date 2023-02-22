@@ -7,7 +7,7 @@ config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.c
 
 config :ash, :use_all_identities_in_manage_relationship?, false
 
-config :ash, ash_apis: [ComponentPreviewer.Ash.Ash.Api]
+config :ash, ash_apis: [ComponentPreviewer.Ash.Api]
 
 if Mix.env() == :dev do
   config :ash, :policies, show_policy_breakdowns?: true

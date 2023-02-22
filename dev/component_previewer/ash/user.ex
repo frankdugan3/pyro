@@ -1,4 +1,4 @@
-defmodule ComponentPreviewer.Ash.Ash.User do
+defmodule ComponentPreviewer.Ash.User do
   @moduledoc false
   use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
@@ -77,7 +77,7 @@ defmodule ComponentPreviewer.Ash.Ash.User do
   end
 
   code_interface do
-    define_for ComponentPreviewer.Ash.Ash.Api
+    define_for ComponentPreviewer.Ash.Api
 
     define :list, action: :list
     define :by_id, action: :read, get_by: [:id]

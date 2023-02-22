@@ -2,7 +2,7 @@ defmodule ComponentPreviewer.AboutLive do
   @moduledoc false
   use ComponentPreviewer, :live_view
 
-  alias ComponentPreviewer.Ash.Ash.User
+  alias ComponentPreviewer.Ash.User
 
   @impl true
   def render(assigns) do

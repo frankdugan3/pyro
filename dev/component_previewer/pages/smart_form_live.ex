@@ -2,7 +2,7 @@ defmodule ComponentPreviewer.SmartFormLive do
   @moduledoc false
   use ComponentPreviewer, :live_view
 
-  alias ComponentPreviewer.Ash.Ash.User
+  alias ComponentPreviewer.Ash.User
 
   @impl true
   def render(assigns) do
@@ -66,7 +66,7 @@ defmodule ComponentPreviewer.SmartFormLive do
     do:
       AshPhoenix.Form.for_create(User, :create,
         forms: [auto?: true],
-        api: ComponentPreviewer.Ash.Ash.Api,
+        api: ComponentPreviewer.Ash.Api,
         as: "create_user_form"
       )
 end

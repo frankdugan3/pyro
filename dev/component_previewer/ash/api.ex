@@ -1,8 +1,8 @@
-defmodule ComponentPreviewer.Ash.Ash.Api do
+defmodule ComponentPreviewer.Ash.Api do
   @moduledoc false
   use Ash.Api
 
   resources do
-    registry(ComponentPreviewer.Ash.Ash.Registry)
+    registry(ComponentPreviewer.Ash.Registry)
   end
 end

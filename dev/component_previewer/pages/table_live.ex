@@ -2,7 +2,7 @@ defmodule ComponentPreviewer.TableLive do
   @moduledoc false
   use ComponentPreviewer, :live_view
 
-  alias ComponentPreviewer.Ash.Ash.User
+  alias ComponentPreviewer.Ash.User
 
   @impl true
   def render(assigns) do
@@ -37,11 +37,11 @@ defmodule ComponentPreviewer.TableLive do
     {:ok,
      socket
      |> assign(:page_title, "<.table>")
-     |> stream(:users, ComponentPreviewer.Ash.Ash.User.list!())
+     |> stream(:users, ComponentPreviewer.Ash.User.list!())
     #  TODO: Figure out how to support streams in `keep_live`
     #  |> keep_live(
     #    :users,
-    #    fn _socket, _page_opts -> ComponentPreviewer.Ash.Ash.User.list!() end,
+    #    fn _socket, _page_opts -> ComponentPreviewer.Ash.User.list!() end,
     #    refetch_interval: :timer.minutes(10),
     #    subscribe: ~w[user:created user:updated user:destroyed],
     #    results: :lose
