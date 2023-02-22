@@ -145,7 +145,7 @@ defmodule Phlegethon.Component do
 
   ### Options
 
-  - `:required` - marks an overridable as required. If a caller does not pass the given overridable,
+  - `:required` - marks an overridable as required. If no configured override defines the given overridable,
   a compile warning is issued.
   - `:examples` - a non-exhaustive list of values accepted by the overridable, used for documentation
     purposes.
