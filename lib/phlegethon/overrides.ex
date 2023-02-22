@@ -1,3 +1,8 @@
+# Original file: overrides.ex from AshAuthenticationPhoenix (https://github.com/team-alembic/ash_authentication_phoenix/blob/main/lib/ash_authentication_phoenix/overrides.ex)
+# Modifications: Changed almost everything, but the basic idea is very much the same.
+# Copyright 2023 Frank Dugan III
+# Licensed under the MIT license
+
 defmodule Phlegethon.Overrides do
   @moduledoc """
   The overrides system provides out-of-the-box presets while also enabling deep customization of Phlegethon components.

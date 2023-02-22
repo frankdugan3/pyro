@@ -1,5 +1,8 @@
-# MODIFIED SOURCE FROM https://github.com/phoenixframework/phoenix_live_view/blob/master/lib/phoenix_component/declarative.ex
-# TODO: PROPER CITATION/LICENSE!!
+# Original file: declarative.ex from Phoenix LiveView (https://github.com/phoenixframework/phoenix_live_view/blob/master/lib/phoenix_component/declarative.ex)
+# Modifications: Extended to add the "overridable" prop and "class" type, documentation changes, etc.
+# Copyright 2023 Frank Dugan III
+# Licensed under the MIT license
+
 defmodule Phlegethon.Component.Declarative do
   @moduledoc false
   @configured_overrides Application.compile_env(:phlegethon, :overrides, [

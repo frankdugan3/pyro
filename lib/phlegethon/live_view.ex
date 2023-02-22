@@ -1,5 +1,8 @@
-# MODIFIED SOURCE FROM https://github.com/phoenixframework/phoenix_live_view/blob/master/lib/phoenix_live_view.ex
-# TODO: PROPER CITATION/LICENSE!!
+# Original file: phoenix_live_view.ex from Phoenix LiveView (https://github.com/phoenixframework/phoenix_live_view/blob/master/lib/phoenix_live_view.ex)
+# Modifications: Change references to Phoenix.LiveComponent and Phoenix.Component for compatibility reasons, stripped out everything that could be imported/delegated from original library.
+# Copyright 2023 Frank Dugan III
+# Licensed under the MIT license
+
 defmodule Phlegethon.LiveView do
   @moduledoc ~S'''
   This is basically the same thing as `Phoenix.LiveView`, but imports `Phlegethon.LiveComponent` and `Phlegethon.Component` instead of `Phoenix.LiveComponent` and `Phoenix.Component` for proper validation of Phlegethon's extended features. Otherwise, there would be false warnings about undefined attributes, etc.
