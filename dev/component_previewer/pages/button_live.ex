@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.ButtonLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.button&gt;</.header>
+    <.header>&lt;.button&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#button/1" />
+    </:actions></.header>
 
     <p>
       Buttons also support links via <var>href</var>, <var>navigate</var>

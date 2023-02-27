@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.HeaderLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.header&gt;</.header>
+    <.header>&lt;.header&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#header/1" />
+    </:actions></.header>
 
     <.header>
       Amazing Thing

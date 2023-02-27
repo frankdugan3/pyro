@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.InputLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.input&gt;</.header>
+    <.header>&lt;.input&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#input/1" />
+    </:actions></.header>
     """
   end
 

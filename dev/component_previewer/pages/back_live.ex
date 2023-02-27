@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.BackLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.back&gt;</.header>
+    <.header>&lt;.back&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#back/1" />
+    </:actions></.header>
 
     <.code
       language="heex"

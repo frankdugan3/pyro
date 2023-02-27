@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.FlashLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.flash&gt;</.header>
+    <.header>&lt;.flash&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#flash/1" />
+    </:actions></.header>
 
     <p>You should see flash messages on page mount.</p>
 

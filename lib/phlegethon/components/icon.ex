@@ -57,10 +57,10 @@ defmodule Phlegethon.Components.Icon do
   ## Examples
 
   ```heex
-  <.icon name={:arrow_left}>
+  <.icon name={:arrow_left} />
   ```
   ```heex
-  <.icon name={:arrow_right} kind={:mini} class="block">
+  <.icon name={:arrow_right} kind={:mini} class="block" />
   ```
   """
   @doc type: :component

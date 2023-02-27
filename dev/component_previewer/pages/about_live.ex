@@ -10,7 +10,7 @@ defmodule ComponentPreviewer.AboutLive do
     <.header>About</.header>
 
     <p>
-      The component previewer is mostly for demonstrating the various options for components, and for testing that they work as expected. It is not intended as documentation. The documentation for components is provided via ExDoc.
+      The component previewer is mostly for demonstrating the various options for components, and for testing that they work as expected. It is not intended as documentation. The documentation for components is provided via ExDoc (direct link on each component page).
     </p>
 
     <p>

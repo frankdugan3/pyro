@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.ModalLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.modal&gt;</.header>
+    <.header>&lt;.modal&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#modal/1" />
+    </:actions></.header>
 
     <%!-- <.modal></.modal> --%>
     """

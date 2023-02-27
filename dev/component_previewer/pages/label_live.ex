@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.LabelLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.label&gt;</.header>
+    <.header>&lt;.label&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#label/1" />
+    </:actions></.header>
 
     <.label>Something</.label>
     """

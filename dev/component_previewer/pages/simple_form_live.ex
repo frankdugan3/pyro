@@ -5,7 +5,9 @@ defmodule ComponentPreviewer.SimpleFormLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.simple_form&gt;</.header>
+    <.header>&lt;.simple_form&gt;<:actions>
+    <.doc_url page="Phlegethon.Components.Core.html#simple_form/1" />
+    </:actions></.header>
     """
   end
 

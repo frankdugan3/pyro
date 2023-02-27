@@ -786,8 +786,11 @@ defmodule Phlegethon.Components.Core do
   overridable :action_class, :class, required: true
   attr :id, :string, required: true
   attr :row_click, :any, default: nil
-  attr :rows, :list, required: true
-  attr :row_id, :any, default: nil, doc: "the function for generating the row id"
+  attr :rows, :list, required: true, doc: "supports a list or LiveStream"
+
+  attr :row_id, :any,
+    default: nil,
+    doc: "the function for generating the row id (will automatically extract from a LiveStream)"
 
   attr :row_item, :any,
     default: &Function.identity/1,

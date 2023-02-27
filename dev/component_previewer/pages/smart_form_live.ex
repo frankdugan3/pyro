@@ -7,7 +7,10 @@ defmodule ComponentPreviewer.SmartFormLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.smart_form&gt;</.header>
+    <.header>&lt;.smart_form&gt;
+    <:actions>
+    <.doc_url page="Phlegethon.Components.SmartForm.html#smart_form/1" />
+    </:actions></.header>
 
     <.code
       source="<.smart_form resource={User} action={:create} for={@create_user_form} ... />"

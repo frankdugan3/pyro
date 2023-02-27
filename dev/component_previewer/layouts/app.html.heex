@@ -25,23 +25,36 @@
   </.button>
 </header>
 <hr class="col-span-2" />
-<nav class="grid gap-2 content-start justify-items-center">
+<nav class="grid gap-2 content-start justify-items-center overflow-y-auto">
   <.nav_link uri={~p"/"} label="About" current_uri={@uri} />
+  <h1 class="font-black text-brand-1 text-xl border-b-2 border-brand-1 w-full text-center">
+    Core
+  </h1>
   <.nav_link uri={~p"/alert"} label="<.alert>" current_uri={@uri} />
   <.nav_link uri={~p"/back"} label="<.back>" current_uri={@uri} />
   <.nav_link uri={~p"/button"} label="<.button>" current_uri={@uri} />
-  <.nav_link uri={~p"/code"} label="<.code>" current_uri={@uri} />
-  <.nav_link uri={~p"/flash"} label="<.flash>" current_uri={@uri} />
   <.nav_link uri={~p"/error"} label="<.error>" current_uri={@uri} />
+  <.nav_link uri={~p"/flash"} label="<.flash>" current_uri={@uri} />
   <.nav_link uri={~p"/header"} label="<.header>" current_uri={@uri} />
   <.nav_link uri={~p"/input"} label="<.input>" current_uri={@uri} />
   <.nav_link uri={~p"/label"} label="<.label>" current_uri={@uri} />
   <.nav_link uri={~p"/list"} label="<.list>" current_uri={@uri} />
   <.nav_link uri={~p"/modal"} label="<.modal>" current_uri={@uri} />
-  <.nav_link uri={~p"/progress"} label="<.progress>" current_uri={@uri} />
-  <.nav_link uri={~p"/simple-form"} label="<.simple_form>" current_uri={@uri} />
-  <.nav_link uri={~p"/smart-form"} label="<.smart_form>" current_uri={@uri} />
   <.nav_link uri={~p"/table"} label="<.table>" current_uri={@uri} />
+  <.nav_link uri={~p"/simple-form"} label="<.simple_form>" current_uri={@uri} />
+  <h1 class="font-black text-brand-1 text-xl border-b-2 border-brand-1 w-full text-center">
+    Extra
+  </h1>
+  <.nav_link uri={~p"/code"} label="<.code>" current_uri={@uri} />
+  <.nav_link uri={~p"/progress"} label="<.progress>" current_uri={@uri} />
+  <h1 class="font-black text-brand-1 text-xl border-b-2 border-brand-1 w-full text-center">
+    Icon
+  </h1>
+  <.nav_link uri={~p"/icon"} label="<.icon>" current_uri={@uri} />
+  <h1 class="font-black text-brand-1 text-xl border-b-2 border-brand-1 w-full text-center">
+    Smart
+  </h1>
+  <.nav_link uri={~p"/smart-form"} label="<.smart_form>" current_uri={@uri} />
 </nav>
 <article class="grid gap-2 overflow-auto content-start p-2 pr-4">
   <%= @inner_content %>
