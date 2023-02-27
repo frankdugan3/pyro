@@ -23,6 +23,7 @@ defmodule ComponentPreviewer.Router do
       live("/flash", FlashLive)
       live("/error", ErrorLive)
       live("/header", HeaderLive)
+      live("/icon", IconLive)
       live("/input", InputLive)
       live("/label", LabelLive)
       live("/list", ListLive)
