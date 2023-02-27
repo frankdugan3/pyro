@@ -7,7 +7,8 @@ defmodule ComponentPreviewer.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {Phoenix.PubSub, name: Phlegethon.PubSub},
+      Supervisor.child_spec({Finch, name: ComponentPreviewer.Finch}, id: ComponentPreviewer.Finch),
+      {Phoenix.PubSub, name: ComponentPreviewer.PubSub},
       ComponentPreviewer.Endpoint
     ]
 

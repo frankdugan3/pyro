@@ -11,6 +11,7 @@ defmodule ComponentPreviewer.TableLive do
       &lt;.table&gt;
       <:actions>
         <.button phx-click="generate_user">Generate User</.button>
+        <.doc_url page="Phlegethon.Components.Core.html#table/1" />
       </:actions>
     </.header>
 
@@ -34,18 +35,19 @@ defmodule ComponentPreviewer.TableLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "<.table>")
-     |> stream(:users, ComponentPreviewer.Ash.User.list!())
-    #  TODO: Figure out how to support streams in `keep_live`
-    #  |> keep_live(
-    #    :users,
-    #    fn _socket, _page_opts -> ComponentPreviewer.Ash.User.list!() end,
-    #    refetch_interval: :timer.minutes(10),
-    #    subscribe: ~w[user:created user:updated user:destroyed],
-    #    results: :lose
-    #  )
+    {
+      :ok,
+      socket
+      |> assign(:page_title, "<.table>")
+      |> stream(:users, ComponentPreviewer.Ash.User.list!())
+      #  TODO: Figure out how to support streams in `keep_live`
+      #  |> keep_live(
+      #    :users,
+      #    fn _socket, _page_opts -> ComponentPreviewer.Ash.User.list!() end,
+      #    refetch_interval: :timer.minutes(10),
+      #    subscribe: ~w[user:created user:updated user:destroyed],
+      #    results: :lose
+      #  )
     }
   end
 

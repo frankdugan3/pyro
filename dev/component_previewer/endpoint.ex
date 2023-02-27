@@ -22,7 +22,7 @@ defmodule ComponentPreviewer.Endpoint do
     at: "/",
     from: :phlegethon,
     gzip: false,
-    only: ComponentPreviewer.static_paths()
+    only: ComponentPreviewer.static_paths() ++ ["doc"]
   )
 
   # Code reloading can be explicitly enabled under the

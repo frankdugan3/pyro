@@ -11,7 +11,7 @@ pkill livereload
 trap killbg EXIT
 
 pids=()
-livereload --open-url-delay 0 --wait 2 --target ./doc/get-started.html ./doc &
+livereload --open-url-delay 0 --wait 2 --target ./priv/static/doc/get-started.html ./priv/static/doc &
 pids+=($!)
 
 inotifywait --monitor --recursive --event modify ./lib ./documentation | while read; do

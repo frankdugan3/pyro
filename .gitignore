@@ -31,3 +31,4 @@ phlegethon-*.tar
 /assets/tailwind.phlegethon.colors.json
 /assets/css/phlegethon.css
 /priv/static/assets
+/priv/static/doc

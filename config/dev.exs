@@ -1,6 +1,13 @@
 import Config
 
-config :phlegethon, :overrides, [Phlegethon.Overrides.Testing, Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
+config :phlegethon, :ex_doc_server, "http://127.0.0.1:35729/"
+
+config :phlegethon, :overrides, [
+  Phlegethon.Overrides.Testing,
+  Phlegethon.Overrides.Default,
+  Phlegethon.Overrides.Essential
+]
+
 config :phlegethon, gettext: ComponentPreviewer.Gettext
 
 config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")
@@ -45,7 +52,7 @@ if Mix.env() == :dev do
       formats: [html: ComponentPreviewer.ErrorHTML, json: ComponentPreviewer.ErrorJSON],
       layout: false
     ],
-    pubsub_server: Phlegethon.PubSub,
+    pubsub_server: ComponentPreviewer.PubSub,
     live_view: [signing_salt: "XxQlIkmHahpJHwX1RiwSdvk5MwxiYJfdoOQ+Ui74D6IqCQaCuQCNqFpdUV9liabg"],
     # Binding to loopback ipv4 address prevents access from other machines.
     # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.

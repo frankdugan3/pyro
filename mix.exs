@@ -62,6 +62,7 @@ defmodule Phlegethon.MixProject do
       main: "get-started",
       # Can't use version until we start tagging releases!
       # source_ref: "v#{@version}",
+      output: "priv/static/doc",
       source_url: @source_url,
       extra_section: "GUIDES",
       extras: extras(),
@@ -132,35 +133,36 @@ defmodule Phlegethon.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ash, "~> 2.4"},
       {:ash_phoenix, "~> 1.2"},
+      {:ash, "~> 2.4"},
       {:bandit, ">= 0.6.4"},
       {:credo, ">= 0.0.0", only: [:dev], runtime: false},
-      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
       {:doctor, ">= 0.0.0", only: [:dev], runtime: false},
+      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:ex_check, "~> 0.15",
        [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
       {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},
       {:faker, "~> 0.17", only: [:test, :dev]},
       {:file_system, "~> 0.2.1 or ~> 0.3"},
+      {:finch, "~> 0.14"},
+      {:floki, ">= 0.30.0", only: :test},
       {:git_ops, "~> 2.5.0", only: [:dev]},
       {:heroicons, "~> 0.5"},
-      {:mix_audit, ">= 0.0.0", only: [:dev], runtime: false},
-      {:phoenix_live_view, "~> 0.18.0"},
-      {:floki, ">= 0.30.0", only: :test},
-      {:makeup, "~> 1.1"},
-      {:makeup_elixir, "~> 0.16"},
       {:makeup_eex, "~> 0.1.1"},
+      {:makeup_elixir, "~> 0.16"},
+      {:makeup_html, "~> 0.1.0"},
       {:makeup_js, "~> 0.1.0"},
       {:makeup_json, "~> 0.1.0"},
-      {:makeup_html, "~> 0.1.0"},
-      {:phoenix, "~> 1.7.0-rc.3", override: true},
+      {:makeup, "~> 1.1"},
+      {:mix_audit, ">= 0.0.0", only: [:dev], runtime: false},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:timex, "~> 3.0"},
-      {:tzdata, "~> 1.1.0"},
+      {:phoenix_live_view, "~> 0.18.0"},
+      {:phoenix, "~> 1.7.0-rc.3", override: true},
+      {:tails, github: "zachdaniel/tails", branch: "main"},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
-      {:tails, github: "zachdaniel/tails", branch: "main"}
+      {:timex, "~> 3.0"},
+      {:tzdata, "~> 1.1.0"}
     ]
   end
 
@@ -172,7 +174,8 @@ defmodule Phlegethon.MixProject do
         "esbuild.install --if-missing",
         "tailwind.install --if-missing",
         "compile",
-        "deps.compile tails --force"
+        "deps.compile tails --force",
+        "docs"
       ],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
     ]
