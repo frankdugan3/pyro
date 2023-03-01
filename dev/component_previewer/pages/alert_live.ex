@@ -5,10 +5,12 @@ defmodule ComponentPreviewer.AlertLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.alert&gt;
-    <:actions>
-    <.doc_url page="Phlegethon.Components.Core.html#alert/1" />
-    </:actions></.header>
+    <.header>
+      &lt;.alert&gt;
+      <:actions>
+        <.doc_url page="Phlegethon.Components.Core.html#alert/1" />
+      </:actions>
+    </.header>
 
     <%= for color <- get_prop_value_opts(Phlegethon.Components.Core, :alert, :overridables, :color) do %>
       <.alert_color_examples color={color} />

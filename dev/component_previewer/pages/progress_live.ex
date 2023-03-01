@@ -5,9 +5,11 @@ defmodule ComponentPreviewer.ProgressLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.progress&gt;<:actions>
-    <.doc_url page="Phlegethon.Components.Extra.html#progress/1" />
-    </:actions></.header>
+    <.header>
+      &lt;.progress&gt;<:actions>
+        <.doc_url page="Phlegethon.Components.Extra.html#progress/1" />
+      </:actions>
+    </.header>
 
     <%= for color <- get_prop_value_opts(Phlegethon.Components.Extra, :progress, :overridables, :color) do %>
       <.progress_color_examples color={color} />

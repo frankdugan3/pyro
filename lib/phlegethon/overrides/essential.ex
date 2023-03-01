@@ -11,6 +11,14 @@ defmodule Phlegethon.Overrides.Essential do
   ####    C O R E    C O M P O N E N T S
   ##############################################################################
 
+  override Core, :button do
+    set :outline, false
+    set :shadow, false
+    set :pill, false
+    set :shadow_hover, false
+    set :shadow_focus, false
+  end
+
   override Core, :flash do
     set :autoshow, true
     set :close, true
@@ -94,6 +102,20 @@ defmodule Phlegethon.Overrides.Essential do
   ##############################################################################
   ####    P H L E G E T H O N    C O M P O N E N T S
   ##############################################################################
+
+  override Extra, :tooltip do
+    set :class,
+        "group hover:relative inline-block select-none hover:bg-brand-1 rounded-sm cursor-help"
+
+    set :tooltip_class,
+        "bg-root-2 text-root-fg dark:bg-root-2-dark dark:text-root-fg-dark min-w-[20rem] block shadow p-2 rounded text-sm font-normal whitespace-pre"
+
+    set :tooltip_text_class, "absolute invisible select-none group-hover:visible normal-case"
+    set :icon_kind, :solid
+    set :icon_name, :question_mark_circle
+    set :vertical_offset, "2em"
+    set :horizontal_offset, "0"
+  end
 
   ##############################################################################
   ####    S M A R T    C O M P O N E N T S

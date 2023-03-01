@@ -7,7 +7,7 @@ module.exports = {
   darkMode: 'class',
   content: [
     './js/**/*.js',
-    '../dev/component_previewer/*_web.ex',
+    '../dev/component_previewer/*_web.*ex',
     '../dev/component_previewer/**/*.*ex',
     '../lib/phlegethon/**/*.*ex',
   ],

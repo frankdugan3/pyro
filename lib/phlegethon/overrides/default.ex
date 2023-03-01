@@ -133,11 +133,6 @@ defmodule Phlegethon.Overrides.Default do
     set :color, "primary"
     set :size, "base"
     set :sizes, ~w[xs sm base lg xl]
-    set :outline, false
-    set :shadow, false
-    set :pill, false
-    set :shadow_hover, false
-    set :shadow_focus, false
   end
 
   def button_class(assigns) do
@@ -414,8 +409,8 @@ defmodule Phlegethon.Overrides.Default do
   ##############################################################################
 
   override SmartForm, :smart_form do
-    set :class, &__MODULE__.smart_form_class/1
     set :actions_class, "mt-2 flex items-center justify-between gap-6"
+    set :class, &__MODULE__.smart_form_class/1
   end
 
   def smart_form_class(assigns) do

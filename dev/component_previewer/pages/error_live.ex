@@ -5,9 +5,11 @@ defmodule ComponentPreviewer.ErrorLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.error&gt;<:actions>
-    <.doc_url page="Phlegethon.Components.Core.html#error/1" />
-    </:actions></.header>
+    <.header>
+      &lt;.error&gt;<:actions>
+        <.doc_url page="Phlegethon.Components.Core.html#error/1" />
+      </:actions>
+    </.header>
 
     <.error>Something went wrong!</.error>
     """

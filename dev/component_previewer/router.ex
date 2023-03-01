@@ -29,6 +29,7 @@ defmodule ComponentPreviewer.Router do
       live("/list", ListLive)
       live("/modal", ModalLive)
       live("/progress", ProgressLive)
+      live("/tooltip", TooltipLive)
       live("/simple-form", SimpleFormLive)
       live("/smart-form", SmartFormLive)
       live("/table", TableLive)

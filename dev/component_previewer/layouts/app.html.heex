@@ -1,6 +1,8 @@
 <.flash_group flash={@flash} />
 <header class="grid col-span-2 grid-cols-[auto,1fr,auto,auto,auto] gap-2 items-center">
-  <span class="font-black text-3xl text-brand-1">🔥 Phlegethon Component Previewer </span>
+  <span class="font-black text-3xl text-brand-1">
+    <.icon name={:fire} kind={:solid} class="h-8 w-8" /> Phlegethon Component Previewer
+  </span>
   <div />
   <.button
     type="button"
@@ -40,13 +42,14 @@
   <.nav_link uri={~p"/label"} label="<.label>" current_uri={@uri} />
   <.nav_link uri={~p"/list"} label="<.list>" current_uri={@uri} />
   <.nav_link uri={~p"/modal"} label="<.modal>" current_uri={@uri} />
-  <.nav_link uri={~p"/table"} label="<.table>" current_uri={@uri} />
   <.nav_link uri={~p"/simple-form"} label="<.simple_form>" current_uri={@uri} />
+  <.nav_link uri={~p"/table"} label="<.table>" current_uri={@uri} />
   <h1 class="font-black text-brand-1 text-xl border-b-2 border-brand-1 w-full text-center">
     Extra
   </h1>
   <.nav_link uri={~p"/code"} label="<.code>" current_uri={@uri} />
   <.nav_link uri={~p"/progress"} label="<.progress>" current_uri={@uri} />
+  <.nav_link uri={~p"/tooltip"} label="<.tooltip>" current_uri={@uri} />
   <h1 class="font-black text-brand-1 text-xl border-b-2 border-brand-1 w-full text-center">
     Icon
   </h1>

@@ -114,6 +114,42 @@ export const hooks = {
       clearInterval(this.ttlInterval)
     },
   },
+  PhlegethonNudgeIntoView: {
+    mounted() {
+      nudge(this.el)
+    },
+    updated() {
+      nudge(this.el)
+    },
+  },
+}
+
+function nudge(el) {
+  let width = window.innerWidth
+  let height = window.innerHeight
+  let rect = el.getBoundingClientRect()
+
+  hOffset = el.dataset.horizontalOffset || 0
+  vOffset = el.dataset.verticalOffset || 0
+
+  // Nudge left if offscreen
+  if (rect.right > width) {
+    el.style.right = hOffset
+    el.style.left = null
+  } else {
+    el.style.left = hOffset
+    el.style.right = null
+  }
+
+  // Nudge up if offscreen
+  // NOTE: This will only do anything if it exceeds the scrollbody
+  if (rect.bottom > height) {
+    el.style.bottom = vOffset
+    el.style.top = null
+  } else {
+    el.style.top = vOffset
+    el.style.bottom = null
+  }
 }
 
 function resetHideTTL(self) {

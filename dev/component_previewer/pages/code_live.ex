@@ -5,9 +5,11 @@ defmodule ComponentPreviewer.CodeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.code&gt;<:actions>
-    <.doc_url page="Phlegethon.Components.Extra.html#code/1" />
-    </:actions></.header>
+    <.header>
+      &lt;.code&gt;<:actions>
+        <.doc_url page="Phlegethon.Components.Extra.html#code/1" />
+      </:actions>
+    </.header>
 
     <.code source={File.read!(__MODULE__.__info__(:compile)[:source])} />
     """

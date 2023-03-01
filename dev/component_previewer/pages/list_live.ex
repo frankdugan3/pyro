@@ -5,9 +5,11 @@ defmodule ComponentPreviewer.ListLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <.header>&lt;.list&gt;<:actions>
-    <.doc_url page="Phlegethon.Components.Core.html#list/1" />
-    </:actions></.header>
+    <.header>
+      &lt;.list&gt;<:actions>
+        <.doc_url page="Phlegethon.Components.Core.html#list/1" />
+      </:actions>
+    </.header>
 
     <.list>
       <:item title="Something">a thing</:item>
