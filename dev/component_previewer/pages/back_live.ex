@@ -21,9 +21,9 @@ defmodule ComponentPreviewer.BackLive do
     <.code
       language="heex"
       class="text-sm"
-      source={~s|<.back icon_name={:arrow_left} navigate={~p"/"}>Go back to the about page.</.back>|}
+      source={~s|<.back icon_name="hero-arrow-left-solid" navigate={~p"/"}>Go back to the about page.</.back>|}
     />
-    <.back icon_name={:arrow_left} navigate={~p"/"}>Go back to the about page.</.back>
+    <.back icon_name="hero-arrow-left-solid" navigate={~p"/"}>Go back to the about page.</.back>
     """
   end
 

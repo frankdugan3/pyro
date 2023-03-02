@@ -133,10 +133,7 @@ defmodule Phlegethon.Overrides.Default do
     variant = assigns[:variant]
     shape = assigns[:shape]
     color = assigns[:color]
-    shadow = assigns[:shadow]
     disabled = assigns[:disabled]
-    shadow_hover = assigns[:shadow_hover]
-    shadow_focus = assigns[:shadow_focus]
 
     [
       "font-black",
@@ -196,7 +193,6 @@ defmodule Phlegethon.Overrides.Default do
 
   def button_ping_class(assigns) do
     shape = assigns[:shape]
-    color = assigns[:color]
 
     [
       "block",
@@ -221,8 +217,7 @@ defmodule Phlegethon.Overrides.Default do
 
   override Core, :error do
     set :class, "phx-no-feedback:hidden flex gap-3 text-sm text-red-500"
-    set :icon_name, :exclamation_circle
-    set :icon_kind, :mini
+    set :icon_name, "hero-exclamation-circle-mini"
     set :icon_class, "mt-0.5 h-5 w-5 flex-none fill-red-500"
   end
 
@@ -232,11 +227,10 @@ defmodule Phlegethon.Overrides.Default do
     set :class, &__MODULE__.flash_class/1
     set :close_button_class, "absolute top-2 right-1 p-2"
     set :close_icon_class, "h-5 w-5 stroke-current opacity-40 group-hover:opacity-70"
-    set :close_icon_name, :x_mark
+    set :close_icon_name, "hero-x-mark-mini"
     set :icon_name, &__MODULE__.flash_icon_name/1
     set :kind, "info"
     set :kinds, @flash_kinds
-    set :icon_kind, :mini
     set :message_class, "text-sm whitespace-pre-wrap"
     set :progress_class, "absolute top-1 left-0 w-full h-1"
     set :title, &__MODULE__.flash_title/1
@@ -255,11 +249,11 @@ defmodule Phlegethon.Overrides.Default do
 
   def flash_icon_name(assigns) do
     case assigns[:kind] do
-      "info" -> :information_circle
-      "error" -> :exclamation_circle
-      "warning" -> :exclamation_triangle
-      "success" -> :check_circle
-      _ -> :information_circle
+      "info" -> "hero-information-circle-mini"
+      "error" -> "hero-exclamation-circle-mini"
+      "warning" -> "hero-exclamation-triangle-mini"
+      "success" -> "hero-check-circle-mini"
+      _ -> "hero-information-circle-mini"
     end
   end
 

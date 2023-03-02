@@ -98,7 +98,7 @@ defmodule Phlegethon.Components.Core do
                   class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
                   aria-label={gettext("close")}
                 >
-                  <Heroicons.x_mark solid class="h-5 w-5 stroke-current" />
+                  <.icon name="hero-x-mark-solid" class="h-5 w-5 stroke-current" />
                 </button>
               </div>
               <div id={"#{@id}-content"}>
@@ -157,9 +157,8 @@ defmodule Phlegethon.Components.Core do
   overridable :close, :boolean, required: true, doc: "Whether the flash can be closed"
   overridable :close_button_class, :class, required: true
   overridable :close_icon_class, :class, required: true
-  overridable :close_icon_name, :atom, values: @icon_name_options, required: true
-  overridable :icon_kind, :atom, values: @icon_kind_options, required: true
-  overridable :icon_name, :atom, required: true
+  overridable :close_icon_name, :string, values: @icon_name_options, required: true
+  overridable :icon_name, :string, required: true
 
   overridable :kind, :string,
     values: :kinds,
@@ -208,7 +207,7 @@ defmodule Phlegethon.Components.Core do
         class={@progress_class}
       />
       <p :if={@title} class={@title_class}>
-        <.icon :if={@icon_name} name={@icon_name} kind={@icon_kind} class={@title_icon_class} />
+        <.icon :if={@icon_name} name={@icon_name} class={@title_icon_class} />
         <%= @title %>
       </p>
       <p id={"phx-flash-#{@kind}-message"} class={@message_class}><%= msg %></p>
@@ -269,8 +268,8 @@ defmodule Phlegethon.Components.Core do
           {_key, nil}, acc ->
             acc
 
-          {"icon_name", value}, acc when is_binary(value) ->
-            Keyword.put(acc, :icon_name, String.to_existing_atom(value))
+          {"icon_name", value}, acc ->
+            Keyword.put(acc, :icon_name, value)
 
           {"ttl", value}, acc ->
             Keyword.put(acc, :ttl, value)
@@ -351,11 +350,6 @@ defmodule Phlegethon.Components.Core do
   overridable :ping_class, :class, required: true
   overridable :icon_class, :class
 
-  overridable :icon_kind, :atom,
-    values: @icon_kind_options,
-    required: true,
-    doc: "The kind of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
-
   overridable :color, :string,
     values: :colors,
     required: true,
@@ -385,10 +379,11 @@ defmodule Phlegethon.Components.Core do
     default: nil,
     doc: "Text to display in a confirm dialog before emitting click event"
 
-  attr :icon_name, :atom,
+  attr :icon_name, :string,
     values: [nil | @icon_name_options],
     default: nil,
-    doc: "The name of the icon to display (nil for none); see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
+    doc:
+      "The name of the icon to display (nil for none); see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
 
   attr :disabled, :boolean, default: false
   attr :loading, :boolean, default: false, doc: "Display a loading spinner"
@@ -415,7 +410,7 @@ defmodule Phlegethon.Components.Core do
       {@rest}
     >
       <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
-      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} />
       <%= render_slot(@inner_block) %>
       <%= if @ping do %>
         <span class={@ping_class <> " animate-ping opacity-75"} />
@@ -436,7 +431,7 @@ defmodule Phlegethon.Components.Core do
       {@rest}
     >
       <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
-      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} />
       <%= render_slot(@inner_block) %>
       <%= if @ping do %>
         <span class={@ping_class <> " animate-ping opacity-75"} />
@@ -457,7 +452,7 @@ defmodule Phlegethon.Components.Core do
       {@rest}
     >
       <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
-      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} />
       <%= render_slot(@inner_block) %>
       <%= if @ping do %>
         <span class={@ping_class <> " animate-ping opacity-75"} />
@@ -478,7 +473,7 @@ defmodule Phlegethon.Components.Core do
       {@rest}
     >
       <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
-      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} />
       <%= render_slot(@inner_block) %>
       <%= if @ping do %>
         <span class={@ping_class <> " animate-ping opacity-75"} />
@@ -658,14 +653,13 @@ defmodule Phlegethon.Components.Core do
 
   overridable :class, :class
   overridable :icon_class, :class
-  overridable :icon_name, :atom, values: @icon_name_options, required: true
-  overridable :icon_kind, :atom, values: @icon_kind_options, required: true
+  overridable :icon_name, :string, values: @icon_name_options, required: true
   slot :inner_block, required: true
 
   def error(assigns) do
     ~H"""
     <p class={@class}>
-      <.icon name={@icon_name} kind={@icon_kind} class={@icon_class} />
+      <.icon name={@icon_name} class={@icon_class} />
       <%= render_slot(@inner_block) %>
     </p>
     """
@@ -817,7 +811,7 @@ defmodule Phlegethon.Components.Core do
   ## Examples
 
       <.back navigate={~p"/posts"}>Back to posts</.back>
-      <.back icon_name={:arrow_left} navigate={~p"/"}>
+      <.back icon_name="hero-arrow_left" navigate={~p"/"}>
         Go back to the about page.
       </.back>
   """
@@ -825,12 +819,7 @@ defmodule Phlegethon.Components.Core do
 
   overridable :class, :class
 
-  overridable :icon_kind, :atom,
-    required: true,
-    values: @icon_kind_options,
-    doc: "The kind of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
-
-  overridable :icon_name, :atom,
+  overridable :icon_name, :string,
     required: true,
     values: @icon_name_options,
     doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
@@ -842,7 +831,7 @@ defmodule Phlegethon.Components.Core do
   def back(assigns) do
     ~H"""
     <.link navigate={@navigate} class={@class}>
-      <.icon kind={@icon_kind} name={@icon_name} class={@icon_class} />
+      <.icon name={@icon_name} class={@icon_class} />
       <%= render_slot(@inner_block) %>
     </.link>
     """

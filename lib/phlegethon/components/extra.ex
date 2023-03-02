@@ -189,7 +189,7 @@ defmodule Phlegethon.Components.Extra do
 
       <.tooltip id="tooltip-1" tooltip="A default tooltip!" />
       <.tooltip id="tooltip-2"
-                icon_name={:light_bulb}
+                icon_name="hero-light-bulb-solid"
                 tooltip="Custom icon." />
       <.tooltip id="tooltip-3">
         <:icon>?</:icon>
@@ -205,12 +205,7 @@ defmodule Phlegethon.Components.Extra do
   overridable :horizontal_offset, :string, required: true
   overridable :vertical_offset, :string, required: true
 
-  overridable :icon_kind, :atom,
-    values: @icon_kind_options,
-    required: true,
-    doc: "The kind of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
-
-  overridable :icon_name, :atom,
+  overridable :icon_name, :string,
     values: @icon_name_options,
     required: true,
     doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
@@ -230,7 +225,7 @@ defmodule Phlegethon.Components.Extra do
       <%= if assigns[:icon] !== [] do %>
         <%= render_slot(@icon) %>
       <% else %>
-        <.icon kind={@icon_kind} name={@icon_name} class={@icon_class} />
+        <.icon name={@icon_name} class={@icon_class} />
       <% end %>
       <span
         id={@id <> "-tooltip-text"}

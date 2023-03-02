@@ -21,7 +21,8 @@ defmodule ComponentPreviewer.AboutLive do
         class="whitespace-nowrap"
         size="sm"
       >
-        <.icon name={:code_bracket} /> GitHub <.icon name={:arrow_right_on_rectangle} />
+        <.icon name="hero-code-bracket-solid" /> GitHub
+        <.icon name="hero-arrow-right-on-rectangle-solid" />
       </.button>. Installation/development instructions can be found in the project's README.
     </p>
 

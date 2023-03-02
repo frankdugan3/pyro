@@ -12,8 +12,7 @@ defmodule Phlegethon.Overrides.Essential do
   ##############################################################################
 
   override Core, :back do
-    set :icon_kind, :solid
-    set :icon_name, :chevron_left
+    set :icon_name, "hero-chevron-left-solid"
   end
 
   override Core, :button do
@@ -23,7 +22,6 @@ defmodule Phlegethon.Overrides.Essential do
     set :shapes, ~w[square rounded pill]
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]
-    set :icon_kind, :solid
   end
 
   override Core, :flash do
@@ -127,8 +125,7 @@ defmodule Phlegethon.Overrides.Essential do
         "bg-root-2 text-root-fg dark:bg-root-2-dark dark:text-root-fg-dark min-w-[20rem] block shadow p-2 rounded text-sm font-normal whitespace-pre"
 
     set :tooltip_text_class, "absolute invisible select-none group-hover:visible normal-case"
-    set :icon_kind, :solid
-    set :icon_name, :question_mark_circle
+    set :icon_name, "hero-question-mark-circle-solid"
     set :vertical_offset, "2em"
     set :horizontal_offset, "0"
   end

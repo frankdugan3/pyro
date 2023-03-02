@@ -10,12 +10,12 @@ The installation process is currently pretty involved, and may be omitting some 
 
 This library is for Phoenix LiveView & Ash Framework
 
-- Phoenix v1.7+
+- Phoenix v1.7.1+
 - Tailwind
 
 ### Steps
 
-These steps assume you are adding Phlegethon to an existing Phoenix LiveView app as generated from the `v1.7` `phx.new`.
+These steps assume you are adding Phlegethon to an existing Phoenix LiveView app as generated from the `v1.7.1+` `phx.new`.
 
 1. Until we approach a stable release candidate, there will be no releases on Hex, so install via GitHub:
 

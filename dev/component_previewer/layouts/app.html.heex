@@ -1,7 +1,7 @@
 <.flash_group flash={@flash} />
 <header class="grid col-span-2 grid-cols-[auto,1fr,auto,auto,auto] gap-2 items-center">
   <span class="font-black text-3xl text-brand-1">
-    <.icon name={:fire} kind={:solid} class="h-8 w-8" /> Phlegethon Component Previewer
+    <.icon name="hero-fire-solid" class="h-8 w-8" /> Phlegethon Component Previewer
   </span>
   <div />
   <.button
@@ -9,21 +9,21 @@
     class="whitespace-nowrap"
     phx-click={JS.dispatch("phlegethon:theme-system")}
   >
-    <.icon name={:computer_desktop} kind={:mini} /> System
+    <.icon name="hero-computer-desktop-mini" /> System
   </.button>
   <.button
     type="button"
     class="whitespace-nowrap"
     phx-click={JS.dispatch("phlegethon:theme-dark")}
   >
-    <.icon name={:moon} kind={:mini} /> Dark
+    <.icon name="hero-moon-mini" /> Dark
   </.button>
   <.button
     type="button"
     class="whitespace-nowrap"
     phx-click={JS.dispatch("phlegethon:theme-light")}
   >
-    <.icon name={:sun} kind={:mini} /> Light
+    <.icon name="hero-sun-mini" /> Light
   </.button>
 </header>
 <hr class="col-span-2 border-brand-1" />

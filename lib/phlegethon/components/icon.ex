@@ -4,19 +4,34 @@ defmodule Phlegethon.Components.Icon do
   """
   use Phlegethon.Component
 
-  @icon_kind_options ~w[outline solid mini]a
-  @icon_name_options Heroicons.__info__(:functions)
-                     |> Enum.reduce([], fn
-                       {:__phoenix_component_verify__, _}, acc -> acc
-                       {key, 1}, acc -> [key | acc]
-                       _, acc -> acc
-                     end)
+  @outline ["./priv/hero_icons/optimized/24/outline"]
+           |> Path.join()
+           |> File.ls!()
+           |> Enum.map(fn name ->
+             "hero-" <> Path.basename(name, ".svg")
+           end)
+
+  @solid ["./priv/hero_icons/optimized/24/solid"]
+         |> Path.join()
+         |> File.ls!()
+         |> Enum.map(fn name ->
+           "hero-" <> Path.basename(name, ".svg") <> "-solid"
+         end)
+
+  @mini ["./priv/hero_icons/optimized/20/solid"]
+        |> Path.join()
+        |> File.ls!()
+        |> Enum.map(fn name ->
+          "hero-" <> Path.basename(name, ".svg") <> "-mini"
+        end)
+
+  @icon_name_options Enum.zip([@outline, @solid, @mini])
+                     |> Enum.flat_map(fn {o, s, m} -> [o, s, m] end)
 
   @doc """
   Provides conveniences for authoring components that use icons.
 
   - Imports the `icon/1` component
-  - Defines `@icon_kind_options` (the list of possible icon kinds)
   - Defines `@icon_name_options` (the list of possible icon names)
 
   The options are useful for compile-time validation of attributes that get passed to the icon component, e.g:
@@ -37,7 +52,6 @@ defmodule Phlegethon.Components.Icon do
     quote do
       import Phlegethon.Components.Icon, only: [icon: 1]
 
-      @icon_kind_options unquote(@icon_kind_options)
       @icon_name_options unquote(@icon_name_options)
     end
   end
@@ -67,12 +81,7 @@ defmodule Phlegethon.Components.Icon do
 
   overridable :class, :class, required: true
 
-  overridable :kind, :atom,
-    required: true,
-    values: @icon_kind_options,
-    doc: "The icon kind"
-
-  attr :name, :atom,
+  attr :name, :string,
     required: true,
     values: @icon_name_options,
     doc: "The icon name"
@@ -82,16 +91,8 @@ defmodule Phlegethon.Components.Icon do
     include: ~w(fill stroke stroke-width)
 
   def icon(assigns) do
-    kind = assigns[:kind]
-    class = assigns[:class]
-
-    assigns =
-      assigns
-      |> assign(:rest, Map.put(assigns[:rest], :class, class))
-      |> assign(:outline, kind == :outline)
-      |> assign(:solid, kind == :solid)
-      |> assign(:mini, kind == :mini)
-
-    apply(Heroicons, assigns.name, [assigns])
+    ~H"""
+    <span class={[@name, @class]} />
+    """
   end
 end

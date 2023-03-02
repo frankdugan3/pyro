@@ -13,7 +13,7 @@ defmodule ComponentPreviewer.TooltipLive do
 
     <div>
       <.tooltip id="tooltip-1" tooltip="A default tooltip!" />
-      <.tooltip id="tooltip-2" icon_name={:light_bulb} tooltip="Custom icon." />
+      <.tooltip id="tooltip-2" icon_name="hero-light-bulb-solid" tooltip="Custom icon." />
       <.tooltip id="tooltip-3">
         <:icon>?</:icon>
         <div class="bg-red-500 text-white p-4 w-48 shadow-lg rounded">

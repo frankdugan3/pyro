@@ -54,7 +54,7 @@ defmodule ComponentPreviewer.ButtonLive do
             shape={shape}
             opts={[disabled: true]}
           />
-          <.button_size_examples color={@color} variant={variant} shape={shape} icon_name={:cpu_chip} />
+          <.button_size_examples color={@color} variant={variant} shape={shape} icon_name="hero-cpu-chip-solid" />
         <% end %>
       <% end %>
     </section>
