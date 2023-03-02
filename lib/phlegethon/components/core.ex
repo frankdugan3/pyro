@@ -29,210 +29,116 @@ defmodule Phlegethon.Components.Core do
   """
 
   @doc """
-  A generic alert component.
-  """
-  @doc type: :component
-
-  overridable :color, :string,
-    required: true,
-    values: :colors,
-    doc: "The color of the alert"
-
-  overridable :class, :class
-  attr :rest, :global
-  slot :inner_block, required: true, doc: "The content of the alert"
-
-  def alert(assigns) do
-    ~H"""
-    <div class={@class} {@rest}><%= render_slot(@inner_block) %></div>
-    """
-  end
-
-  @doc """
-  Renders a back navigation link.
+  TODO: This component is not fully converted to use overrides/properly styled.
+  Renders a modal.
 
   ## Examples
 
-      <.back navigate={~p"/posts"}>Back to posts</.back>
-      <.back icon_name={:arrow_left} navigate={~p"/"}>
-        Go back to the about page.
-      </.back>
-  """
-  @doc type: :component
+      <.modal id="confirm-modal">
+        Are you sure?
+        <:confirm>OK</:confirm>
+        <:cancel>Cancel</:cancel>
+      </.modal>
 
-  overridable :class, :class
+  JS commands may be passed to the `:on_cancel` and `on_confirm` attributes
+  for the caller to react to each button press, for example:
 
-  overridable :icon_kind, :atom,
-    required: true,
-    values: @icon_kind_options,
-    doc: "The kind of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
-
-  overridable :icon_name, :atom,
-    required: true,
-    values: @icon_name_options,
-    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
-
-  overridable :icon_class, :class
-  attr :navigate, :any, required: true
-  slot :inner_block, required: true
-
-  def back(assigns) do
-    ~H"""
-    <.link navigate={@navigate} class={@class}>
-      <.icon kind={@icon_kind} name={@icon_name} class={@icon_class} />
-      <%= render_slot(@inner_block) %>
-    </.link>
-    """
-  end
-
-  @doc """
-  Renders a button.
-
-  Supports:
-
-  - Any button type
-  - Any anchor type
-    - LivePatch
-    - LiveRedirect
-    - External href links
-
-  ## Examples
-
-      <.button>Send!</.button>
-      <.button phx-click="go" class="ml-2">Send!</.button>
-      <.button navigate={~p"/home"}>Home</.button>
+      <.modal id="confirm" on_confirm={JS.push("delete")} on_cancel={JS.navigate(~p"/posts")}>
+        Are you sure you?
+        <:confirm>OK</:confirm>
+        <:cancel>Cancel</:cancel>
+      </.modal>
   """
   @doc type: :component
 
   overridable :class, :class, required: true
-
-  overridable :color, :string,
-    values: :colors,
-    required: true,
-    doc: "The color of the button"
-
-  attr :type, :string,
-    default: "button",
-    values: ~w[button reset submit],
-    doc: "Type of the button"
-
-  overridable :outline, :boolean,
-    required: true,
-    doc: "Outline style for button instead of filled"
-
-  overridable :shadow, :boolean,
-    required: true,
-    doc: "Always display a shadow for the button"
-
-  overridable :shadow_hover, :boolean,
-    required: true,
-    doc: "Display a shadow for the button on hover"
-
-  overridable :shadow_focus, :boolean,
-    required: true,
-    doc: "Display a shadow for the button on focus"
-
-  attr :disabled, :boolean, default: false
-
-  overridable :size, :string,
-    required: true,
-    values: :sizes,
-    doc: "The size of the button"
-
-  overridable :pill, :boolean, required: true, doc: "Pill shaped if true"
-
-  attr :confirm, :string,
-    default: nil,
-    doc: "Text to display in a confirm dialog before emitting click event"
-
-  attr :navigate, :string
-  attr :patch, :string
-  attr :href, :any
-  attr :replace, :boolean, default: false
-  attr :method, :string, default: "get"
-  attr :csrf_token, :string, default: nil
-  attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target type]
-  slot :inner_block, required: true, doc: "The content of the button"
-
-  def button(%{href: _href} = assigns) do
-    ~H"""
-    <.link
-      href={@href}
-      replace={@replace}
-      method={@method}
-      csrf_token={@csrf_token}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <%= render_slot(@inner_block) %>
-    </.link>
-    """
-  end
-
-  def button(%{patch: _patch} = assigns) do
-    ~H"""
-    <.link
-      patch={@patch}
-      replace={@replace}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <%= render_slot(@inner_block) %>
-    </.link>
-    """
-  end
-
-  def button(%{navigate: _navigate} = assigns) do
-    ~H"""
-    <.link
-      navigate={@navigate}
-      replace={@replace}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <%= render_slot(@inner_block) %>
-    </.link>
-    """
-  end
-
-  def button(assigns) do
-    ~H"""
-    <button
-      type={@type}
-      disabled={@disabled}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <%= render_slot(@inner_block) %>
-    </button>
-    """
-  end
-
-  @doc """
-  Generates a generic error message.
-  """
-  @doc type: :component
-
-  overridable :class, :any
-  overridable :icon_class, :class
-  overridable :icon_name, :atom, values: @icon_name_options, required: true
-  overridable :icon_kind, :atom, values: @icon_kind_options, required: true
+  overridable :show_js, :any
+  overridable :hide_js, :any
+  attr :id, :string, required: true
+  attr :show, :boolean, default: false
+  attr :on_cancel, JS, default: %JS{}
+  attr :on_confirm, JS, default: %JS{}
   slot :inner_block, required: true
+  slot :title
+  slot :subtitle
+  slot :confirm
+  slot :cancel
 
-  def error(assigns) do
+  def modal(assigns) do
     ~H"""
-    <p class={@class}>
-      <.icon name={@icon_name} kind={@icon_kind} class={@icon_class} />
-      <%= render_slot(@inner_block) %>
-    </p>
+    <div
+      id={@id}
+      phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
+      phx-remove={apply(@hide_js, [%JS{}, @id])}
+      class={@class}
+    >
+      <div id={"#{@id}-bg"} class="fixed inset-0 bg-zinc-50/90 transition-opacity" aria-hidden="true" />
+      <div
+        class="fixed inset-0 overflow-y-auto"
+        aria-labelledby={"#{@id}-title"}
+        aria-describedby={"#{@id}-description"}
+        role="dialog"
+        aria-modal="true"
+        tabindex="0"
+      >
+        <div class="flex min-h-full items-center justify-center">
+          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
+            <.focus_wrap
+              id={"#{@id}-container"}
+              phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
+              phx-window-keydown={apply(@hide_js, [@on_cancel, @id])}
+              phx-key="escape"
+              phx-click-away={apply(@hide_js, [@on_cancel, @id])}
+              class="hidden relative rounded-2xl bg-white p-14 shadow-lg shadow-zinc-700/10 ring-1 ring-zinc-700/10 transition"
+            >
+              <div class="absolute top-6 right-5">
+                <button
+                  phx-click={apply(@hide_js, [@on_cancel, @id])}
+                  type="button"
+                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
+                  aria-label={gettext("close")}
+                >
+                  <Heroicons.x_mark solid class="h-5 w-5 stroke-current" />
+                </button>
+              </div>
+              <div id={"#{@id}-content"}>
+                <header :if={@title != []}>
+                  <h1 id={"#{@id}-title"} class="text-lg font-semibold leading-8 text-zinc-800">
+                    <%= render_slot(@title) %>
+                  </h1>
+                  <p
+                    :if={@subtitle != []}
+                    id={"#{@id}-description"}
+                    class="mt-2 text-sm leading-6 text-zinc-600"
+                  >
+                    <%= render_slot(@subtitle) %>
+                  </p>
+                </header>
+                <%= render_slot(@inner_block) %>
+                <div :if={@confirm != [] or @cancel != []} class="ml-6 mb-4 flex items-center gap-5">
+                  <.button
+                    :for={confirm <- @confirm}
+                    id={"#{@id}-confirm"}
+                    phx-click={@on_confirm}
+                    phx-disable-with
+                    class="py-2 px-3"
+                  >
+                    <%= render_slot(confirm) %>
+                  </.button>
+                  <.link
+                    :for={cancel <- @cancel}
+                    phx-click={apply(@hide_js, [@on_cancel, @id])}
+                    class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+                  >
+                    <%= render_slot(cancel) %>
+                  </.link>
+                </div>
+              </div>
+            </.focus_wrap>
+          </div>
+        </div>
+      </div>
+    </div>
     """
   end
 
@@ -385,33 +291,200 @@ defmodule Phlegethon.Components.Core do
   end
 
   @doc """
-  Renders a header with title and optional subtitle/actions.
+  Renders a simple form.
+
+  ## Examples
+
+      <.simple_form for={@form} phx-change="validate" phx-submit="save">
+        <.input field={@form[:email]} label="Email"/>
+        <.input field={@form[:username]} label="Username" />
+        <:actions>
+          <.button>Save</.button>
+        </:actions>
+      </.simple_form>
   """
   @doc type: :component
 
   overridable :class, :class, required: true
-  overridable :title_class, :class, required: true
-  overridable :subtitle_class, :class, required: true
   overridable :actions_class, :class, required: true
-  slot :inner_block, required: true
-  slot :subtitle
-  slot :actions
+  attr :for, :any, required: true, doc: "The datastructure for the form"
+  attr :as, :any, default: nil, doc: "The server side parameter to collect all input under"
 
-  def header(assigns) do
+  attr :rest, :global,
+    include: ~w(autocomplete name rel action enctype method novalidate target),
+    doc: "The arbitrary HTML attributes to apply to the form tag"
+
+  slot :inner_block, required: true
+  slot :actions, doc: "The slot for form actions, such as a submit button"
+
+  def simple_form(assigns) do
     ~H"""
-    <header class={@class}>
-      <div>
-        <h1 class={@title_class}>
-          <%= render_slot(@inner_block) %>
-        </h1>
-        <p :if={@subtitle != []} class={@subtitle_class}>
-          <%= render_slot(@subtitle) %>
-        </p>
-      </div>
-      <div :if={@actions != []} class={@actions_class}>
-        <%= render_slot(@actions) %>
-      </div>
-    </header>
+    <.form :let={f} for={@for} as={@as} class={@class} {@rest}>
+      <%= render_slot(@inner_block, f) %>
+      <section :for={action <- @actions} class={@actions_class}>
+        <%= render_slot(action, f) %>
+      </section>
+    </.form>
+    """
+  end
+
+  @doc """
+  Renders a button.
+
+  Supports:
+
+  - Any button type
+  - Any anchor type
+    - LivePatch
+    - LiveRedirect
+    - External href links
+
+  ## Examples
+
+      <.button>Send!</.button>
+      <.button phx-click="go" class="ml-2">Send!</.button>
+      <.button navigate={~p"/home"}>Home</.button>
+  """
+  @doc type: :component
+
+  overridable :class, :class, required: true
+  overridable :ping_class, :class, required: true
+  overridable :icon_class, :class
+
+  overridable :icon_kind, :atom,
+    values: @icon_kind_options,
+    required: true,
+    doc: "The kind of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
+
+  overridable :color, :string,
+    values: :colors,
+    required: true,
+    doc: "The color of the button"
+
+  attr :type, :string,
+    default: "button",
+    values: ~w[button reset submit],
+    doc: "Type of the button"
+
+  overridable :variant, :string,
+    values: :variants,
+    required: true,
+    doc: "Style of button"
+
+  overridable :shape, :string,
+    values: :shapes,
+    required: true,
+    doc: "Shape of the button"
+
+  overridable :size, :string,
+    required: true,
+    values: :sizes,
+    doc: "The size of the button"
+
+  attr :confirm, :string,
+    default: nil,
+    doc: "Text to display in a confirm dialog before emitting click event"
+
+  attr :icon_name, :atom,
+    values: [nil | @icon_name_options],
+    default: nil,
+    doc: "The name of the icon to display (nil for none); see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
+
+  attr :disabled, :boolean, default: false
+  attr :loading, :boolean, default: false, doc: "Display a loading spinner"
+  attr :ping, :boolean, default: false, doc: "Show a ping indicator"
+  attr :navigate, :string
+  attr :patch, :string
+  attr :href, :any
+  attr :replace, :boolean, default: false
+  attr :method, :string, default: "get"
+  attr :csrf_token, :string, default: nil
+  attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target type]
+  slot :inner_block, required: true, doc: "The content of the button"
+
+  def button(%{href: _href} = assigns) do
+    ~H"""
+    <.link
+      href={@href}
+      replace={@replace}
+      method={@method}
+      csrf_token={@csrf_token}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_class <> " animate-ping opacity-75"} />
+        <span class={@ping_class} />
+      <% end %>
+    </.link>
+    """
+  end
+
+  def button(%{patch: _patch} = assigns) do
+    ~H"""
+    <.link
+      patch={@patch}
+      replace={@replace}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_class <> " animate-ping opacity-75"} />
+        <span class={@ping_class} />
+      <% end %>
+    </.link>
+    """
+  end
+
+  def button(%{navigate: _navigate} = assigns) do
+    ~H"""
+    <.link
+      navigate={@navigate}
+      replace={@replace}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_class <> " animate-ping opacity-75"} />
+        <span class={@ping_class} />
+      <% end %>
+    </.link>
+    """
+  end
+
+  def button(assigns) do
+    ~H"""
+    <button
+      type={@type}
+      disabled={@disabled}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <Phlegethon.Components.Extra.spinner :if={@loading} size={@size} />
+      <.icon :if={!@loading && @icon_name} name={@icon_name} class={@icon_class} kind={@icon_kind} />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_class <> " animate-ping opacity-75"} />
+        <span class={@ping_class} />
+      <% end %>
+    </button>
     """
   end
 
@@ -435,7 +508,7 @@ defmodule Phlegethon.Components.Core do
   overridable :description_class, :class, required: true, doc: "Class of the field description"
   overridable :clear_on_escape, :boolean, doc: "Clear input value on pressing Escape"
 
-  attr :id, :any
+  attr :id, :any, default: nil
   attr :name, :any
   attr :label, :string, default: nil
   attr :value, :any
@@ -465,7 +538,7 @@ defmodule Phlegethon.Components.Core do
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     assigns
-    |> assign(field: nil, id: assigns[:id] || field.id)
+    |> assign(field: nil, id: assigns.id || field.id)
     |> assign(:errors, Enum.map(field.errors, &translate_error(&1)))
     |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
     |> assign_new(:value, fn -> field.value end)
@@ -477,8 +550,8 @@ defmodule Phlegethon.Components.Core do
       assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", value) end)
 
     ~H"""
-    <div class={@class}>
-      <label phx-feedback-for={@name}>
+    <div class={@class} phx-feedback-for={@name}>
+      <label>
         <input type="hidden" name={@name} value="false" />
         <input
           type="checkbox"
@@ -499,7 +572,7 @@ defmodule Phlegethon.Components.Core do
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div phx-feedback-for={@name} class={@class}>
+    <div class={@class} phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
       <select
         id={@id}
@@ -546,7 +619,7 @@ defmodule Phlegethon.Components.Core do
         type={@type}
         name={@name}
         id={@id || @name}
-        value={@value}
+        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={@input_class}
         phx-keydown={!@clear_on_escape || JS.dispatch("phlegethon:clear")}
         phx-key={!@clear_on_escape || "Escape"}
@@ -579,186 +652,53 @@ defmodule Phlegethon.Components.Core do
   end
 
   @doc """
-  Renders a simple form.
+  Generates a generic error message.
+  """
+  @doc type: :component
 
-  ## Examples
+  overridable :class, :class
+  overridable :icon_class, :class
+  overridable :icon_name, :atom, values: @icon_name_options, required: true
+  overridable :icon_kind, :atom, values: @icon_kind_options, required: true
+  slot :inner_block, required: true
 
-      <.simple_form for={@form} phx-change="validate" phx-submit="save">
-        <.input field={@form[:email]} label="Email"/>
-        <.input field={@form[:username]} label="Username" />
-        <:actions>
-          <.button>Save</.button>
-        </:actions>
-      </.simple_form>
+  def error(assigns) do
+    ~H"""
+    <p class={@class}>
+      <.icon name={@icon_name} kind={@icon_kind} class={@icon_class} />
+      <%= render_slot(@inner_block) %>
+    </p>
+    """
+  end
+
+  @doc """
+  Renders a header with title and optional subtitle/actions.
   """
   @doc type: :component
 
   overridable :class, :class, required: true
+  overridable :title_class, :class, required: true
+  overridable :subtitle_class, :class, required: true
   overridable :actions_class, :class, required: true
-  attr :for, :any, required: true, doc: "The datastructure for the form"
-  attr :as, :any, default: nil, doc: "The server side parameter to collect all input under"
-
-  attr :rest, :global,
-    include: ~w(autocomplete name rel action enctype method novalidate target),
-    doc: "The arbitrary HTML attributes to apply to the form tag"
-
   slot :inner_block, required: true
-  slot :actions, doc: "The slot for form actions, such as a submit button"
-
-  def simple_form(assigns) do
-    ~H"""
-    <.form :let={f} for={@for} as={@as} class={@class} {@rest}>
-      <%= render_slot(@inner_block, f) %>
-      <section :for={action <- @actions} class={@action_class}>
-        <%= render_slot(action, f) %>
-      </section>
-    </.form>
-    """
-  end
-
-  @doc """
-  Renders a description list.
-
-  ## Examples
-
-      <.list>
-        <:item title="Title"><%= @post.title %></:item>
-        <:item title="Views"><%= @post.views %></:item>
-      </.list>
-  """
-  @doc type: :component
-
-  overridable :class, :class, required: true
-  overridable :wrapper_class, :class, required: true
-  overridable :dt_class, :class, required: true
-  overridable :dd_class, :class, required: true
-
-  slot :item, required: true do
-    attr :title, :string, required: true
-  end
-
-  def list(assigns) do
-    ~H"""
-    <dl class={@class}>
-      <div :for={item <- @item} class={@wrapper_class}>
-        <dt class={@dt_class}><%= item.title %></dt>
-        <dd class={@dd_class}><%= render_slot(item) %></dd>
-      </div>
-    </dl>
-    """
-  end
-
-  @doc """
-  TODO: This component is not fully converted to use overrides/properly styled.
-  Renders a modal.
-
-  ## Examples
-
-      <.modal id="confirm-modal">
-        Are you sure?
-        <:confirm>OK</:confirm>
-        <:cancel>Cancel</:cancel>
-      </.modal>
-
-  JS commands may be passed to the `:on_cancel` and `on_confirm` attributes
-  for the caller to react to each button press, for example:
-
-      <.modal id="confirm" on_confirm={JS.push("delete")} on_cancel={JS.navigate(~p"/posts")}>
-        Are you sure you?
-        <:confirm>OK</:confirm>
-        <:cancel>Cancel</:cancel>
-      </.modal>
-  """
-  @doc type: :component
-
-  overridable :class, :class, required: true
-  overridable :show_js, :any
-  overridable :hide_js, :any
-  attr :id, :string, required: true
-  attr :show, :boolean, default: false
-  attr :on_cancel, JS, default: %JS{}
-  attr :on_confirm, JS, default: %JS{}
-  slot :inner_block, required: true
-  slot :title
   slot :subtitle
-  slot :confirm
-  slot :cancel
+  slot :actions
 
-  def modal(assigns) do
+  def header(assigns) do
     ~H"""
-    <div
-      id={@id}
-      phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
-      phx-remove={apply(@hide_js, [%JS{}, @id])}
-      class={@class}
-    >
-      <div id={"#{@id}-bg"} class="fixed inset-0 bg-zinc-50/90 transition-opacity" aria-hidden="true" />
-      <div
-        class="fixed inset-0 overflow-y-auto"
-        aria-labelledby={"#{@id}-title"}
-        aria-describedby={"#{@id}-description"}
-        role="dialog"
-        aria-modal="true"
-        tabindex="0"
-      >
-        <div class="flex min-h-full items-center justify-center">
-          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
-            <.focus_wrap
-              id={"#{@id}-container"}
-              phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
-              phx-window-keydown={apply(@hide_js, [@on_cancel, @id])}
-              phx-key="escape"
-              phx-click-away={apply(@hide_js, [@on_cancel, @id])}
-              class="hidden relative rounded-2xl bg-white p-14 shadow-lg shadow-zinc-700/10 ring-1 ring-zinc-700/10 transition"
-            >
-              <div class="absolute top-6 right-5">
-                <button
-                  phx-click={apply(@hide_js, [@on_cancel, @id])}
-                  type="button"
-                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
-                  aria-label={gettext("close")}
-                >
-                  <Heroicons.x_mark solid class="h-5 w-5 stroke-current" />
-                </button>
-              </div>
-              <div id={"#{@id}-content"}>
-                <header :if={@title != []}>
-                  <h1 id={"#{@id}-title"} class="text-lg font-semibold leading-8 text-zinc-800">
-                    <%= render_slot(@title) %>
-                  </h1>
-                  <p
-                    :if={@subtitle != []}
-                    id={"#{@id}-description"}
-                    class="mt-2 text-sm leading-6 text-zinc-600"
-                  >
-                    <%= render_slot(@subtitle) %>
-                  </p>
-                </header>
-                <%= render_slot(@inner_block) %>
-                <div :if={@confirm != [] or @cancel != []} class="ml-6 mb-4 flex items-center gap-5">
-                  <.button
-                    :for={confirm <- @confirm}
-                    id={"#{@id}-confirm"}
-                    phx-click={@on_confirm}
-                    phx-disable-with
-                    class="py-2 px-3"
-                  >
-                    <%= render_slot(confirm) %>
-                  </.button>
-                  <.link
-                    :for={cancel <- @cancel}
-                    phx-click={apply(@hide_js, [@on_cancel, @id])}
-                    class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
-                  >
-                    <%= render_slot(cancel) %>
-                  </.link>
-                </div>
-              </div>
-            </.focus_wrap>
-          </div>
-        </div>
+    <header class={@class}>
+      <div>
+        <h1 class={@title_class}>
+          <%= render_slot(@inner_block) %>
+        </h1>
+        <p :if={@subtitle != []} class={@subtitle_class}>
+          <%= render_slot(@subtitle) %>
+        </p>
       </div>
-    </div>
+      <div :if={@actions != []} class={@actions_class}>
+        <%= render_slot(@actions) %>
+      </div>
+    </header>
     """
   end
 
@@ -786,11 +726,11 @@ defmodule Phlegethon.Components.Core do
   overridable :action_class, :class, required: true
   attr :id, :string, required: true
   attr :row_click, :any, default: nil
-  attr :rows, :list, required: true, doc: "supports a list or LiveStream"
+  attr :rows, :list, required: true, doc: "Supports a list or LiveStream"
 
   attr :row_id, :any,
     default: nil,
-    doc: "the function for generating the row id (will automatically extract from a LiveStream)"
+    doc: "The function for generating the row id (will automatically extract from a LiveStream)"
 
   attr :row_item, :any,
     default: &Function.identity/1,
@@ -837,6 +777,74 @@ defmodule Phlegethon.Components.Core do
         </tr>
       </tbody>
     </table>
+    """
+  end
+
+  @doc """
+  Renders a description list.
+
+  ## Examples
+
+      <.list>
+        <:item title="Title"><%= @post.title %></:item>
+        <:item title="Views"><%= @post.views %></:item>
+      </.list>
+  """
+  @doc type: :component
+
+  overridable :class, :class, required: true
+  overridable :dt_class, :class, required: true
+  overridable :dd_class, :class, required: true
+
+  slot :item, required: true do
+    attr :title, :string, required: true
+  end
+
+  def list(assigns) do
+    ~H"""
+    <dl class={@class}>
+      <%= for item <- @item do %>
+        <dt class={@dt_class}><%= item.title %></dt>
+        <dd class={@dd_class}><%= render_slot(item) %></dd>
+      <% end %>
+    </dl>
+    """
+  end
+
+  @doc """
+  Renders a back navigation link.
+
+  ## Examples
+
+      <.back navigate={~p"/posts"}>Back to posts</.back>
+      <.back icon_name={:arrow_left} navigate={~p"/"}>
+        Go back to the about page.
+      </.back>
+  """
+  @doc type: :component
+
+  overridable :class, :class
+
+  overridable :icon_kind, :atom,
+    required: true,
+    values: @icon_kind_options,
+    doc: "The kind of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
+
+  overridable :icon_name, :atom,
+    required: true,
+    values: @icon_name_options,
+    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
+
+  overridable :icon_class, :class
+  attr :navigate, :any, required: true
+  slot :inner_block, required: true
+
+  def back(assigns) do
+    ~H"""
+    <.link navigate={@navigate} class={@class}>
+      <.icon kind={@icon_kind} name={@icon_name} class={@icon_class} />
+      <%= render_slot(@inner_block) %>
+    </.link>
     """
   end
 end

@@ -100,39 +100,15 @@ defmodule Phlegethon.Overrides.Ash do
   ####    C O R E    C O M P O N E N T S
   ##############################################################################
 
-  override Core, :alert do
-    set :class, &__MODULE__.alert_class/1
-    set :color, "info"
-    set :colors, ~w[info success warning danger]
-  end
-
-  def alert_class(assigns) do
-    color = assigns[:color]
-
-    [
-      "block",
-      "p-2",
-      "rounded",
-      "bg-sky-200 text-black": color == "info",
-      "bg-green-400 text-black": color == "success",
-      "bg-yellow-400 text-black": color == "warning",
-      "bg-red-400 text-white": color == "danger"
-    ]
-  end
-
   override Core, :back do
     set :class, "text-sm font-semibold hover:text-brand-3"
     set :icon_class, "w-3 h-3 stroke-current align-baseline"
-    set :icon_kind, :solid
-    set :icon_name, :chevron_left
   end
 
   override Core, :button do
     set :class, &__MODULE__.button_class/1
     set :colors, ~w[root primary red yellow green]
     set :color, "primary"
-    set :size, "base"
-    set :sizes, ~w[xs sm base lg xl]
   end
 
   def button_class(assigns) do
@@ -160,17 +136,17 @@ defmodule Phlegethon.Overrides.Ash do
       "active:opacity-50",
       "text-xs": size == "xs",
       "text-sm": size == "sm",
-      "text-base": size == "base",
+      "text-base": size == "md",
       "text-lg": size == "lg",
       "text-xl": size == "xl",
       "rounded-full": pill,
       "rounded-sm": !pill && size == "xs",
-      rounded: !pill && size == "base",
+      rounded: !pill && size == "md",
       rounded: !pill && size == "lg",
       rounded: !pill && size == "xl",
       "rounded-sm": !pill && size == "sm",
       "border border-solid": outline,
-      "border-2": outline && size == "base",
+      "border-2": outline && size == "md",
       "border-2": outline && size == "lg",
       "border-2": outline && size == "xl",
       "shadow-lg": shadow,
@@ -378,8 +354,8 @@ defmodule Phlegethon.Overrides.Ash do
   @progress_colors ~w[info error warning success]
   override Extra, :progress do
     set :class, &__MODULE__.progress_class/1
-    set :size, "base"
-    set :sizes, ~w[xs sm base lg xl]
+    set :size, "md"
+    set :sizes, ~w[xs sm md lg xl]
     set :color, "info"
     set :colors, @progress_colors
   end
@@ -393,7 +369,7 @@ defmodule Phlegethon.Overrides.Ash do
       [
         "h-1": size == "xs",
         "h-2": size == "sm",
-        "h-4": size == "base",
+        "h-4": size == "md",
         "h-6": size == "lg",
         "h-8": size == "xl",
         error: color == "error",

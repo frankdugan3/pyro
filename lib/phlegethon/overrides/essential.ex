@@ -11,12 +11,19 @@ defmodule Phlegethon.Overrides.Essential do
   ####    C O R E    C O M P O N E N T S
   ##############################################################################
 
+  override Core, :back do
+    set :icon_kind, :solid
+    set :icon_name, :chevron_left
+  end
+
   override Core, :button do
-    set :outline, false
-    set :shadow, false
-    set :pill, false
-    set :shadow_hover, false
-    set :shadow_focus, false
+    set :variant, "solid"
+    set :variants, ~w[solid inverted outline]
+    set :shape, "rounded"
+    set :shapes, ~w[square rounded pill]
+    set :size, "md"
+    set :sizes, ~w[xs sm md lg xl]
+    set :icon_kind, :solid
   end
 
   override Core, :flash do
@@ -102,6 +109,11 @@ defmodule Phlegethon.Overrides.Essential do
   ##############################################################################
   ####    P H L E G E T H O N    C O M P O N E N T S
   ##############################################################################
+
+  override Extra, :spinner do
+    set :size, "md"
+    set :sizes, ~w[xs sm md lg xl]
+  end
 
   override Extra, :tooltip do
     set :class,

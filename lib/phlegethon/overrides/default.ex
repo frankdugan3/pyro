@@ -100,47 +100,26 @@ defmodule Phlegethon.Overrides.Default do
   ####    C O R E    C O M P O N E N T S
   ##############################################################################
 
-  override Core, :alert do
-    set :class, &__MODULE__.alert_class/1
-    set :color, "info"
-    set :colors, ~w[info success warning danger]
-  end
-
-  def alert_class(assigns) do
-    color = assigns[:color]
-
-    [
-      "block",
-      "p-2",
-      "rounded",
-      "bg-sky-200 text-black": color == "info",
-      "bg-green-400 text-black": color == "success",
-      "bg-yellow-400 text-black": color == "warning",
-      "bg-red-400 text-white": color == "danger"
-    ]
-  end
-
   override Core, :back do
     set :class, "text-sm font-semibold hover:text-brand-3"
     set :icon_class, "w-3 h-3 stroke-current align-baseline"
-    set :icon_kind, :solid
-    set :icon_name, :chevron_left
   end
 
   override Core, :button do
     set :class, &__MODULE__.button_class/1
-    set :colors, ~w[root primary red yellow green]
+    set :ping_class, &__MODULE__.button_ping_class/1
+    set :icon_class, &__MODULE__.button_icon_class/1
+    set :colors, ~w[root primary info danger warning success]
     set :color, "primary"
-    set :size, "base"
-    set :sizes, ~w[xs sm base lg xl]
   end
 
   def button_class(assigns) do
     size = assigns[:size]
-    pill = assigns[:pill]
+    variant = assigns[:variant]
+    shape = assigns[:shape]
     color = assigns[:color]
-    outline = assigns[:outline]
     shadow = assigns[:shadow]
+    disabled = assigns[:disabled]
     shadow_hover = assigns[:shadow_hover]
     shadow_focus = assigns[:shadow_focus]
 
@@ -156,46 +135,72 @@ defmodule Phlegethon.Overrides.Default do
       "select-none",
       "px-2",
       "whitespace-nowrap",
-      "hover:scale-105",
       "active:opacity-50",
+      "shadow",
+      "relative",
+      "hover:scale-105": !disabled,
       "text-xs": size == "xs",
       "text-sm": size == "sm",
-      "text-base": size == "base",
+      "text-base": size == "md",
       "text-lg": size == "lg",
       "text-xl": size == "xl",
-      "rounded-full": pill,
-      "rounded-sm": !pill && size == "xs",
-      rounded: !pill && size == "base",
-      rounded: !pill && size == "lg",
-      rounded: !pill && size == "xl",
-      "rounded-sm": !pill && size == "sm",
-      "border border-solid": outline,
-      "border-2": outline && size == "base",
-      "border-2": outline && size == "lg",
-      "border-2": outline && size == "xl",
-      "shadow-lg": shadow,
-      "hover:shadow-lg": shadow_hover,
-      "focus:shadow-lg": shadow_focus,
-      "shadow-root dark:shadow-root-fg-dark":
-        (shadow || shadow_hover || shadow_focus) && color == "root",
-      "shadow-brand-1 dark:shadow-brand-3":
-        (shadow || shadow_hover || shadow_focus) && color == "primary",
-      "shadow-red-400": (shadow || shadow_hover || shadow_focus) && color == "red",
-      "shadow-yellow-400": (shadow || shadow_hover || shadow_focus) && color == "yellow",
-      "shadow-green-400": (shadow || shadow_hover || shadow_focus) && color == "green",
-      "bg-brand-1 dark:bg-brand-3": color == "primary" && !outline,
-      "text-brand-1 dark:text-brand-3 border-brand-1 dark:border-brand-3":
-        color == "primary" && outline,
-      "bg-root-fg dark:bg-root-fg-dark text-root dark:text-root-dark":
-        color == "root" && !outline,
-      "text-root-fg dark:text-root-fg-dark border-root-fg dark:border-root-fg-dark":
-        color == "root" && outline,
-      "bg-red-500 text-white": color == "red" && !outline,
-      "text-red-500 border-red-500": color == "red" && outline,
-      "bg-green-500 text-white": color == "green" && !outline,
-      "text-green-500 border-green-500": color == "green" && outline,
-      "bg-yellow-400 text-black": color == "yellow" && !outline,
-      "text-yellow-400 border-yellow-400": color == "yellow" && outline
+      rounded: shape == "rounded",
+      "rounded-full": shape == "pill",
+      "border border-solid": variant in ["outline", "inverted"],
+      "border-2": variant in ["outline", "inverted"] && size == "md",
+      "border-2": variant in ["outline", "inverted"] && size == "lg",
+      "border-2": variant in ["outline", "inverted"] && size == "xl",
+      "bg-root-fg text-root dark:bg-root-fg-dark dark:text-root-dark":
+        color == "root" && variant == "solid",
+      "bg-sky-500 text-white": color == "primary" && variant == "solid",
+      "bg-gray-500 text-white": color == "info" && variant == "solid",
+      "bg-red-500 text-white": color == "danger" && variant == "solid",
+      "bg-yellow-500 text-black": color == "warning" && variant == "solid",
+      "bg-green-500 text-black": color == "success" && variant == "solid",
+      "border-root-fg text-root-fg dark:border-root-fg-dark dark:text-root-fg-dark hover:bg-root-fg hover:text-root dark:hover:bg-root-fg-dark dark:hover:text-root-dark":
+        color == "root" && variant == "inverted",
+      "border-sky-500 text-sky-500 bg-white hover:bg-sky-500 hover:text-white":
+        color == "primary" && variant == "inverted",
+      "border-gray-500 text-gray-500 bg-white hover:bg-gray-500 hover:text-white":
+        color == "info" && variant == "inverted",
+      "border-red-500 text-red-500 bg-white hover:bg-red-500 hover:text-white":
+        color == "danger" && variant == "inverted",
+      "border-yellow-500 text-yellow-500 bg-black hover:bg-yellow-500 hover:text-black":
+        color == "warning" && variant == "inverted",
+      "border-green-500 text-green-500 bg-black hover:bg-green-500 hover:text-black":
+        color == "success" && variant == "inverted",
+      "border-root-fg text-root-fg dark:border-root-fg-dark dark:text-root-fg-dark":
+        color == "root" && variant == "outline",
+      "border-sky-500 text-sky-500": color == "primary" && variant == "outline",
+      "border-gray-500 text-gray-500": color == "info" && variant == "outline",
+      "border-red-500 text-red-500": color == "danger" && variant == "outline",
+      "border-yellow-500 text-yellow-500": color == "warning" && variant == "outline",
+      "border-green-500 text-green-500": color == "success" && variant == "outline"
+    ]
+  end
+
+  def button_ping_class(assigns) do
+    shape = assigns[:shape]
+    color = assigns[:color]
+
+    [
+      "block",
+      "absolute",
+      "rounded-full",
+      "w-3",
+      "h-3",
+      "bg-red-400",
+      "-top-1.5 -right-1.5": shape != "pill",
+      "-top-1 -right-1": shape == "pill"
+    ]
+  end
+
+  def button_icon_class(assigns) do
+    size = assigns[:size]
+
+    [
+      "h-5 w-5": size in ["md", "lg"],
+      "h-6 w-6": size == "xl"
     ]
   end
 
@@ -250,7 +255,6 @@ defmodule Phlegethon.Overrides.Default do
 
     [
       "hidden w-80 sm:w-96 rounded p-3 shadow-md shadow-zinc-900/5 group relative z-10",
-      [
         "cursor-pointer": close,
         "bg-red-500 text-white": kind == "error" || style_for_kind == "error",
         "bg-yellow-500 text-black": kind == "warning" || style_for_kind == "warning",
@@ -258,7 +262,6 @@ defmodule Phlegethon.Overrides.Default do
         "bg-root text-root-fg dark:bg-root-dark dark:text-root-fg-dark ring-1 ring-root-fg dark:ring-root-fg-dark":
           kind == "info" || style_for_kind == "info" ||
             (style_for_kind not in @flash_kinds and kind not in @flash_kinds)
-      ]
     ]
   end
 
@@ -283,7 +286,7 @@ defmodule Phlegethon.Overrides.Default do
   def header_title_class(assigns) do
     actions = assigns[:actions]
 
-    ["leading-normal font-bold text-5xl text-brand-2", ["text-center": actions == []]]
+    ["leading-normal font-bold text-5xl text-brand-2", "text-center": actions == []]
   end
 
   override Core, :input do
@@ -310,13 +313,10 @@ defmodule Phlegethon.Overrides.Default do
       "focus:ring-4",
       "bg-root dark:bg-root-dark",
       "text-root-fg dark:text-root-fg-dark",
-      [
         "border-root-fg dark:border-root-fg-dark": !errors?,
         "border-red-500 focus:border-red-500 focus:ring-red-500": errors?,
         "focus:ring-brand-1": !errors?,
-        # "": type == "text",
         "min-h-[6rem]": type == "textarea"
-      ]
     ]
   end
 
@@ -330,10 +330,9 @@ defmodule Phlegethon.Overrides.Default do
   end
 
   override Core, :list do
-    set :class, "-my-4 divide-y divide-zinc-100"
-    set :wrapper_class, "flex gap-4 py-4 sm:gap-8"
-    set :dt_class, "w-1/4 flex-none text-[0.8125rem] leading-6 text-zinc-500"
-    set :dd_class, "text-sm leading-6 text-zinc-700"
+    set :class, "grid grid-cols-[auto,1fr] gap-2"
+    set :dt_class, "font-black leading-6"
+    set :dd_class, ""
   end
 
   override Core, :modal do
@@ -358,7 +357,7 @@ defmodule Phlegethon.Overrides.Default do
 
   def table_td_class(assigns) do
     row_click = assigns[:row_click]
-    ["p-0", ["hover:cursor-pointer": row_click]]
+    ["p-0", "hover:cursor-pointer": row_click]
   end
 
   ##############################################################################
@@ -378,8 +377,8 @@ defmodule Phlegethon.Overrides.Default do
   @progress_colors ~w[info error warning success]
   override Extra, :progress do
     set :class, &__MODULE__.progress_class/1
-    set :size, "base"
-    set :sizes, ~w[xs sm base lg xl]
+    set :size, "md"
+    set :sizes, ~w[xs sm md lg xl]
     set :color, "info"
     set :colors, @progress_colors
   end
@@ -390,10 +389,9 @@ defmodule Phlegethon.Overrides.Default do
 
     [
       "progress",
-      [
         "h-1": size == "xs",
         "h-2": size == "sm",
-        "h-4": size == "base",
+      "h-4": size == "md",
         "h-6": size == "lg",
         "h-8": size == "xl",
         error: color == "error",
@@ -401,6 +399,26 @@ defmodule Phlegethon.Overrides.Default do
         success: color == "success",
         info: color == "info" || color not in @progress_colors
       ]
+  end
+
+  override Extra, :spinner do
+    set :class, &__MODULE__.spinner_class/1
+  end
+
+  def spinner_class(assigns) do
+    size = assigns[:size]
+    show = assigns[:show]
+
+    [
+      "animate-spin",
+      "inline-block",
+      "align-baseline",
+      hidden: !show,
+      "h-2 w-2": size == "xs",
+      "h-3 w-3": size == "sm",
+      "h-3 w-3": size == "md",
+      "h-3 w-3": size == "lg",
+      "h-4 w-4": size == "xl"
     ]
   end
 

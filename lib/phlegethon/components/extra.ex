@@ -67,6 +67,34 @@ defmodule Phlegethon.Components.Extra do
   end
 
   @doc """
+  A simple spinner component.
+  """
+  @doc type: :component
+
+  overridable :class, :class, required: true
+
+  overridable :size, :string,
+    required: true,
+    values: :sizes,
+    doc: "The size of the spinner"
+
+  attr :show, :boolean, default: true, doc: "Show or hide spinner"
+  attr :rest, :global
+
+  def spinner(assigns) do
+    ~H"""
+    <svg {@rest} class={@class} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+    """
+  end
+
+  @doc """
   A tooltip component.
 
   - JS hook that "nudges" tooltip into view
@@ -92,8 +120,16 @@ defmodule Phlegethon.Components.Extra do
   overridable :icon_class, :class
   overridable :horizontal_offset, :string, required: true
   overridable :vertical_offset, :string, required: true
-  overridable :icon_kind, :atom, values: @icon_kind_options, required: true
-  overridable :icon_name, :atom, values: @icon_name_options, required: true
+
+  overridable :icon_kind, :atom,
+    values: @icon_kind_options,
+    required: true,
+    doc: "The kind of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
+
+  overridable :icon_name, :atom,
+    values: @icon_name_options,
+    required: true,
+    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
 
   attr :id, :string, required: true
   attr :tooltip, :string, default: nil

@@ -16,7 +16,6 @@ defmodule ComponentPreviewer.Router do
 
     live_session :page, on_mount: ComponentPreviewer.Hooks.Page do
       live("/", AboutLive)
-      live("/alert", AlertLive)
       live("/back", BackLive)
       live("/button", ButtonLive)
       live("/code", CodeLive)
@@ -29,6 +28,7 @@ defmodule ComponentPreviewer.Router do
       live("/list", ListLive)
       live("/modal", ModalLive)
       live("/progress", ProgressLive)
+      live("/spinner", SpinnerLive)
       live("/tooltip", TooltipLive)
       live("/simple-form", SimpleFormLive)
       live("/smart-form", SmartFormLive)
