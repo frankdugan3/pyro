@@ -384,6 +384,11 @@ defmodule Phlegethon.Overrides.Default do
     set :kind, :solid
   end
 
+  override Extra, :a do
+    set :class,
+        "font-black border-b-2 text-sky-500 border-sky-500 border-dotted hover:opacity-75 active:opacity-75"
+  end
+
   override Extra, :code do
     set :class,
         "makeup whitespace-pre-wrap p-4 rounded bg-root-2 dark:bg-root-2-dark shadow"

@@ -110,6 +110,10 @@ defmodule Phlegethon.Overrides.Essential do
   ####    P H L E G E T H O N    C O M P O N E N T S
   ##############################################################################
 
+  override Extra, :a do
+    set :replace, false
+  end
+
   override Extra, :spinner do
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]

@@ -3,6 +3,90 @@ defmodule Phlegethon.Components.Extra do
 
   use Phlegethon.Components.Icon
 
+  @doc """
+  Renders a link. This basically wraps `Phoenix.Component.link/1` with some overridable attributes, in particular `class` for consistent, DRY link default styling.
+  """
+  @doc type: :component
+
+  overridable :class, :class,
+    required: true,
+    doc: "Merge/override default classes of the `code` element"
+
+  overridable :replace, :boolean,
+    required: true,
+    doc: """
+    When using `:patch` or `:navigate`,
+    should the browser's history be replaced with `pushState`?
+    """
+
+  attr :navigate, :string,
+    default: nil,
+    doc: """
+    Navigates from a LiveView to a new LiveView.
+    The browser page is kept, but a new LiveView process is mounted and its content on the page
+    is reloaded. It is only possible to navigate between LiveViews declared under the same router
+    `Phoenix.LiveView.Router.live_session/3`. Otherwise, a full browser redirect is used.
+    """
+
+  attr :patch, :string,
+    default: nil,
+    doc: """
+    Patches the current LiveView.
+    The `handle_params` callback of the current LiveView will be invoked and the minimum content
+    will be sent over the wire, as any other LiveView diff.
+    """
+
+  attr :href, :any,
+    default: nil,
+    doc: """
+    Uses traditional browser navigation to the new location.
+    This means the whole page is reloaded on the browser.
+    """
+
+  attr :method, :string,
+    default: "get",
+    doc: """
+    The HTTP method to use with the link. This is intended for usage outside of LiveView
+    and therefore only works with the `href={...}` attribute. It has no effect on `patch`
+    and `navigate` instructions.
+    In case the method is not `get`, the link is generated inside the form which sets the proper
+    information. In order to submit the form, JavaScript must be enabled in the browser.
+    """
+
+  attr :csrf_token, :any,
+    default: true,
+    doc: """
+    A boolean or custom token to use for links with an HTTP method other than `get`.
+    """
+
+  attr :rest, :global,
+    doc: """
+    Additional HTML attributes added to the `a` tag.
+    """
+
+  slot :inner_block,
+    required: true,
+    doc: """
+    The content rendered inside of the `a` tag.
+    """
+
+  def a(assigns) do
+    ~H"""
+    <.link
+      class={@class}
+      navigate={@navigate}
+      patch={@patch}
+      href={@href}
+      replace={@replace}
+      method={@method}
+      csrf_token={@csrf_token}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </.link>
+    """
+  end
+
   @moduledoc """
   Original components provided by Phlegethon.
   """
