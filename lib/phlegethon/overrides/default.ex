@@ -54,44 +54,59 @@ defmodule Phlegethon.Overrides.Default do
     }
 
     @layer component {
-      .progress {
-        @apply appearance-none rounded;
-      }
+      .progress,
       .progress::-webkit-progress-value {
-        @apply rounded;
+        @apply appearance-none rounded bg-root dark:bg-root-dark rounded;
       }
+      .progress.error,
       .progress.error::-webkit-progress-bar {
         @apply bg-red-600;
       }
       .progress.error::-webkit-progress-value {
         @apply bg-red-400;
       }
+      .progress.warning,
       .progress.warning::-webkit-progress-bar {
         @apply bg-yellow-600;
       }
       .progress.warning::-webkit-progress-value {
         @apply bg-yellow-400;
       }
+      .progress.success,
       .progress.success::-webkit-progress-bar {
         @apply bg-green-600;
       }
       .progress.success::-webkit-progress-value {
         @apply bg-green-400;
       }
+      .progress.info,
       .progress.info::-webkit-progress-bar {
         @apply bg-root;
       }
       .progress.info::-webkit-progress-value {
         @apply bg-root-fg;
       }
+      .dark .progress.info,
       .dark .progress.info::-webkit-progress-bar {
         @apply bg-root-dark;
       }
       .dark .progress.info::-webkit-progress-value {
         @apply bg-root-fg-dark;
       }
-      .progress::-moz-progress-bar {
-        /* TODO: style rules for FF */
+      .progress.error::-moz-progress-bar {
+        @apply rounded bg-red-400;
+      }
+      .progress.warning::-moz-progress-bar {
+        @apply rounded bg-yellow-400;
+      }
+      .progress.success::-moz-progress-bar {
+        @apply rounded bg-green-400;
+      }
+      .progress.info::-moz-progress-bar {
+        @apply rounded bg-root-fg;
+      }
+      .dark .progress.info::-moz-progress-bar {
+        @apply rounded bg-root-fg-dark;
       }
     }
     """
