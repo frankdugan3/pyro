@@ -228,8 +228,8 @@ defmodule Phlegethon.Components.Extra do
         <.icon name={@icon_name} class={@icon_class} />
       <% end %>
       <span
-        id={@id <> "-tooltip-text"}
-        class={@tooltip_text_class}
+        id={@id <> "-tooltip"}
+        class={@tooltip_class}
         data-vertical-offset={@vertical_offset}
         data-horizontal-offset={@horizontal_offset}
         phx-hook="PhlegethonNudgeIntoView"
@@ -237,7 +237,7 @@ defmodule Phlegethon.Components.Extra do
         <%= if assigns[:inner_block] !== [] do %>
           <%= render_slot(@inner_block) %>
         <% else %>
-          <span class={@tooltip_class} phx-no-format><%= @tooltip %></span>
+          <span class={@tooltip_text_class} phx-no-format><%= @tooltip %></span>
         <% end %>
       </span>
     </span>
