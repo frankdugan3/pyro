@@ -121,10 +121,10 @@ defmodule Phlegethon.Overrides.Essential do
     set :class,
         "group hover:relative inline-block select-none hover:bg-brand-1 rounded-sm cursor-help"
 
-    set :tooltip_class,
-        "bg-root-2 text-root-fg dark:bg-root-2-dark dark:text-root-fg-dark min-w-[20rem] block shadow p-2 rounded text-sm font-normal whitespace-pre"
+    set :tooltip_class, "absolute invisible select-none group-hover:visible normal-case block shadow z-10"
+    set :tooltip_text_class,
+        "bg-root-2 text-root-fg dark:bg-root-2-dark dark:text-root-fg-dark min-w-[20rem] p-2 rounded text-sm font-normal whitespace-pre"
 
-    set :tooltip_text_class, "absolute invisible select-none group-hover:visible normal-case"
     set :icon_name, "hero-question-mark-circle-solid"
     set :vertical_offset, "2em"
     set :horizontal_offset, "0"
