@@ -21,7 +21,13 @@
 
 defmodule Phlegethon.Component.Declarative do
   @moduledoc false
+
   @configured_overrides Application.compile_env!(:phlegethon, :overrides)
+
+  # TODO: This is a bit of a hack to ensure recompilation. This may not work for custom overrides outside the lib, and it may take some substantial refactoring to make the UX for custom overrides pleasant.
+  for override <- @configured_overrides do
+    Kernel.LexicalTracker.remote_dispatch(__ENV__.lexical_tracker, override, :compile)
+  end
 
   import Phoenix.Component.Declarative,
     only: [__reserved__: 0]
