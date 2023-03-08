@@ -18,6 +18,8 @@ defmodule ComponentPreviewer.TableLive do
     <.table id="table-live-demo" rows={@streams.users}>
       <:col :let={{_id, user}} label="Name"><%= user.name %></:col>
       <:col :let={{_id, user}} label="Email"><%= user.email %></:col>
+      <:col :let={{_id, user}} label="Role"><%= user.role %></:col>
+      <:col :let={{_id, user}} label="Active"><%= user.active %></:col>
       <:col :let={{_id, user}} label="Notes"><%= user.notes %></:col>
       <:action :let={{_id, user}}>
         <.button

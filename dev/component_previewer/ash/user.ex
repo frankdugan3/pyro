@@ -25,6 +25,19 @@ defmodule ComponentPreviewer.Ash.User do
           field :email
         end
 
+        field_group :authorization do
+          label "Authorization"
+          class "md:grid-cols-2"
+
+          field :role do
+            label "Role"
+          end
+
+          field :active do
+            label "Active"
+          end
+        end
+
         field :notes do
           type :long_text
           input_class "min-h-[10rem]"
@@ -55,6 +68,13 @@ defmodule ComponentPreviewer.Ash.User do
         max_length: 160,
         match: ~r/^[\w.!#$%&’*+\-\/=?\^`{|}~]+@[A-Z0-9-]+(\.[A-Z0-9-]+)*$/i
       ]
+
+    attribute :active, :boolean, allow_nil?: false, default: true
+
+    attribute :role, :atom,
+      allow_nil?: false,
+      constraints: [one_of: ~w[reader author editor admin]a],
+      default: :reader
 
     attribute :notes, :string, description: "Note anything unusual about yourself"
   end
