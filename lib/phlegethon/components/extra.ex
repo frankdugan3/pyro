@@ -1,7 +1,9 @@
 defmodule Phlegethon.Components.Extra do
   use Phlegethon.Component
 
-  use Phlegethon.Components.Icon
+  @moduledoc """
+  Original components provided by Phlegethon.
+  """
 
   @doc """
   Renders a link. This basically wraps `Phoenix.Component.link/1` with some overridable attributes, in particular `class` for consistent, DRY link default styling.
@@ -87,12 +89,6 @@ defmodule Phlegethon.Components.Extra do
     """
   end
 
-  @moduledoc """
-  Original components provided by Phlegethon.
-  """
-
-  # import Phlegethon.Component.Core, only: [flash: 1]
-
   @doc """
   Renders a code block.
   """
@@ -121,6 +117,28 @@ defmodule Phlegethon.Components.Extra do
       lexer -> Makeup.highlight_inner_html(source, lexer: lexer)
     end
     |> Phoenix.HTML.raw()
+  end
+
+  @doc """
+  Renders a navigation link, taking into account whether the URI is the current page.
+  """
+  @doc type: :component
+
+  overridable :class, :class, required: true, doc: "The class of the navigation link"
+  overridable :is_current, :boolean, required: true, doc: "Does `:uri` match `:current_uri`?"
+  attr :label, :string, required: true, doc: "The label of of the link"
+  attr :uri, :string, required: true, doc: "The URI of the link"
+  attr :current_uri, :string, required: true, doc: "The current URI of the page"
+
+  def nav_link(assigns) do
+    ~H"""
+    <.link :if={!@is_current} class={@class} navigate={@uri}>
+      <%= @label %>
+    </.link>
+    <span :if={@is_current} class={@class}>
+      <%= @label %>
+    </span>
+    """
   end
 
   @doc """
@@ -206,9 +224,8 @@ defmodule Phlegethon.Components.Extra do
   overridable :vertical_offset, :string, required: true
 
   overridable :icon_name, :string,
-    values: @icon_name_options,
     required: true,
-    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Icon.icon/1`) for details"
+    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
 
   attr :id, :string, required: true
   attr :tooltip, :string, default: nil
@@ -225,7 +242,7 @@ defmodule Phlegethon.Components.Extra do
       <%= if assigns[:icon] !== [] do %>
         <%= render_slot(@icon) %>
       <% else %>
-        <.icon name={@icon_name} class={@icon_class} />
+        <Phlegethon.Components.Core.icon name={@icon_name} class={@icon_class} />
       <% end %>
       <span
         id={@id <> "-tooltip"}

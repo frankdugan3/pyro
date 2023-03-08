@@ -165,7 +165,7 @@ function resetHideTTL(self) {
           self.el.getAttribute('data-hide-exec-js'),
         )
       } else {
-        el = document.querySelector(`#${self.el.id}>progress`)
+        el = document.querySelector(`#${self.el.id}>section>progress`)
         if (el) {
           el.value = self.countdown
         } else {

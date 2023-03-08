@@ -19,22 +19,18 @@ defmodule Phlegethon.Overrides.Essential do
     set :variant, "solid"
     set :variants, ~w[solid inverted outline]
     set :shape, "rounded"
-    set :shapes, ~w[square rounded pill]
+    set :shapes, ~w[rounded square pill]
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]
+    set :case, "uppercase"
   end
 
   override Core, :flash do
     set :autoshow, true
     set :close, true
     set :ttl, 10_000
-    set :style_for_kind, &__MODULE__.flash_style_for_kind/1
     set :show_js, &__MODULE__.flash_show_js/2
     set :hide_js, &__MODULE__.flash_hide_js/2
-  end
-
-  def flash_style_for_kind(assigns) do
-    assigns[:kind]
   end
 
   def flash_show_js(js, selector) do
@@ -112,21 +108,24 @@ defmodule Phlegethon.Overrides.Essential do
     set :replace, false
   end
 
+  override Extra, :nav_link do
+    set :is_current, &__MODULE__.nav_link_is_current/1
+  end
+
+  def nav_link_is_current(assigns) do
+    %{path: current_path} = URI.parse(assigns[:current_uri])
+    %{path: path} = URI.parse(assigns[:uri])
+    current_path == path
+  end
+
   override Extra, :spinner do
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]
   end
 
   override Extra, :tooltip do
-    set :class,
-        "group hover:relative inline-block select-none hover:bg-brand-1 rounded-sm cursor-help"
-
-    set :tooltip_class, "absolute invisible select-none group-hover:visible normal-case block shadow z-10"
-    set :tooltip_text_class,
-        "bg-root-2 text-root-fg dark:bg-root-2-dark dark:text-root-fg-dark min-w-[20rem] p-2 rounded text-sm font-normal whitespace-pre"
-
     set :icon_name, "hero-question-mark-circle-solid"
-    set :vertical_offset, "2em"
+    set :vertical_offset, "2.25rem"
     set :horizontal_offset, "0"
   end
 

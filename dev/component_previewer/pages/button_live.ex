@@ -21,6 +21,14 @@ defmodule ComponentPreviewer.ButtonLive do
       Otherwise, it renders an HTML <var>button</var> with some added niceties.
     </p>
 
+    <ul class="flex gap-2">
+      <%= for color <- get_prop_value_opts(Phlegethon.Components.Core, :button, :overridables, :color) do %>
+        <li>
+          <.a href={"#color-#{color}"}><%= color %></.a>
+        </li>
+      <% end %>
+    </ul>
+
     <%= for color <- get_prop_value_opts(Phlegethon.Components.Core, :button, :overridables, :color) do %>
       <.button_color_examples color={color} />
     <% end %>
@@ -32,8 +40,22 @@ defmodule ComponentPreviewer.ButtonLive do
   def button_color_examples(assigns) do
     ~H"""
     <section class="grid gap-2 border rounded p-2">
-      <h2 class="font-black text-xl bg-root-fg text-root dark:bg-root-fg-dark dark:text-root-dark -mx-2 -mt-2 px-2 pb-1">
-        COLOR: <%= @color %>
+      <h2
+        id={"color-" <> @color}
+        class="font-black text-xl bg-root-fg text-root dark:bg-root-fg-dark dark:text-root-dark -mx-2 -mt-2 px-2 pb-1"
+      >
+        COLOR: <%= @color %> ||
+        <.a
+          :for={
+            color <-
+              get_prop_value_opts(Phlegethon.Components.Core, :button, :overridables, :color)
+              |> Enum.filter(&(&1 != @color))
+          }
+          href={"#color-#{color}"}
+          class="text-primary-200 dark:text-primary-400"
+        >
+          <%= color %>
+        </.a>
       </h2>
       <%= for shape <- get_prop_value_opts(Phlegethon.Components.Core, :button, :overridables, :shape) do %>
         <h3 class="w-full font-black text-lg px-2 pb-1 border-b-2">
@@ -54,7 +76,12 @@ defmodule ComponentPreviewer.ButtonLive do
             shape={shape}
             opts={[disabled: true]}
           />
-          <.button_size_examples color={@color} variant={variant} shape={shape} icon_name="hero-cpu-chip-solid" />
+          <.button_size_examples
+            color={@color}
+            variant={variant}
+            shape={shape}
+            icon_name="hero-cpu-chip-solid"
+          />
         <% end %>
       <% end %>
     </section>

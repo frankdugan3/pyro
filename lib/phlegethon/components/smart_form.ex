@@ -44,7 +44,7 @@ defmodule Phlegethon.Components.SmartForm do
           disabled={!f.source.changed?}
           size="lg"
           phx-click={"reset_#{f.name}"}
-          color="red"
+          color="error"
           confirm="Are you sure you want to reset the form?"
         >
           reset

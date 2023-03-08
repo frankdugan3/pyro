@@ -42,12 +42,12 @@ defmodule ComponentPreviewer.FlashLive do
             - Should *not* show up in app's floating flash tray
             - Should show up on the page's flash tray
             - Should not be dismissible
-            - Should have the "success" style, but with a different icon
+            - Should have the "brand" style, but with an icon and title
           """,
           ttl: 0,
           title: "A Different Kind of Flash",
-          icon_name: "light_bulb",
-          style_for_kind: "success",
+          icon_name: "hero-light-bulb-mini",
+          style_for_kind: "brand",
           close: false
         )
       )
@@ -57,7 +57,7 @@ defmodule ComponentPreviewer.FlashLive do
           "This is a flash to test default style. It also doesn't auto-close. And has a custom title and icon.",
           title: "TOTALLY CUSTOM",
           ttl: 0,
-          icon_name: "beaker"
+          icon_name: "hero-beaker-mini"
         )
       )
       |> put_flash(

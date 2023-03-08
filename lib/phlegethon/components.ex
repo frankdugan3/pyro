@@ -19,7 +19,6 @@ defmodule Phlegethon.Components do
     quote do
       import Phlegethon.Components.Core
       import Phlegethon.Components.Extra
-      import Phlegethon.Components.Icon
       import Phlegethon.Components.SmartForm
       alias Phlegethon.Components.SmartDataTable
     end

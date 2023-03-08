@@ -24,9 +24,10 @@ defmodule ComponentPreviewer.TableLive do
           phx-click="delete_user"
           phx-value-id={user.id}
           outline
+          color="error"
           confirm={"Are you sure you want to delete the user #{user.name}?"}
         >
-          <.icon name={:trash} kind={:mini} class="block my-1" />
+          <.icon name="hero-trash-mini" kind={:mini} class="block my-1" />
         </.button>
       </:action>
     </.table>
@@ -66,7 +67,7 @@ defmodule ComponentPreviewer.TableLive do
        :success,
        encode_flash(~s|User "#{user.name}" successfully created!|,
          title: "User Generated",
-         icon_name: "user_circle"
+         icon_name: "hero-user-circle-mini"
        )
      )}
   end

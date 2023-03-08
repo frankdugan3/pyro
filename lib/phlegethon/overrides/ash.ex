@@ -339,7 +339,7 @@
 #   ####    P H L E G E T H O N    C O M P O N E N T S
 #   ##############################################################################
 
-#   override Icon, :icon do
+#   override Core, :icon do
 #     set :class, "h-4 w-4 inline-block align-text-bottom"
 #     set :kind, :solid
 #   end

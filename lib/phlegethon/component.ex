@@ -234,7 +234,7 @@ defmodule Phlegethon.Component do
         """,
         title: "TOTALLY CUSTOM",
         ttl: 6_000,
-        icon_name: "beaker"
+        icon_name: "hero-beaker"
       )
     )
   ```

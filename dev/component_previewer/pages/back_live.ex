@@ -16,14 +16,20 @@ defmodule ComponentPreviewer.BackLive do
       class="text-sm"
       source={~s|<.back navigate={~p"/"}>Go back to the about page.</.back>|}
     />
-    <.back navigate={~p"/"}>Go back to the about page.</.back>
+    <p>
+      <.back navigate={~p"/"}>Go back to the about page.</.back>
+    </p>
 
     <.code
       language="heex"
       class="text-sm"
-      source={~s|<.back icon_name="hero-arrow-left-solid" navigate={~p"/"}>Go back to the about page.</.back>|}
+      source={
+        ~s|<.back icon_name="hero-arrow-left-solid" navigate={~p"/"}>Go back to the about page.</.back>|
+      }
     />
-    <.back icon_name="hero-arrow-left-solid" navigate={~p"/"}>Go back to the about page.</.back>
+    <p>
+      <.back icon_name="hero-arrow-left-solid" navigate={~p"/"}>Go back to the about page.</.back>
+    </p>
     """
   end
 
