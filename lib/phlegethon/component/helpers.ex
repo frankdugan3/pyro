@@ -14,10 +14,10 @@ defmodule Phlegethon.Component.Helpers do
 
   ## Examples
 
-      iex> get_prop_value_opts(Core, :button, :overridables, :color)
-      ["root", "primary", "red", "yellow", "green"]
+      iex> get_prop_value_opts(Core, :icon, :attrs, :name) |> Enum.length()
+      876
   """
-  @spec get_prop_value_opts(module(), atom(), :attrs | :overridables | :slots, atom()) :: any()
+  @spec get_prop_value_opts(module(), atom(), :attrs | :slots, atom()) :: any()
   def get_prop_value_opts(module, component, kind, name) do
     opts =
       get_by_path(

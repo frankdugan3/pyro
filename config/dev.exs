@@ -2,12 +2,6 @@ import Config
 
 config :phlegethon, :ex_doc_server, "http://127.0.0.1:35729/"
 
-config :phlegethon, :overrides, [
-  Phlegethon.Overrides.Testing,
-  Phlegethon.Overrides.Default,
-  Phlegethon.Overrides.Essential
-]
-
 config :phlegethon, gettext: ComponentPreviewer.Gettext
 
 config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")

@@ -1,4 +1,4 @@
-defmodule ComponentPreviewer.TableLive do
+defmodule ComponentPreviewer.SmartDataTableLive do
   @moduledoc false
   use ComponentPreviewer, :live_view
 
@@ -11,27 +11,16 @@ defmodule ComponentPreviewer.TableLive do
       &lt;.table&gt;
       <:actions>
         <.button phx-click="generate_user">Generate User</.button>
-        <.doc_url page="Phlegethon.Components.Core.html#table/1" />
+        <.doc_url page="Phlegethon.Components.SmartDataTable.html#smart_data_table/1" />
       </:actions>
     </.header>
 
-    <.table id="table-live-demo" rows={@streams.users}>
-      <:col :let={{_id, user}} label="Name"><%= user.name %></:col>
-      <:col :let={{_id, user}} label="Email"><%= user.email %></:col>
-      <:col :let={{_id, user}} label="Role"><%= user.role %></:col>
-      <:col :let={{_id, user}} label="Active"><%= user.active %></:col>
-      <:col :let={{_id, user}} label="Notes"><%= user.notes %></:col>
-      <:action :let={{_id, user}}>
-        <.button
-          phx-click="delete_user"
-          phx-value-id={user.id}
-          color="error"
-          confirm={"Are you sure you want to delete the user #{user.name}?"}
-        >
-          <.icon name="hero-trash-mini" class="block my-1" />
-        </.button>
-      </:action>
-    </.table>
+    <.live_component
+      module={SmartDataTable}
+      id="smart-data-table-users"
+      resource={User}
+      rows={@streams.users}
+    />
     """
   end
 

@@ -134,9 +134,7 @@ defmodule Phlegethon.Overrides.Essential do
   ##############################################################################
 
   override SmartForm, :smart_form do
-    set :action_info, &__MODULE__.smart_form_action_info/1
     set :autocomplete, "off"
-    set :phlegethon_form, &__MODULE__.smart_form_phlegethon_form/1
   end
 
   def smart_form_phlegethon_form(assigns) do

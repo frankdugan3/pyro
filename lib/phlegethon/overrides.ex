@@ -84,8 +84,6 @@ defmodule Phlegethon.Overrides do
 
   alias Phlegethon.Overrides
 
-  @configured_overrides Application.compile_env!(:phlegethon, :overrides)
-
   @doc false
   @spec __using__(any) :: Macro.t()
   defmacro __using__(env) do
@@ -102,7 +100,7 @@ defmodule Phlegethon.Overrides do
       alias Phlegethon.Components.{
         Core,
         Extra,
-        Icon,
+        SmartDataTable,
         SmartForm
       }
 
@@ -305,13 +303,6 @@ defmodule Phlegethon.Overrides do
 
   @doc false
   # Internally used for asset generation.
-  @spec configured_overrides :: [module()] | nil
-  def configured_overrides do
-    @configured_overrides
-  end
-
-  @doc false
-  # Internally used for asset generation.
   @spec extend_colors :: map() | nil
   def extend_colors do
     configured_overrides()
@@ -363,5 +354,29 @@ defmodule Phlegethon.Overrides do
       end)
 
     %{light: light, dark: dark}
+  end
+
+  @doc """
+  Get am override value for a given component prop.
+  """
+  @spec override_for({module, atom}, atom) :: any
+  def override_for(component, prop) do
+    configured_overrides()
+    |> Enum.reduce_while(nil, fn module, _ ->
+      module.overrides()
+      |> Map.fetch({component, prop})
+      |> case do
+        {:ok, value} -> {:halt, value}
+        :error -> {:cont, nil}
+      end
+    end)
+  end
+
+  @doc """
+  Get the configured override modules from config.
+  """
+  @spec configured_overrides() :: [module]
+  def configured_overrides() do
+    Application.get_env(:phlegethon, :overrides, [Overrides.Default, Overrides.Essential])
   end
 end

@@ -333,13 +333,15 @@ defmodule Phlegethon.Overrides.Default do
 
   override Core, :icon do
     set :class, "h-4 w-4 inline-block align-text-bottom"
-    set :kind, :solid
   end
 
   override Core, :input do
     set :class, "grid gap-1 content-start"
     set :input_class, &__MODULE__.input_class/1
-    set :input_check_label_class, "flex items-center gap-2 text-sm leading-6 text-zinc-800 dark:text-zinc-100 font-semibold"
+
+    set :input_check_label_class,
+        "flex items-center gap-2 text-sm leading-6 text-zinc-800 dark:text-zinc-100 font-semibold"
+
     set :description_class, "text-xs text-zinc-600 dark:text-zinc-400"
   end
 
@@ -363,7 +365,8 @@ defmodule Phlegethon.Overrides.Default do
         !errors?,
       "border-rose-600 focus:border-rose-600 focus:ring-rose-600/10 dark:border-rose-500 dark:focus:border-rose-500 dark:focus:ring-rose-500/25":
         errors?,
-      "w-auto rounded text-brand focus:ring-brand dark:text-brand dark:focus:ring-brand": type == "checkbox",
+      "w-auto rounded text-brand focus:ring-brand dark:text-brand dark:focus:ring-brand":
+        type == "checkbox",
       "py-2 px-3": type == "select",
         "min-h-[6rem]": type == "textarea"
     ]

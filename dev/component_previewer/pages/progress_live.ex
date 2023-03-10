@@ -11,7 +11,7 @@ defmodule ComponentPreviewer.ProgressLive do
       </:actions>
     </.header>
 
-    <%= for color <- get_prop_value_opts(Phlegethon.Components.Extra, :progress, :overridables, :color) do %>
+    <%= for color <- Phlegethon.Overrides.override_for({Phlegethon.Components.Extra, :progress}, :colors) do %>
       <.progress_color_examples color={color} value={assigns[color <> "_value"]} />
     <% end %>
     """
@@ -36,13 +36,13 @@ defmodule ComponentPreviewer.ProgressLive do
 
   def progress_size_examples(assigns) do
     ~H"""
-    <%= for size <- get_prop_value_opts(Phlegethon.Components.Extra, :progress, :overridables, :size) do %>
+    <%= for size <- Phlegethon.Overrides.override_for({Phlegethon.Components.Extra, :progress}, :sizes) do %>
       <.progress value={@value} color={@color} size={size} />
     <% end %>
     """
   end
 
-  @colors get_prop_value_opts(Phlegethon.Components.Extra, :progress, :overridables, :color)
+  @colors Phlegethon.Overrides.override_for({Phlegethon.Components.Extra, :progress}, :colors)
 
   @impl true
   def mount(_params, _session, socket) do

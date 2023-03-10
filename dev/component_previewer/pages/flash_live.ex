@@ -16,7 +16,6 @@ defmodule ComponentPreviewer.FlashLive do
     <.flash_group
       class="static"
       flash={@flash}
-      flash_class="z-auto"
       include_kinds={~w[permanent dismissible auto-close]}
     />
     """
@@ -25,8 +24,7 @@ defmodule ComponentPreviewer.FlashLive do
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      Phlegethon.Components.Core
-      |> get_prop_value_opts(:flash, :overridables, :kind)
+      Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :flash}, :kinds)
       |> Enum.reduce(socket, fn kind, socket ->
         put_flash(
           socket,

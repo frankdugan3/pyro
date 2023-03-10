@@ -48,9 +48,9 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
-  overridable :show_js, :any
-  overridable :hide_js, :any
+  attr :class, :any
+  attr :show_js, :any
+  attr :hide_js, :any
   attr :id, :string, required: true
   attr :show, :boolean, default: false
   attr :on_cancel, JS, default: %JS{}
@@ -62,6 +62,12 @@ defmodule Phlegethon.Components.Core do
   slot :cancel
 
   def modal(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:class, class?: true, required: true)
+      |> assign_overridable(:show_js, required: true)
+      |> assign_overridable(:hide_js, required: true)
+
     ~H"""
     <div
       id={@id}
@@ -149,39 +155,51 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :autoshow, :boolean, required: true, doc: "Whether to auto show the flash on mount"
-  overridable :class, :class, required: true
-  overridable :control_class, :class
-  overridable :close, :boolean, required: true, doc: "Whether the flash can be closed"
-  overridable :close_button_class, :class
-  overridable :close_icon_class, :class, required: true
-  overridable :close_icon_name, :string, required: true, doc: ""
-  overridable :icon_name, :string, required: true
-
-  overridable :kind, :string,
-    values: :kinds,
-    required: true,
-    doc: "Used for styling and flash lookup"
-
-  overridable :style_for_kind, :string,
-    values: :kinds,
-    doc: "Used for styling a flash with a different kind"
-
-  overridable :message_class, :class, required: true
-  overridable :progress_class, :class, required: true
-  overridable :title_class, :class, required: true
-  overridable :title, :string
-  overridable :title_icon_class, :class
-  overridable :ttl, :integer, required: true
-  overridable :hide_js, :any, required: true
-  overridable :show_js, :any, required: true
-
+  attr :autoshow, :boolean, doc: "Whether to auto show the flash on mount"
+  attr :class, :any
+  attr :control_class, :any
+  attr :close, :boolean, doc: "Whether the flash can be closed"
+  attr :close_button_class, :any
+  attr :close_icon_class, :any
+  attr :close_icon_name, :string
+  attr :icon_name, :string
+  attr :kind, :string, doc: "Used for styling and flash lookup"
+  attr :style_for_kind, :string, doc: "Used for styling a flash with a different kind"
+  attr :message_class, :any
+  attr :progress_class, :any
+  attr :title_class, :any
+  attr :title, :string
+  attr :title_icon_class, :any
+  attr :ttl, :integer
+  attr :hide_js, :any
+  attr :show_js, :any
   attr :flash, :map, default: %{}, doc: "The map of flash messages to display."
   attr :rest, :global, doc: "The arbitrary HTML attributes to add to the flash container"
 
   slot :inner_block, doc: "The optional inner block to render the flash message"
 
   def flash(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:autoshow, required?: true)
+      |> assign_overridable(:close, required?: true)
+      |> assign_overridable(:close_icon_name, required?: true)
+      |> assign_overridable(:hide_js, required?: true)
+      |> assign_overridable(:icon_name, required?: true)
+      |> assign_overridable(:show_js, required?: true)
+      |> assign_overridable(:title)
+      |> assign_overridable(:ttl, required?: true)
+      |> assign_overridable(:kind, values: :kinds, required?: true)
+      |> assign_overridable(:style_for_kind, values: :kinds)
+      |> assign_overridable(:class, class?: true, required?: true)
+      |> assign_overridable(:close_button_class, class?: true)
+      |> assign_overridable(:close_icon_class, class?: true, required?: true)
+      |> assign_overridable(:control_class, class?: true)
+      |> assign_overridable(:message_class, class?: true, required?: true)
+      |> assign_overridable(:progress_class, class?: true, required?: true)
+      |> assign_overridable(:title_class, class?: true, required?: true)
+      |> assign_overridable(:title_icon_class, class?: true)
+
     ~H"""
     <div
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
@@ -232,17 +250,20 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
-
-  overridable :include_kinds, :list,
-    required: true,
-    doc: "The kinds of flashes to display"
-
+  attr :class, :any
+  attr :include_kinds, :list, doc: "The kinds of flashes to display"
   attr :flash, :map, required: true, doc: "The map of flash messages to display"
   attr :rest, :global, doc: "The arbitrary HTML attributes to add to the flash tray"
 
   def flash_group(assigns) do
-    assigns = assign(assigns, :flash, filter_flash(assigns[:flash], assigns[:include_kinds]))
+    assigns =
+      assigns
+      |> assign_overridable(:class, class?: true, required?: true)
+      |> assign_overridable(:include_kinds, required?: true)
+
+    assigns =
+      assigns
+      |> assign(:flash, filter_flash(assigns[:flash], assigns[:include_kinds]))
 
     ~H"""
     <div :if={any_flash?(@flash)} class={@class}>
@@ -250,6 +271,9 @@ defmodule Phlegethon.Components.Core do
     </div>
     """
   end
+
+  # defp filter_flash(nil, _kinds), do: %{}
+  defp filter_flash(_flash, nil), do: %{}
 
   defp filter_flash(flash, kinds) do
     flash
@@ -310,10 +334,10 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
-  overridable :actions_class, :class, required: true
-  attr :for, :any, required: true, doc: "The datastructure for the form"
+  attr :actions_class, :any, required: true
   attr :as, :any, default: nil, doc: "The server side parameter to collect all input under"
+  attr :class, :any, required: true
+  attr :for, :any, required: true, doc: "The datastructure for the form"
 
   attr :rest, :global,
     include: ~w(autocomplete name rel action enctype method novalidate target),
@@ -323,6 +347,11 @@ defmodule Phlegethon.Components.Core do
   slot :actions, doc: "The slot for form actions, such as a submit button"
 
   def simple_form(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:class, class?: true)
+      |> assign_overridable(:actions_class, class?: true)
+
     ~H"""
     <.form :let={f} for={@for} as={@as} class={@class} {@rest}>
       <%= render_slot(@inner_block, f) %>
@@ -352,61 +381,60 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
-  overridable :ping_class, :class, required: true
-  overridable :icon_class, :class
-
-  overridable :case, :string,
+  attr :case, :string,
     values: ~w[uppercase normal-case lowercase capitalize],
     doc: "The case of the text"
 
-  overridable :color, :string,
-    values: :colors,
-    required: true,
-    doc: "The color of the button"
-
-  overridable :variant, :string,
-    values: :variants,
-    required: true,
-    doc: "Style of button"
-
-  overridable :shape, :string,
-    values: :shapes,
-    required: true,
-    doc: "Shape of the button"
-
-  overridable :size, :string,
-    required: true,
-    values: :sizes,
-    doc: "The size of the button"
-
-  attr :type, :string,
-    default: "button",
-    values: ~w[button reset submit],
-    doc: "Type of the button"
+  attr :class, :any
+  attr :color, :string, doc: "The color of the button"
 
   attr :confirm, :string,
     default: nil,
     doc: "Text to display in a confirm dialog before emitting click event"
+
+  attr :csrf_token, :string, default: nil
+  attr :disabled, :boolean, default: false
+  attr :href, :any
+  attr :icon_class, :any
 
   attr :icon_name, :string,
     default: nil,
     doc:
       "The name of the icon to display (nil for none); see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
 
-  attr :disabled, :boolean, default: false
   attr :loading, :boolean, default: false, doc: "Display a loading spinner"
-  attr :ping, :boolean, default: false, doc: "Show a ping indicator"
+  attr :method, :string, default: "get"
   attr :navigate, :string
   attr :patch, :string
-  attr :href, :any
+  attr :ping_class, :any
+  attr :ping, :boolean, default: false, doc: "Show a ping indicator"
   attr :replace, :boolean, default: false
-  attr :method, :string, default: "get"
-  attr :csrf_token, :string, default: nil
   attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target type]
+  attr :shape, :string, doc: "Shape of the button"
+  attr :size, :string, doc: "The size of the button"
+
+  attr :type, :string,
+    default: "button",
+    values: ~w[button reset submit],
+    doc: "Type of the button"
+
+  attr :variant, :string, doc: "Style of button"
   slot :inner_block, required: true, doc: "The content of the button"
 
-  def button(%{href: _href} = assigns) do
+  def button(assigns) do
+    assigns
+    |> assign_overridable(:case)
+    |> assign_overridable(:color, values: :colors, required?: true)
+    |> assign_overridable(:shape, values: :shapes, required?: true)
+    |> assign_overridable(:size, values: :sizes, required?: true)
+    |> assign_overridable(:variant, values: :variants, required?: true)
+    |> assign_overridable(:class, class?: true, required?: true)
+    |> assign_overridable(:icon_class, class?: true)
+    |> assign_overridable(:ping_class, class?: true, required?: true)
+    |> render_button()
+  end
+
+  defp render_button(%{href: _href} = assigns) do
     ~H"""
     <.link
       href={@href}
@@ -429,7 +457,7 @@ defmodule Phlegethon.Components.Core do
     """
   end
 
-  def button(%{patch: _patch} = assigns) do
+  defp render_button(%{patch: _patch} = assigns) do
     ~H"""
     <.link
       patch={@patch}
@@ -450,7 +478,7 @@ defmodule Phlegethon.Components.Core do
     """
   end
 
-  def button(%{navigate: _navigate} = assigns) do
+  defp render_button(%{navigate: _navigate} = assigns) do
     ~H"""
     <.link
       navigate={@navigate}
@@ -471,7 +499,7 @@ defmodule Phlegethon.Components.Core do
     """
   end
 
-  def button(assigns) do
+  defp render_button(assigns) do
     ~H"""
     <button
       type={@type}
@@ -507,40 +535,37 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true, doc: "Class of the field container element"
-  overridable :input_class, :class, required: true, doc: "Class of the input element"
-
-  overridable :input_check_label_class, :class,
-    required: true,
-    doc: "Class of the label element for a check input"
-
-  overridable :description_class, :class, required: true, doc: "Class of the field description"
-  overridable :clear_on_escape, :boolean, doc: "Clear input value on pressing Escape"
-
-  attr :id, :any, default: nil
-  attr :name, :any
-  attr :label, :string, default: nil
-  attr :value, :any
-  attr :description, :string, default: nil
-
-  attr :type, :string,
-    default: "text",
-    values: ~w[checkbox color date datetime-local email file hidden month number password
-               range radio search select tel text textarea time url week]
-
-  attr :field, Phoenix.HTML.FormField,
-    doc: "A form field struct retrieved from the form, for example: @form[:email]"
-
-  attr :errors, :list, default: []
-  attr :checked, :boolean, doc: "The checked flag for checkbox inputs"
-  attr :prompt, :string, default: nil, doc: "The prompt for select inputs"
-  attr :options, :list, doc: "The options to pass to Phoenix.HTML.Form.options_for_select/2"
-  attr :multiple, :boolean, default: false, doc: "The multiple flag for select inputs"
-
   attr :autofocus, :boolean,
     default: false,
     doc: "Enable autofocus hook to reliably focus input on mount"
 
+  attr :checked, :boolean, doc: "The checked flag for checkbox inputs"
+  attr :class, :any, doc: "Class of the field container element"
+  attr :clear_on_escape, :boolean, doc: "Clear input value on pressing Escape"
+  attr :description_class, :any, doc: "Class of the field description"
+  attr :description, :string, default: nil
+  attr :errors, :list, default: []
+
+  attr :field, Phoenix.HTML.FormField,
+    doc: "A form field struct retrieved from the form, for example: @form[:email]"
+
+  attr :id, :any, default: nil
+
+  attr :input_check_label_class, :any, doc: "Class of the label element for a check input"
+
+  attr :input_class, :any, doc: "Class of the input element"
+  attr :label, :string, default: nil
+  attr :multiple, :boolean, default: false, doc: "The multiple flag for select inputs"
+  attr :name, :any
+  attr :options, :list, doc: "The options to pass to Phoenix.HTML.Form.options_for_select/2"
+  attr :prompt, :string, default: nil, doc: "The prompt for select inputs"
+
+  attr :type, :string,
+    default: "text",
+    values:
+      ~w[checkbox color date datetime-local email file hidden month number password range radio search select tel text textarea time url week]
+
+  attr :value, :any
   attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
                                    pattern placeholder readonly required rows size step)
   slot :inner_block
@@ -554,7 +579,17 @@ defmodule Phlegethon.Components.Core do
     |> input()
   end
 
-  def input(%{type: "checkbox", value: value} = assigns) do
+  def input(assigns) do
+    assigns
+    |> assign_overridable(:clear_on_escape)
+    |> assign_overridable(:class, class?: true, required?: true)
+    |> assign_overridable(:input_class, class?: true, required?: true)
+    |> assign_overridable(:input_check_label_class, class?: true, required?: true)
+    |> assign_overridable(:description_class, class?: true, required?: true)
+    |> render_input()
+  end
+
+  defp render_input(%{type: "checkbox", value: value} = assigns) do
     assigns =
       assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", value) end)
 
@@ -579,7 +614,7 @@ defmodule Phlegethon.Components.Core do
     """
   end
 
-  def input(%{type: "select"} = assigns) do
+  defp render_input(%{type: "select"} = assigns) do
     ~H"""
     <div class={@class} phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
@@ -599,7 +634,7 @@ defmodule Phlegethon.Components.Core do
     """
   end
 
-  def input(%{type: "textarea"} = assigns) do
+  defp render_input(%{type: "textarea"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name} class={@class}>
       <.label for={@id}><%= @label %></.label>
@@ -620,7 +655,7 @@ defmodule Phlegethon.Components.Core do
     """
   end
 
-  def input(assigns) do
+  defp render_input(assigns) do
     ~H"""
     <div phx-feedback-for={@name} class={@class}>
       <.label for={@id}><%= @label %></.label>
@@ -648,11 +683,13 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
+  attr :class, :any
   attr :for, :string, default: nil
   slot :inner_block, required: true
 
   def label(assigns) do
+    assigns = assign_overridable(assigns, :class, class?: true, required?: true)
+
     ~H"""
     <label for={@for} class={@class}>
       <%= render_slot(@inner_block) %>
@@ -665,16 +702,21 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class
-  overridable :icon_class, :class
+  attr :class, :any
+  attr :icon_class, :any
 
-  overridable :icon_name, :string,
-    required: true,
+  attr :icon_name, :string,
     doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
 
   slot :inner_block, required: true
 
   def error(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:icon_name, required?: true)
+      |> assign_overridable(:class, class?: true, required?: true)
+      |> assign_overridable(:icon_class, class?: true)
+
     ~H"""
     <p class={@class}>
       <.icon name={@icon_name} class={@icon_class} />
@@ -688,15 +730,22 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
-  overridable :title_class, :class, required: true
-  overridable :subtitle_class, :class, required: true
-  overridable :actions_class, :class, required: true
+  attr :class, :any
+  attr :title_class, :any
+  attr :subtitle_class, :any
+  attr :actions_class, :any
   slot :inner_block, required: true
   slot :subtitle
   slot :actions
 
   def header(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:class, class?: true, required?: true)
+      |> assign_overridable(:title_class, class?: true, required?: true)
+      |> assign_overridable(:subtitle_class, class?: true, required?: true)
+      |> assign_overridable(:actions_class, class?: true, required?: true)
+
     ~H"""
     <header class={@class}>
       <div>
@@ -726,19 +775,12 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
-  overridable :thead_class, :class, required: true
-  overridable :th_label_class, :class, required: true
-  overridable :th_action_class, :class, required: true
-  overridable :tbody_class, :class, required: true
-  overridable :tr_class, :class, required: true
-  overridable :td_class, :class, required: true
-  overridable :action_td_class, :class, required: true
-  overridable :action_wrapper_class, :class, required: true
-  overridable :action_class, :class, required: true
-  attr :id, :string, required: true
+  attr :action_class, :any
+  attr :action_td_class, :any
+  attr :action_wrapper_class, :any
+  attr :class, :any
+  attr :id, :string
   attr :row_click, :any, default: nil
-  attr :rows, :list, required: true, doc: "Supports a list or LiveStream"
 
   attr :row_id, :any,
     default: nil,
@@ -748,6 +790,14 @@ defmodule Phlegethon.Components.Core do
     default: &Function.identity/1,
     doc: "The function for mapping each row before calling the :col and :action slots"
 
+  attr :rows, :list, required: true, doc: "Supports a list or LiveStream"
+  attr :tbody_class, :any
+  attr :td_class, :any
+  attr :th_action_class, :any
+  attr :th_label_class, :any
+  attr :thead_class, :any
+  attr :tr_class, :any
+
   slot :col, required: true do
     attr :label, :string
   end
@@ -755,6 +805,19 @@ defmodule Phlegethon.Components.Core do
   slot(:action, doc: "The slot for showing user actions in the last table column")
 
   def table(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:class, class?: true, required?: true)
+      |> assign_overridable(:thead_class, class?: true, required?: true)
+      |> assign_overridable(:th_label_class, class?: true, required?: true)
+      |> assign_overridable(:th_action_class, class?: true, required?: true)
+      |> assign_overridable(:tbody_class, class?: true, required?: true)
+      |> assign_overridable(:tr_class, class?: true, required?: true)
+      |> assign_overridable(:td_class, class?: true, required?: true)
+      |> assign_overridable(:action_td_class, class?: true, required?: true)
+      |> assign_overridable(:action_wrapper_class, class?: true, required?: true)
+      |> assign_overridable(:action_class, class?: true, required?: true)
+
     assigns =
       with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
         assign(assigns, row_id: assigns.row_id || fn {id, _item} -> id end)
@@ -804,15 +867,21 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
-  overridable :dt_class, :class, required: true
-  overridable :dd_class, :class, required: true
+  attr :class, :any
+  attr :dd_class, :any
+  attr :dt_class, :any
 
   slot :item, required: true do
     attr :title, :string, required: true
   end
 
   def list(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:class, class?: true, required?: true)
+      |> assign_overridable(:dd_class, class?: true, required?: true)
+      |> assign_overridable(:dt_class, class?: true, required?: true)
+
     ~H"""
     <dl class={@class}>
       <%= for item <- @item do %>
@@ -835,17 +904,21 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class
+  attr :class, :any
+  attr :icon_class, :any
 
-  overridable :icon_name, :string,
-    required: true,
-    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
+  attr :icon_name, :string, doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
 
-  overridable :icon_class, :class
   attr :navigate, :any, required: true
   slot :inner_block, required: true
 
   def back(assigns) do
+    assigns =
+      assigns
+      |> assign_overridable(:class, class?: true, required?: true)
+      |> assign_overridable(:icon_class, class?: true, required?: true)
+      |> assign_overridable(:icon_name)
+
     ~H"""
     <.link navigate={@navigate} class={@class}>
       <.icon name={@icon_name} class={@icon_class} />
@@ -899,7 +972,7 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  overridable :class, :class, required: true
+  attr :class, :any
 
   attr :name, :string,
     required: true,
@@ -911,6 +984,8 @@ defmodule Phlegethon.Components.Core do
     include: ~w(fill stroke stroke-width)
 
   def icon(assigns) do
+    assigns = assign_overridable(assigns, :class, class?: true, required?: true)
+
     ~H"""
     <span class={[@name, @class]} />
     """

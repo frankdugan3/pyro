@@ -26,8 +26,6 @@ spark_locals_without_parens = [
 ]
 
 phlegethon_locals_without_parens = [
-  overridable: 2,
-  overridable: 3,
   set: 2
 ]
 
