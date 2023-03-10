@@ -334,9 +334,9 @@ defmodule Phlegethon.Components.Core do
   """
   @doc type: :component
 
-  attr :actions_class, :any, required: true
+  attr :actions_class, :any
   attr :as, :any, default: nil, doc: "The server side parameter to collect all input under"
-  attr :class, :any, required: true
+  attr :class, :any
   attr :for, :any, required: true, doc: "The datastructure for the form"
 
   attr :rest, :global,
@@ -349,8 +349,8 @@ defmodule Phlegethon.Components.Core do
   def simple_form(assigns) do
     assigns =
       assigns
-      |> assign_overridable(:class, class?: true)
-      |> assign_overridable(:actions_class, class?: true)
+      |> assign_overridable(:class, class?: true, required: true)
+      |> assign_overridable(:actions_class, class?: true, required?: true)
 
     ~H"""
     <.form :let={f} for={@for} as={@as} class={@class} {@rest}>
@@ -907,7 +907,8 @@ defmodule Phlegethon.Components.Core do
   attr :class, :any
   attr :icon_class, :any
 
-  attr :icon_name, :string, doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
+  attr :icon_name, :string,
+    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
 
   attr :navigate, :any, required: true
   slot :inner_block, required: true

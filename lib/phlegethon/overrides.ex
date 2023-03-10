@@ -34,13 +34,12 @@ defmodule Phlegethon.Overrides do
   @moduledoc """
   The overrides system provides out-of-the-box presets while also enabling deep customization of Phlegethon components.
 
-  The `Phlegethon.Overrides.Default` preset is a great example to dig in and see how the override system works. A `Phlegethon.Component` uses [`overridable`](`Phlegethon.Component.overridable/3`) props to reference overrides set in these presets/custom override modules, and loads them as defaults.
+  The `Phlegethon.Overrides.Default` preset is a great example to dig in and see how the override system works. A `Phlegethon.Component` uses [`assign_overridable/3`](`Phlegethon.Component.assign_overridable/3`) to reference overrides set in these presets/custom override modules, and loads them as defaults.
 
-  To get started quickly, Phlegethon has a default style that can be used without any customization:
+  Phlegethon defaults to the following overrides:
 
   ```
-  config :phlegethon, :overrides,
-    [Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
+  [Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
   ```
 
   But you probably want to customize at least a few overrides. To do so, configure your app with:
@@ -70,7 +69,7 @@ defmodule Phlegethon.Overrides do
   - You only need to define what you want to override from the other defaults
   - You can use any number of `:overrides` modules, though it is probably best to only use only 2-3 to keep things simple
   - If no modules define the value, it will simply be `nil`
-  - If the `overridable` is defined on the component as `required: true`, an error will be raised at compile-time
+  - If [`assign_overridable/3`](`Phlegethon.Component.assign_overridable/3`) is called on the component with the `required?: true` option, an error will be raised if no configured overrides define a default
 
   > #### Note: {: .warning}
   >
@@ -82,8 +81,6 @@ defmodule Phlegethon.Overrides do
   > ```
   """
 
-  alias Phlegethon.Overrides
-
   @doc false
   @spec __using__(any) :: Macro.t()
   defmacro __using__(env) do
@@ -93,8 +90,8 @@ defmodule Phlegethon.Overrides do
     makeup_dark = env[:makeup_dark]
 
     quote do
-      require Overrides
-      import Overrides, only: :macros
+      require unquote(__MODULE__)
+      import unquote(__MODULE__), only: :macros
       import Phlegethon.Component.Helpers
 
       alias Phlegethon.Components.{
@@ -113,8 +110,16 @@ defmodule Phlegethon.Overrides do
       @global_style unquote(global_style)
       @makeup_light unquote(makeup_light)
       @makeup_dark unquote(makeup_dark)
+      @__pass_assigns_to__ %{}
 
-      @before_compile Overrides
+      @on_definition unquote(__MODULE__)
+      @before_compile unquote(__MODULE__)
+
+      @doc false
+      # Internally used for validation.
+      @spec __pass_assigns_to__ :: map()
+      def __pass_assigns_to__(), do: @__pass_assigns_to__
+
       @doc false
       # Internally used for asset generation.
       @spec extend_colors :: map() | nil
@@ -162,10 +167,11 @@ defmodule Phlegethon.Overrides do
 
   Value can be:
 
-  * A literal value matching the type of the `overridable` prop (compile-time validated)
-  * An arity 1 function, which is assigned at runtime and is passes the component's `assigns`
+  * A literal value matching the type of the prop being overridden
+  * A function capture of arity 1 with the argument `passed_assigns`, which is executed at runtime and is passed the component's `assigns`
+  * Any other function capture, which will simply be passed along as a literal
 
-  The function value allows for complex conditionals. For examples of this, please view the source of `Phlegethon.Overrides.Default`.
+  The `passed_assigns` function capture allows for complex conditionals. For examples of this, please view the source of `Phlegethon.Overrides.Default`.
 
   > #### Tip: {: .info}
   >
@@ -175,6 +181,8 @@ defmodule Phlegethon.Overrides do
 
       set :class, "text-lg font-black"
       set :class, &__MODULE__.back_class/1
+      # ...
+      def back_class(passed_assigns) do
   """
   @doc type: :macro
   @spec set(atom, any) :: Macro.t()
@@ -185,12 +193,63 @@ defmodule Phlegethon.Overrides do
   end
 
   @doc false
+  def __on_definition__(env, kind, name, args, _guards, _body) do
+    if kind == :def && length(args) == 1 &&
+         Enum.find(args, fn {arg, _line, _} -> arg == :passed_assigns end) do
+      pass_assigns_to =
+        env.module
+        |> Module.get_attribute(:__pass_assigns_to__)
+        |> Map.put(name, true)
+
+      append = "This override is passed component assigns at runtime."
+
+      docs =
+        case Module.get_attribute(env.module, :doc) do
+          false ->
+            append
+
+          nil ->
+            append
+
+          {_line, docs} ->
+            docs <> "\n" <> append
+        end
+
+      Module.put_attribute(env.module, :doc, {env.line, docs})
+      Module.put_attribute(env.module, :__pass_assigns_to__, pass_assigns_to)
+    end
+
+    :ok
+  end
+
+  @doc false
   @spec __before_compile__(any) :: Macro.t()
   defmacro __before_compile__(env) do
     overrides =
       env.module
       |> Module.get_attribute(:override, [])
-      |> Map.new(fn {component, selector, value} -> {{component, selector}, value} end)
+      |> Enum.map(fn
+        {component, selector, value} = override when is_function(value, 1) ->
+          name =
+            value
+            |> Function.info()
+            |> Keyword.get(:name)
+
+          if Map.get(Module.get_attribute(env.module, :__pass_assigns_to__), name) do
+            {component, selector, {:pass_assigns_to, value}}
+          else
+            override
+          end
+
+        override ->
+          override
+      end)
+
+    env.module
+    |> Module.put_attribute(:override, overrides)
+
+    overrides =
+      Map.new(overrides, fn {component, selector, value} -> {{component, selector}, value} end)
 
     makeup =
       if Module.get_attribute(env.module, :makeup_light) ||
@@ -252,9 +311,9 @@ defmodule Phlegethon.Overrides do
       end
 
     override_docs = """
-    - Arity 1 functions are passed all assigns at runtime, allowing complex conditional logic
-    - Non-class overrides are assigned first, so class functions have access to all other defaults and passed prop values
-    - Classes utilize [Tailwind CSS](https://tailwindcss.com/), and are merged by the component to prevent weird conflicts and bloat
+    - Captured functions with arity 1 and the arg named `passed_assigns` are passed component assigns at runtime, allowing complex conditional logic
+    - The component explicitly defines the order of [`assign_overridable/3`](`Phlegethon.Component.assign_overridable/3`), ensuring that dependent assigns are processed properly
+    - Overridable props specified as classes (in the component) utilize [Tailwind CSS](https://tailwindcss.com/), and are merged by the component to prevent weird conflicts and bloat
 
     #{makeup}
     #{extend_colors}
@@ -266,6 +325,7 @@ defmodule Phlegethon.Overrides do
       - `#{module}.#{component}/1`
       #{Enum.map_join(overrides, "\n", fn {{_, selector}, value} ->
         value = case value do
+          {:pass_assigns_to, value} -> value |> inspect |> String.replace("&", "")
           value when is_function(value) -> value |> inspect |> String.replace("&", "")
           value -> inspect(value)
         end
@@ -357,14 +417,14 @@ defmodule Phlegethon.Overrides do
   end
 
   @doc """
-  Get am override value for a given component prop.
+  Get an override value for a given component prop.
   """
-  @spec override_for({module, atom}, atom) :: any
-  def override_for(component, prop) do
+  @spec override_for(module, atom, atom) :: any
+  def override_for(module, component, prop) do
     configured_overrides()
-    |> Enum.reduce_while(nil, fn module, _ ->
-      module.overrides()
-      |> Map.fetch({component, prop})
+    |> Enum.reduce_while(nil, fn override_module, _ ->
+      override_module.overrides()
+      |> Map.fetch({{module, component}, prop})
       |> case do
         {:ok, value} -> {:halt, value}
         :error -> {:cont, nil}
@@ -373,10 +433,10 @@ defmodule Phlegethon.Overrides do
   end
 
   @doc """
-  Get the configured override modules from config.
+  Get the configured or default override modules.
   """
   @spec configured_overrides() :: [module]
   def configured_overrides() do
-    Application.get_env(:phlegethon, :overrides, [Overrides.Default, Overrides.Essential])
+    Application.get_env(:phlegethon, :overrides, [__MODULE__.Default, __MODULE__.Essential])
   end
 end

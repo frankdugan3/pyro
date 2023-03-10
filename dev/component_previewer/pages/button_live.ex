@@ -22,14 +22,14 @@ defmodule ComponentPreviewer.ButtonLive do
     </p>
 
     <ul class="flex gap-2">
-      <%= for color <- Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :button}, :colors) do %>
+      <%= for color <- Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :button, :colors) do %>
         <li>
           <.a href={"#color-#{color}"}><%= color %></.a>
         </li>
       <% end %>
     </ul>
 
-    <%= for color <- Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :button}, :colors) do %>
+    <%= for color <- Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :button, :colors) do %>
       <.button_color_examples color={color} />
     <% end %>
     """
@@ -48,7 +48,7 @@ defmodule ComponentPreviewer.ButtonLive do
         <.a
           :for={
             color <-
-              Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :button}, :colors)
+              Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :button, :colors)
               |> Enum.filter(&(&1 != @color))
           }
           href={"#color-#{color}"}
@@ -57,11 +57,11 @@ defmodule ComponentPreviewer.ButtonLive do
           <%= color %>
         </.a>
       </h2>
-      <%= for shape <- Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :button}, :shapes)do %>
+      <%= for shape <- Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :button, :shapes)do %>
         <h3 class="w-full font-black text-lg px-2 pb-1 border-b-2">
           SHAPE: <%= shape %>
         </h3>
-        <%= for variant <- Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :button}, :variants) do %>
+        <%= for variant <- Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :button, :variants) do %>
           <.button_size_examples color={@color} variant={variant} shape={shape} />
           <.button_size_examples
             color={@color}
@@ -97,7 +97,7 @@ defmodule ComponentPreviewer.ButtonLive do
   def button_size_examples(assigns) do
     ~H"""
     <div class="flex flex-wrap gap-2 justify-start items-end">
-      <%= for size <- Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :button}, :sizes) do %>
+      <%= for size <- Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :button, :sizes) do %>
         <.button
           color={@color}
           size={size}

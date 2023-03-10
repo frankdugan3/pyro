@@ -148,15 +148,15 @@ defmodule Phlegethon.Overrides.Default do
     set :color, "brand"
   end
 
-  def button_class(assigns) do
-    size = assigns[:size]
-    variant = assigns[:variant]
-    shape = assigns[:shape]
-    color = assigns[:color]
-    disabled = assigns[:disabled]
+  def button_class(passed_assigns) do
+    size = passed_assigns[:size]
+    variant = passed_assigns[:variant]
+    shape = passed_assigns[:shape]
+    color = passed_assigns[:color]
+    disabled = passed_assigns[:disabled]
 
     [
-      assigns[:case],
+      passed_assigns[:case],
       @shared_shadow_class,
       "font-semibold",
       "text-center",
@@ -211,8 +211,8 @@ defmodule Phlegethon.Overrides.Default do
     ]
   end
 
-  def button_ping_class(assigns) do
-    shape = assigns[:shape]
+  def button_ping_class(passed_assigns) do
+    shape = passed_assigns[:shape]
 
     [
       "block",
@@ -226,8 +226,8 @@ defmodule Phlegethon.Overrides.Default do
     ]
   end
 
-  def button_icon_class(assigns) do
-    size = assigns[:size]
+  def button_icon_class(passed_assigns) do
+    size = passed_assigns[:size]
 
     [
       "h-5 w-5": size in ["md", "lg"],
@@ -257,8 +257,8 @@ defmodule Phlegethon.Overrides.Default do
     set :title_class, "flex items-center gap-1.5 text-sm font-semibold leading-6"
   end
 
-  def flash_title(assigns) do
-    case assigns[:kind] do
+  def flash_title(passed_assigns) do
+    case passed_assigns[:kind] do
       "info" -> "Information"
       "error" -> "Error"
       "warning" -> "Warning"
@@ -267,8 +267,8 @@ defmodule Phlegethon.Overrides.Default do
     end
   end
 
-  def flash_icon_name(assigns) do
-    case assigns[:kind] do
+  def flash_icon_name(passed_assigns) do
+    case passed_assigns[:kind] do
       "info" -> "hero-information-circle-mini"
       "error" -> "hero-exclamation-circle-mini"
       "warning" -> "hero-exclamation-triangle-mini"
@@ -277,11 +277,11 @@ defmodule Phlegethon.Overrides.Default do
     end
   end
 
-  def flash_class(assigns) do
-    kind = assigns[:kind]
-    style_for_kind = assigns[:style_for_kind]
-    close = assigns[:close]
-    ttl = assigns[:ttl]
+  def flash_class(passed_assigns) do
+    kind = passed_assigns[:kind]
+    style_for_kind = passed_assigns[:style_for_kind]
+    close = passed_assigns[:close]
+    ttl = passed_assigns[:ttl]
 
     [
       "hidden w-80 sm:w-96 rounded p-3 group relative z-50 ring-1",
@@ -316,14 +316,14 @@ defmodule Phlegethon.Overrides.Default do
     set :actions_class, "no-flex flex gap-2"
   end
 
-  def header_class(assigns) do
-    actions = assigns[:actions]
+  def header_class(passed_assigns) do
+    actions = passed_assigns[:actions]
 
     ["flex items-center justify-between gap-6": actions != []]
   end
 
-  def header_title_class(assigns) do
-    actions = assigns[:actions]
+  def header_title_class(passed_assigns) do
+    actions = passed_assigns[:actions]
 
     [
       "text-lg font-semibold leading-8 text-zinc-800 dark:text-zinc-50",
@@ -345,11 +345,11 @@ defmodule Phlegethon.Overrides.Default do
     set :description_class, "text-xs text-zinc-600 dark:text-zinc-400"
   end
 
-  def input_class(assigns) do
-    type = assigns[:type]
+  def input_class(passed_assigns) do
+    type = passed_assigns[:type]
 
     errors? =
-      case assigns[:errors] do
+      case passed_assigns[:errors] do
         [] -> false
         [_ | _] -> true
       end
@@ -407,8 +407,8 @@ defmodule Phlegethon.Overrides.Default do
     set :action_class, "relative ml-4 font-semibold leading-6 hover:text-zinc-700"
   end
 
-  def table_td_class(assigns) do
-    row_click = assigns[:row_click]
+  def table_td_class(passed_assigns) do
+    row_click = passed_assigns[:row_click]
     ["p-0", "hover:cursor-pointer": row_click]
   end
 
@@ -429,8 +429,8 @@ defmodule Phlegethon.Overrides.Default do
     set :class, &__MODULE__.nav_link_class/1
   end
 
-  def nav_link_class(assigns) do
-    is_current = assigns[:is_current]
+  def nav_link_class(passed_assigns) do
+    is_current = passed_assigns[:is_current]
 
     [
       @shared_link_class,
@@ -447,9 +447,9 @@ defmodule Phlegethon.Overrides.Default do
     set :colors, @theme_colors
   end
 
-  def progress_class(assigns) do
-    color = assigns[:color]
-    size = assigns[:size]
+  def progress_class(passed_assigns) do
+    color = passed_assigns[:color]
+    size = passed_assigns[:size]
 
     [
       "progress",
@@ -471,9 +471,9 @@ defmodule Phlegethon.Overrides.Default do
     set :class, &__MODULE__.spinner_class/1
   end
 
-  def spinner_class(assigns) do
-    size = assigns[:size]
-    show = assigns[:show]
+  def spinner_class(passed_assigns) do
+    size = passed_assigns[:size]
+    show = passed_assigns[:show]
 
     [
       "animate-spin",
@@ -511,10 +511,10 @@ defmodule Phlegethon.Overrides.Default do
     set :class, &__MODULE__.smart_form_class/1
   end
 
-  def smart_form_class(assigns) do
+  def smart_form_class(passed_assigns) do
     [
       "grid gap-2",
-      get_by_path(assigns, [:phlegethon_form, :class])
+      get_by_path(passed_assigns, [:phlegethon_form, :class])
     ]
   end
 
@@ -523,11 +523,11 @@ defmodule Phlegethon.Overrides.Default do
     set :field_group_label_class, "font-black col-span-full"
   end
 
-  def smart_form_field_group_class(assigns) do
+  def smart_form_field_group_class(passed_assigns) do
     [
       "grid col-span-full gap-2 p-2 border border-solid rounded-lg",
       "border-zinc-300 dark:border-zinc-700",
-      get_by_path(assigns, [:field, :class])
+      get_by_path(passed_assigns, [:field, :class])
     ]
   end
 end

@@ -134,8 +134,8 @@ defmodule Phlegethon.Components.Extra do
   def nav_link(assigns) do
     assigns =
       assigns
-      |> assign_overridable(:class, class?: true, required?: true)
       |> assign_overridable(:is_current, required?: true)
+      |> assign_overridable(:class, class?: true, required?: true)
 
     ~H"""
     <.link :if={!@is_current} class={@class} navigate={@uri}>

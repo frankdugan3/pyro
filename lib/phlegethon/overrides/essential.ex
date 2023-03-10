@@ -112,9 +112,14 @@ defmodule Phlegethon.Overrides.Essential do
     set :is_current, &__MODULE__.nav_link_is_current/1
   end
 
-  def nav_link_is_current(assigns) do
-    %{path: current_path} = URI.parse(assigns[:current_uri])
-    %{path: path} = URI.parse(assigns[:uri])
+  @doc """
+  Determine if the current path prop matches the uri prop.
+
+  This is useful for styling the link differently if the link is "active".
+  """
+  def nav_link_is_current(passed_assigns) do
+    %{path: current_path} = URI.parse(passed_assigns[:current_uri])
+    %{path: path} = URI.parse(passed_assigns[:uri])
     current_path == path
   end
 

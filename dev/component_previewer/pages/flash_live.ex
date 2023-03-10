@@ -13,18 +13,14 @@ defmodule ComponentPreviewer.FlashLive do
 
     <p>You should see flash messages on page mount.</p>
 
-    <.flash_group
-      class="static"
-      flash={@flash}
-      include_kinds={~w[permanent dismissible auto-close]}
-    />
+    <.flash_group class="static" flash={@flash} include_kinds={~w[permanent dismissible auto-close]} />
     """
   end
 
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      Phlegethon.Overrides.override_for({Phlegethon.Components.Core, :flash}, :kinds)
+      Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :flash, :kinds)
       |> Enum.reduce(socket, fn kind, socket ->
         put_flash(
           socket,
