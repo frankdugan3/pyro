@@ -34,19 +34,19 @@ defmodule Phlegethon.Overrides do
   @moduledoc """
   The overrides system provides out-of-the-box presets while also enabling deep customization of Phlegethon components.
 
-  The `Phlegethon.Overrides.Default` preset is a great example to dig in and see how the override system works. A `Phlegethon.Component` uses [`assign_overridable/3`](`Phlegethon.Component.assign_overridable/3`) to reference overrides set in these presets/custom override modules, and loads them as defaults.
+  The `Phlegethon.Overrides.Default` preset is a great example to dig in and see how the override system works. A `Phlegethon.Component` flags attrs with `overridable`, then leverages [`assign_overridables/1`](`Phlegethon.Component.assign_overridables/1`) to reference overrides set in these presets/custom override modules and load them as defaults.
 
   Phlegethon defaults to the following overrides:
 
   ```
-  [Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
+  [Phlegethon.Overrides.Default]
   ```
 
   But you probably want to customize at least a few overrides. To do so, configure your app with:
 
   ```
   config :phlegethon, :overrides,
-    [MyApp.CustomOverrides, Phlegethon.Overrides.Default, Phlegethon.Overrides.Essential]
+    [MyApp.CustomOverrides, Phlegethon.Overrides.Default]
   ```
 
   Then, define your overrides in your custom module:
@@ -67,18 +67,9 @@ defmodule Phlegethon.Overrides do
   The overrides will be merged left-to-right, returning the value in the *first* module that sets a given key. So in the above example, the `<Core.back>` component will have an `icon_name` default of `:arrow_left`, since the `MyApp.CustomOverrides` was the first module in the list to provide that key. But the `icon_class` was unspecified in the custom module, so it will return the value from `Phlegethon.Overrides.Default` since it is provided there:
 
   - You only need to define what you want to override from the other defaults
-  - You can use any number of `:overrides` modules, though it is probably best to only use only 2-3 to keep things simple
+  - You can use any number of `:overrides` modules, though it is probably best to only use only 1-3 to keep things simple/efficient
   - If no modules define the value, it will simply be `nil`
-  - If [`assign_overridable/3`](`Phlegethon.Component.assign_overridable/3`) is called on the component with the `required?: true` option, an error will be raised if no configured overrides define a default
-
-  > #### Note: {: .warning}
-  >
-  > If you want to *completely* omit default style, you should still include the `Phlegethon.Overrides.Essential` overrides, because it specially configures essential things components require unrelated to style. Some of them can be safely overridden, but they must be included and do not affect style directly, so you will still have a blank slate for your custom style overrides.
-  >
-  > ```
-  > config :phlegethon, :overrides,
-  >   [MyApp.CustomOverrides, Phlegethon.Overrides.Essential]
-  > ```
+  - If [`assign_overridables/1`](`Phlegethon.Component.assign_overridables/1`) is called on the component with the `required: true` attr option, an error will be raised if no configured overrides define a default
   """
 
   @doc false
@@ -201,7 +192,7 @@ defmodule Phlegethon.Overrides do
         |> Module.get_attribute(:__pass_assigns_to__)
         |> Map.put(name, true)
 
-      append = "This override is passed component assigns at runtime."
+      append = "This override is passed component assigns and executed while being assigned at runtime."
 
       docs =
         case Module.get_attribute(env.module, :doc) do
@@ -312,8 +303,8 @@ defmodule Phlegethon.Overrides do
 
     override_docs = """
     - Captured functions with arity 1 and the arg named `passed_assigns` are passed component assigns at runtime, allowing complex conditional logic
-    - The component explicitly defines the order of [`assign_overridable/3`](`Phlegethon.Component.assign_overridable/3`), ensuring that dependent assigns are processed properly
-    - Overridable props specified as classes (in the component) utilize [Tailwind CSS](https://tailwindcss.com/), and are merged by the component to prevent weird conflicts and bloat
+    - [`assign_overridables/1`](`Phlegethon.Component.assign_overridables/1`) preserves the definition order of attrs and assigns them in that order, preserving dependency chains
+    - Attrs with type `:tails_classes` utilize `Tails`, and are merged by the component to prevent weird precedence conflicts and HTML bloat
 
     #{makeup}
     #{extend_colors}
@@ -335,8 +326,6 @@ defmodule Phlegethon.Overrides do
     """
 
     quote do
-      @doc false
-      # Internally used for documentation.
       @moduledoc (case @moduledoc do
                     false ->
                       false
@@ -437,6 +426,6 @@ defmodule Phlegethon.Overrides do
   """
   @spec configured_overrides() :: [module]
   def configured_overrides() do
-    Application.get_env(:phlegethon, :overrides, [__MODULE__.Default, __MODULE__.Essential])
+    Application.get_env(:phlegethon, :overrides, [__MODULE__.Default])
   end
 end

@@ -138,6 +138,7 @@ defmodule Phlegethon.Overrides.Default do
   override Core, :back do
     set :class, @shared_link_class
     set :icon_class, "w-3 h-3 stroke-current align-baseline"
+    set :icon_name, "hero-chevron-left-solid"
   end
 
   override Core, :button do
@@ -146,6 +147,13 @@ defmodule Phlegethon.Overrides.Default do
     set :icon_class, &__MODULE__.button_icon_class/1
     set :colors, @theme_colors
     set :color, "brand"
+    set :variant, "solid"
+    set :variants, ~w[solid inverted outline]
+    set :shape, "rounded"
+    set :shapes, ~w[rounded square pill]
+    set :size, "md"
+    set :sizes, ~w[xs sm md lg xl]
+    set :case, "uppercase"
   end
 
   def button_class(passed_assigns) do
@@ -255,6 +263,11 @@ defmodule Phlegethon.Overrides.Default do
     set :progress_class, "border border-black/25"
     set :title, &__MODULE__.flash_title/1
     set :title_class, "flex items-center gap-1.5 text-sm font-semibold leading-6"
+    set :autoshow, true
+    set :close, true
+    set :ttl, 10_000
+    set :show_js, &__MODULE__.flash_show_js/2
+    set :hide_js, &__MODULE__.flash_hide_js/2
   end
 
   def flash_title(passed_assigns) do
@@ -287,7 +300,7 @@ defmodule Phlegethon.Overrides.Default do
       "hidden w-80 sm:w-96 rounded p-3 group relative z-50 ring-1",
       @shared_shadow_class,
       "pt-1": close || ttl > 0,
-        "cursor-pointer": close,
+      "cursor-pointer": close,
       "bg-orange-100 text-orange-900 ring-brand fill-orange-900 dark:bg-orange-900 dark:text-orange-100 dark:ring-brand dark:fill-orange-100":
         kind == "brand" || style_for_kind == "brand",
       "bg-cyan-50 text-cyan-800 ring-cyan-500 fill-cyan-900 dark:bg-cyan-900 dark:text-cyan-100 dark:ring-cyan-500 dark:fill-cyan-50":
@@ -302,6 +315,27 @@ defmodule Phlegethon.Overrides.Default do
         kind == "root" || style_for_kind == "root" ||
           (style_for_kind not in @theme_colors and kind not in @theme_colors)
     ]
+  end
+
+  def flash_show_js(js, selector) do
+    JS.show(js,
+      to: selector,
+      transition:
+        {"transition-all transform ease-out duration-300",
+         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
+         "opacity-100 translate-y-0 sm:scale-100"}
+    )
+  end
+
+  def flash_hide_js(js, selector) do
+    JS.hide(js,
+      to: selector,
+      time: 200,
+      transition:
+        {"transition-all transform ease-in duration-200",
+         "opacity-100 translate-y-0 sm:scale-100",
+         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
+    )
   end
 
   override Core, :flash_group do
@@ -343,6 +377,7 @@ defmodule Phlegethon.Overrides.Default do
         "flex items-center gap-2 text-sm leading-6 text-zinc-800 dark:text-zinc-100 font-semibold"
 
     set :description_class, "text-xs text-zinc-600 dark:text-zinc-400"
+    set :clear_on_escape, true
   end
 
   def input_class(passed_assigns) do
@@ -368,7 +403,7 @@ defmodule Phlegethon.Overrides.Default do
       "w-auto rounded text-brand focus:ring-brand dark:text-brand dark:focus:ring-brand":
         type == "checkbox",
       "py-2 px-3": type == "select",
-        "min-h-[6rem]": type == "textarea"
+      "min-h-[6rem]": type == "textarea"
     ]
   end
 
@@ -389,6 +424,45 @@ defmodule Phlegethon.Overrides.Default do
 
   override Core, :modal do
     set :class, "relative z-50 hidden"
+    set :show_js, &__MODULE__.modal_show_js/2
+    set :hide_js, &__MODULE__.modal_hide_js/2
+  end
+
+  def modal_show_js(js, id) do
+    js
+    |> JS.show(to: "##{id}")
+    |> JS.show(
+      to: "##{id}-bg",
+      transition: {"transition-all transform ease-out duration-300", "opacity-0", "opacity-100"}
+    )
+    |> JS.show(
+      to: "##{id}-container",
+      transition:
+        {"transition-all transform ease-out duration-300",
+         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
+         "opacity-100 translate-y-0 sm:scale-100"}
+    )
+    |> JS.add_class("overflow-hidden", to: "body")
+    |> JS.focus_first(to: "##{id}-content")
+  end
+
+  def modal_hide_js(js, id) do
+    js
+    |> JS.hide(
+      to: "##{id}-bg",
+      transition: {"transition-all transform ease-in duration-200", "opacity-100", "opacity-0"}
+    )
+    |> JS.hide(
+      to: "##{id}-container",
+      time: 200,
+      transition:
+        {"transition-all transform ease-in duration-200",
+         "opacity-100 translate-y-0 sm:scale-100",
+         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
+    )
+    |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
+    |> JS.remove_class("overflow-hidden", to: "body")
+    |> JS.pop_focus()
   end
 
   override Core, :table do
@@ -418,6 +492,7 @@ defmodule Phlegethon.Overrides.Default do
 
   override Extra, :a do
     set :class, @shared_link_class
+    set :replace, false
   end
 
   override Extra, :code do
@@ -427,6 +502,18 @@ defmodule Phlegethon.Overrides.Default do
 
   override Extra, :nav_link do
     set :class, &__MODULE__.nav_link_class/1
+    set :is_current, &__MODULE__.nav_link_is_current/1
+  end
+
+  @doc """
+  Determine if the current path prop matches the uri prop.
+
+  This is useful for styling the link differently if the link is "active".
+  """
+  def nav_link_is_current(passed_assigns) do
+    %{path: current_path} = URI.parse(passed_assigns[:current_uri])
+    %{path: path} = URI.parse(passed_assigns[:uri])
+    current_path == path
   end
 
   def nav_link_class(passed_assigns) do
@@ -453,22 +540,24 @@ defmodule Phlegethon.Overrides.Default do
 
     [
       "progress",
-        "h-1": size == "xs",
-        "h-2": size == "sm",
+      "h-1": size == "xs",
+      "h-2": size == "sm",
       "h-4": size == "md",
-        "h-6": size == "lg",
-        "h-8": size == "xl",
+      "h-6": size == "lg",
+      "h-8": size == "xl",
       root: color == "root" || color not in @theme_colors,
       brand: color == "brand",
       info: color == "info",
-        error: color == "error",
-        warning: color == "warning",
+      error: color == "error",
+      warning: color == "warning",
       success: color == "success"
-      ]
+    ]
   end
 
   override Extra, :spinner do
     set :class, &__MODULE__.spinner_class/1
+    set :size, "md"
+    set :sizes, ~w[xs sm md lg xl]
   end
 
   def spinner_class(passed_assigns) do
@@ -500,6 +589,10 @@ defmodule Phlegethon.Overrides.Default do
 
     set :tooltip_text_class,
         "bg-brand text-brand-fg min-w-[20rem] p-2 rounded text-sm font-normal whitespace-pre"
+
+    set :icon_name, "hero-question-mark-circle-solid"
+    set :vertical_offset, "2.25rem"
+    set :horizontal_offset, "0"
   end
 
   ##############################################################################
@@ -509,6 +602,7 @@ defmodule Phlegethon.Overrides.Default do
   override SmartForm, :smart_form do
     set :actions_class, "mt-2 flex items-center justify-between gap-6"
     set :class, &__MODULE__.smart_form_class/1
+    set :autocomplete, "off"
   end
 
   def smart_form_class(passed_assigns) do
@@ -530,4 +624,13 @@ defmodule Phlegethon.Overrides.Default do
       get_by_path(passed_assigns, [:field, :class])
     ]
   end
+
+  # override SmartDataTable, :render do
+  #   set :class, "grid"
+  #   set :phlegethon_table, &__MODULE__.smart_data_table_phlegethon_table/1
+  # end
+
+  # def smart_data_table_phlegethon_table(passed_assigns) do
+  #   UI.table_for(passed_assigns[:resource])
+  # end
 end

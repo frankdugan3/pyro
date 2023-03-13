@@ -1,6 +1,6 @@
 # defmodule Phlegethon.Overrides.Ash do
 #   @moduledoc """
-#   This is the theme for [AshHQ](https://ash-hq.org/). It builds on `Phlegethon.Overrides.Default` and `Phlegethon.Overrides.Essential`, overriding only the settings needed to apply its theme.
+#   This is the theme for [AshHQ](https://ash-hq.org/). It builds on `Phlegethon.Overrides.Default`, overriding only the settings needed to apply its theme.
 
 #   In addition to proving Ash projects with a consistent preset, it is an example of how to tweak a handful of settings while leaving most of the configuration to the default preset.
 #   """

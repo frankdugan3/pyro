@@ -8,15 +8,8 @@ defmodule Phlegethon.Components.Extra do
   @doc """
   Renders a link. This basically wraps `Phoenix.Component.link/1` with some overridable attributes, in particular `class` for consistent, DRY link default styling.
   """
-  @doc type: :component
 
-  attr :class, :any, doc: "Merge/override default classes of the `code` element"
-
-  attr :replace, :boolean,
-    doc: """
-    When using `:patch` or `:navigate`,
-    should the browser's history be replaced with `pushState`?
-    """
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
 
   attr :navigate, :string,
     default: nil,
@@ -58,6 +51,19 @@ defmodule Phlegethon.Components.Extra do
     A boolean or custom token to use for links with an HTTP method other than `get`.
     """
 
+  attr :replace, :boolean,
+    overridable: true,
+    required: true,
+    doc: """
+    When using `:patch` or `:navigate`,
+    should the browser's history be replaced with `pushState`?
+    """
+
+  attr :class, :tails_classes,
+    overridable: true,
+    required: true,
+    doc: "Merge/override default classes of the `code` element"
+
   attr :rest, :global,
     doc: """
     Additional HTML attributes added to the `a` tag.
@@ -70,10 +76,7 @@ defmodule Phlegethon.Components.Extra do
     """
 
   def a(assigns) do
-    assigns =
-      assigns
-      |> assign_overridable(:class, class?: true, required?: true)
-      |> assign_overridable(:replace, required?: true)
+    assigns = assign_overridables(assigns)
 
     ~H"""
     <.link
@@ -94,9 +97,8 @@ defmodule Phlegethon.Components.Extra do
   @doc """
   Renders a code block.
   """
-  @doc type: :component
 
-  attr :class, :any, doc: "Merge/override default classes of the `code` element"
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :source, :string, required: true, doc: "The code snippet"
 
   attr :language, :string,
@@ -104,8 +106,13 @@ defmodule Phlegethon.Components.Extra do
     values: ~w[elixir heex html none],
     doc: "Language of the code snippet"
 
+  attr :class, :tails_classes,
+    overridable: true,
+    required: true,
+    doc: "Merge/override default classes of the `code` element"
+
   def code(assigns) do
-    assigns = assign_overridable(assigns, :class, class?: true, required?: true)
+    assigns = assign_overridables(assigns)
 
     ~H"""
     <code class={@class} phx-no-format><%= format_code(@source, @language) %></code>
@@ -123,19 +130,24 @@ defmodule Phlegethon.Components.Extra do
   @doc """
   Renders a navigation link, taking into account whether the URI is the current page.
   """
-  @doc type: :component
 
-  attr :class, :any, doc: "The class of the navigation link"
-  attr :is_current, :boolean, doc: "Does `:uri` match `:current_uri`?"
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :label, :string, required: true, doc: "The label of of the link"
   attr :uri, :string, required: true, doc: "The URI of the link"
   attr :current_uri, :string, required: true, doc: "The current URI of the page"
 
+  attr :is_current, :boolean,
+    overridable: true,
+    required: true,
+    doc: "Does `:uri` match `:current_uri`?"
+
+  attr :class, :tails_classes,
+    overridable: true,
+    required: true,
+    doc: "The class of the navigation link"
+
   def nav_link(assigns) do
-    assigns =
-      assigns
-      |> assign_overridable(:is_current, required?: true)
-      |> assign_overridable(:class, class?: true, required?: true)
+    assigns = assign_overridables(assigns)
 
     ~H"""
     <.link :if={!@is_current} class={@class} navigate={@uri}>
@@ -150,21 +162,22 @@ defmodule Phlegethon.Components.Extra do
   @doc """
   A progress element. Styling the progress element is tricky, so this wraps it with some nice conveniences.
   """
-  @doc type: :component
 
-  attr :class, :any, doc: "The class of the progress bar"
-  attr :color, :string, doc: "The color of the progress bar"
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :max, :integer, default: 100
-  attr :size, :string, doc: "The size of the progress bar"
   attr :value, :integer, default: 0
+  attr :color, :string, overridable: true, required: true, doc: "The color of the progress bar"
+  attr :size, :string, overridable: true, required: true, doc: "The size of the progress bar"
+
+  attr :class, :tails_classes,
+    overridable: true,
+    required: true,
+    doc: "The class of the progress bar"
+
   attr :rest, :global
 
   def progress(assigns) do
-    assigns =
-      assigns
-      |> assign_overridable(:class, class?: true, required?: true)
-      |> assign_overridable(:size, values: :sizes, required?: true)
-      |> assign_overridable(:color, values: :colors, required?: true)
+    assigns = assign_overridables(assigns)
 
     ~H"""
     <progress value={@value} max={@max} class={@class} {@rest} />
@@ -174,18 +187,15 @@ defmodule Phlegethon.Components.Extra do
   @doc """
   A simple spinner component.
   """
-  @doc type: :component
 
-  attr :class, :any
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :show, :boolean, default: true, doc: "Show or hide spinner"
-  attr :size, :string, doc: "The size of the spinner"
   attr :rest, :global
+  attr :size, :string, overridable: true, required: true, doc: "The size of the spinner"
+  attr :class, :tails_classes, overridable: true, required: true
 
   def spinner(assigns) do
-    assigns =
-      assigns
-      |> assign_overridable(:class, class?: true, required?: true)
-      |> assign_overridable(:size, values: :sizes, required?: true)
+    assigns = assign_overridables(assigns)
 
     ~H"""
     <svg {@rest} class={@class} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -219,32 +229,28 @@ defmodule Phlegethon.Components.Extra do
         </div>
       </.tooltip>
   """
-  attr :class, :any
-  attr :tooltip_class, :any
-  attr :tooltip_text_class, :any
-  attr :icon_class, :any
-  attr :horizontal_offset, :string
-  attr :vertical_offset, :string
 
-  attr :icon_name, :string,
-    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
-
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :id, :string, required: true
   attr :tooltip, :string, default: nil
+  attr :vertical_offset, :string, overridable: true, required: true
+  attr :horizontal_offset, :string, overridable: true, required: true
+  attr :tooltip_class, :tails_classes, overridable: true, required: true
+  attr :tooltip_text_class, :tails_classes, overridable: true, required: true
+  attr :icon_class, :tails_classes, overridable: true
+
+  attr :icon_name, :string,
+    overridable: true,
+    required: true,
+    doc: "The name of the icon; see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
+
+  attr :class, :tails_classes, overridable: true, required: true
 
   slot :icon
   slot :inner_block
 
   def tooltip(assigns) do
-    assigns =
-      assigns
-      |> assign_overridable(:horizontal_offset, required?: true)
-      |> assign_overridable(:icon_name, required?: true)
-      |> assign_overridable(:vertical_offset, required?: true)
-      |> assign_overridable(:class, class?: true, required?: true)
-      |> assign_overridable(:icon_class, class?: true)
-      |> assign_overridable(:tooltip_class, class?: true, required?: true)
-      |> assign_overridable(:tooltip_text_class, class?: true, required?: true)
+    assigns = assign_overridables(assigns)
 
     assigns[:tooltip] || assigns[:inner_block] ||
       raise ArgumentError, "missing :tooltip assign or :inner_block slot"
@@ -254,7 +260,7 @@ defmodule Phlegethon.Components.Extra do
       <%= if assigns[:icon] !== [] do %>
         <%= render_slot(@icon) %>
       <% else %>
-        <Phlegethon.Components.Core.icon name={@icon_name} class={@icon_class} />
+        <Phlegethon.Components.Core.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
       <% end %>
       <span
         id={@id <> "-tooltip"}

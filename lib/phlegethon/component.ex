@@ -1,6 +1,12 @@
 defmodule Phlegethon.Component do
   @moduledoc ~S'''
-  This is basically the same thing as `Phoenix.Component`, but adds a powerful helper `assign_overridable/2` and some other conveniences.
+  This is basically the same thing as `Phoenix.Component`, but Phlegethon extends the `attr/3` macro with:
+
+  * `:tails_classes` type
+  * `:overridable` flag
+  * `:values` supports an atom value (override key)
+
+  Phlegethon also provides `assign_overridables/1`, which automatically assigns all flagged `overridable` attrs with defautls from `Phlegethon.Overrides`
 
   ## Example
 
@@ -11,16 +17,17 @@ defmodule Phlegethon.Component do
     """
     use Phlegethon.Component
 
-    attr :class, :any
+    attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+    attr :class, :tails_classes, overridable: true, required: true
     attr :href, :string, required: true
     attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target type]
     slot :inner_block, required: true
 
     def external_link(assigns) do
-      assigns = assign_overridable(:class, required?: true)
+      assigns = assign_overridables(assigns)
       ~H"""
       <a class={@class} href={@href}} {@rest}>
-      <%= render_slot(@inner_block) %>
+        <%= render_slot(@inner_block) %>
       </a>
       """
     end
@@ -29,104 +36,242 @@ defmodule Phlegethon.Component do
 
   > #### Note: {: .info}
   >
-  > Please see the `Phoenix.Component` docs, as they will not be duplicated here.
+  > Only additional features will be documented here. Please see the `Phoenix.Component` docs for the rest, as they will not be duplicated here.
   '''
 
   @gettext_backend Application.compile_env!(:phlegethon, :gettext)
+  @overrides_attr_doc "Manually set the overrides for this component (instead of config/default)"
 
   defmacro __using__(opts \\ []) do
-    quote do
-      use Phoenix.Component, Keyword.take(unquote(opts), [:global_prefixes])
+    conditional =
+      if __CALLER__.module != Phoenix.LiveView.Helpers do
+        quote do: import(Phoenix.LiveView.Helpers)
+      end
 
-      Module.register_attribute(__MODULE__, :__overrides__, accumulate: true)
+    component =
+      quote bind_quoted: [opts: opts] do
+        import Kernel, except: [def: 2, defp: 2]
+        import Phoenix.Component, except: [attr: 2, attr: 3]
+        import Phoenix.Component.Declarative
+        require Phoenix.Template
 
-      @before_compile unquote(__MODULE__)
+        for {prefix_match, value} <-
+              Phoenix.Component.Declarative.__setup__(
+                __MODULE__,
+                Keyword.take(opts, [:global_prefixes])
+              ) do
+          @doc false
+          def __global__?(unquote(prefix_match)), do: unquote(value)
+        end
+      end
 
-      import unquote(__MODULE__)
-      import unquote(__MODULE__).Helpers
-      alias Phoenix.LiveView.JS
+    phlegethon =
+      quote do
+        @overrides_attr_doc unquote(@overrides_attr_doc)
 
-      import unquote(@gettext_backend)
-      @gettext_backend unquote(@gettext_backend)
+        Module.register_attribute(__MODULE__, :__overridable_attrs__, accumulate: true)
+        Module.register_attribute(__MODULE__, :__assign_overridables_calls__, accumulate: true)
+        Module.put_attribute(__MODULE__, :__overridable_components__, %{})
+
+        import unquote(__MODULE__)
+        import unquote(__MODULE__).Helpers
+        alias Phoenix.LiveView.JS
+
+        @on_definition unquote(__MODULE__)
+        @before_compile unquote(__MODULE__)
+
+        Module.delete_attribute(__MODULE__, :__overridable_attrs__)
+        Module.delete_attribute(__MODULE__, :__assign_overridables_calls__)
+
+        import unquote(@gettext_backend)
+        @gettext_backend unquote(@gettext_backend)
+      end
+
+    [conditional, component, phlegethon]
+  end
+
+  @doc """
+  There are only a few things added to `Phoenix.Component.attr/3` by Phlegethon:
+
+  * `:tails_classes` type
+    * merges overridable defaults with passed prop values via `Tails`
+    * prevents weird precedence conflicts
+    * less bloated HTML
+  * `:overridable` flag (marks attribute to be overridden by `Phlegethon.Overrides`)
+  * `:values` supports an atom value (override key, loaded by `Phlegethon.Overrides`)
+
+  There are compile time checks to ensure the following, but of note:
+
+  * Attrs flagged as `overridable` cannot have a `default` - That's what overrides are for! 🚀
+  * If flagged as `overridable` and `required`, a runtime exception will be raised if no configured overrides provide a default
+  * If any attrs are flagged as overridable
+    * The first attribute must be:
+
+    ```
+    attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+    ```
+
+    * `assign_overridables/1` must be called
+
+  Everything else is handled by `Phoenix.Component.attr/3`, so please consult those docs for the rest.
+  """
+  defmacro attr(name, type, opts \\ []) do
+    type =
+      if Macro.quoted_literal?(type) do
+        Macro.prewalk(type, &expand_alias(&1, __CALLER__))
+      else
+        type
+      end
+
+    if type == :tails_classes && !opts[:overridable] do
+      invalid_overridable_attr_option!(
+        __CALLER__,
+        name,
+        ":tails_classes type is only available for overridable props",
+        "attr #{inspect(name)}, :tails_classes, overridable: true"
+      )
+    end
+
+    if opts[:overridable] && opts[:default] do
+      invalid_overridable_attr_option!(
+        __CALLER__,
+        name,
+        "attr #{inspect(name)}, default: #{inspect(opts[:default])}",
+        """
+        remove the default from the attr options.
+
+          Overridable defaults *must* be set via override files, not attribute options.
+
+        """
+      )
+    end
+
+    # Append overridable info to docs
+    opts =
+      if opts[:overridable] do
+        Keyword.put(
+          opts,
+          :doc,
+          [
+            opts[:doc],
+            "(#{["overridable", if(type == :tails_classes, do: "`#{inspect(type)}`"), if(opts[:required], do: "required")] |> Enum.filter(& &1) |> Enum.join(", ")})"
+          ]
+          |> Enum.filter(& &1)
+          |> Enum.join(" ")
+        )
+      else
+        opts
+      end
+
+    phoenix_opts =
+      if opts[:overridable] do
+        drops =
+          case opts[:values] do
+            values when not is_nil(values) and is_atom(values) ->
+              [:values]
+
+            _ ->
+              []
+          end ++ [:overridable, :required]
+
+        Keyword.drop(opts, drops)
+      else
+        opts
+      end
+
+    # Phoenix doesn't support the `:tails_classes` type natively
+    phoenix_type =
+      case type do
+        :tails_classes -> :any
+        type -> type
+      end
+
+    quote bind_quoted: [
+            name: name,
+            type: type,
+            phoenix_type: phoenix_type,
+            opts: opts,
+            phoenix_opts: phoenix_opts
+          ] do
+      Phlegethon.Component.__overridable_attr__!(
+        __MODULE__,
+        name,
+        type,
+        opts,
+        __ENV__.line,
+        __ENV__.file
+      )
+
+      Phoenix.Component.Declarative.__attr__!(
+        __MODULE__,
+        name,
+        phoenix_type,
+        phoenix_opts,
+        __ENV__.line,
+        __ENV__.file
+      )
     end
   end
 
-  @doc false
-  defmacro __before_compile__(env) do
-    phlegethon_components =
-      env.module
-      |> Module.get_attribute(:__overrides__)
-      |> Enum.reduce(%{}, fn {component_name, attr_name, opts}, acc ->
-        attr =
-          with %{attrs: attrs} <-
-                 Module.get_attribute(env.module, :__components__)[component_name],
-               %{opts: opts} = attr <- Enum.find(attrs, &(&1.name == attr_name)) do
-            %{
-              attr_opts: opts |> Map.new() |> Map.put(:required, attr.required),
-              type: attr.type
-            }
-          else
-            _ ->
-              raise """
-              Unable to find prop ":#{attr_name}" on component "#{env.module}.#{component_name}/1".
+  @doc """
+  This macro automatically assigns all the overridable attrs, and handles merging classes for `:tails_classes` type attrs.
 
-                Currently only "attr" props are supported.
-              """
-          end
+  It *must* be called once in any component that contains overridable attrs.
+
+  ## Example
+
+  ```
+  def external_link(assigns) do
+      assigns = assign_overridables(assigns)
+  ```
+  """
+  @spec assign_overridables(map) :: map
+  defmacro assign_overridables(assigns) do
+    module = __CALLER__.module
+    {component_name, 1} = __CALLER__.function
+
+    # TODO: Check that it isn't already defined, implying it got called twice in the same component
+    Module.put_attribute(module, :__assign_overridables_calls__, component_name)
+
+
+    quote bind_quoted: [assigns: assigns, module: module, component_name: component_name] do
+      __overridable_components__()[component_name][:overridable_attrs]
+      |> Enum.reduce(assigns, fn %{name: name, required: required} = opts, assigns ->
+
+        # TODO: Validate values at runtime; load overridable values if atom instead of list.
 
         override =
-          opts
-          |> Map.new()
-          |> Map.merge(attr)
+          Map.get(assigns, :overrides) || Phlegethon.Overrides.configured_overrides()
+          |> Enum.reduce_while(nil, fn override_module, _ ->
+            override_module.overrides()
+            |> Map.fetch({{__MODULE__, component_name}, name})
+            |> case do
+              {:ok, value} -> {:halt, value}
+              :error -> {:cont, nil}
+            end
+          end)
+          |> case do
+            {:pass_assigns_to, override} ->
+              override = maybe_merge_classes(assigns, name, override.(assigns), opts)
+              assign(assigns, name, override)
 
-        if override[:attr_opts][:default] do
-          raise """
-          Cannot override default for "attr :#{attr_name}"
+            override when not is_nil(override) ->
+              assign(assigns, name, maybe_merge_classes(assigns, name, override, opts))
 
-            - Component: #{env.module}.#{component_name}/1
-            - Prop: "attr :#{attr_name}"
-            - Reason: "assign_override(:#{attr_name}, default: #{inspect(Keyword.get(opts, :default))})"
+            _ ->
+              if required do
+                raise """
+                No override set for "attr #{inspect(name)}"
 
-            Overridable defaults *must* be set via override files, not attribute options.
-          """
-        end
-
-        if override[:attr_opts][:required] do
-          raise """
-          Cannot override default for "attr :#{attr_name}"
-
-            - Component: #{env.module}.#{component_name}/1
-            - Prop: "attr :#{attr_name}"
-            - Reason: "required: true"
-
-            If you want to require an override setting, remove "required: true" from the prop and instead:
-
-            assign_override(:#{attr_name}, required?: true)
-          """
-        end
-
-        if override[:class?] && override[:type] != :any do
-          raise """
-          Cannot override default for "attr :#{attr_name}"
-
-            - Component: #{env.module}.#{component_name}/1
-            - Prop: "attr :#{attr_name}"
-            - Reason: "class?: true", but "type: :#{override[:type]}"
-
-            The class override type is expecting a variety of prop types to pass into Tails.
-
-            You must set the attr type to ":any".
-          """
-        end
-
-        case Map.get(acc, component_name) do
-          nil -> Map.put(acc, component_name, Map.new([{attr_name, override}]))
-          component -> Map.put(acc, component_name, Map.put(component, attr_name, override))
-        end
+                  * Component: #{__MODULE__}.#{component_name}/1
+                  * Prop: "attr #{inspect(name)}"
+                  * Problem: override is required to be set
+                """
+              else
+                assign(assigns, name, maybe_merge_classes(assigns, name, nil, opts))
+              end
+          end
       end)
-
-    quote do
-      def __phlegethon_components__, do: unquote(Macro.escape(phlegethon_components))
     end
   end
 
@@ -177,75 +322,216 @@ defmodule Phlegethon.Component do
     })
   end
 
-  @doc """
-  Assign an overridable attribute.
-
-  TODO: Expand on docs.
-  """
-  @type assign_overridable_opts ::
-          {:class?, boolean}
-          | {:required?, boolean}
-          | {:values, :atom}
-  @spec assign_overridable(map, atom, [assign_overridable_opts]) :: map
-  defmacro assign_overridable(assigns, attr, opts \\ []) do
-    module = __CALLER__.module
-    {component, 1} = __CALLER__.function
-
-    Module.put_attribute(module, :__overrides__, {component, attr, opts})
-
-    quote bind_quoted: [
-            component: component,
-            assigns: assigns,
-            attr: attr
-          ] do
-      opts = __phlegethon_components__()[component][attr]
-
-      # TODO: validate values
-
-      override =
-        Map.get(assigns, :overrides, Phlegethon.Overrides.configured_overrides())
-        |> Enum.reduce_while(nil, fn override_module, _ ->
-          override_module.overrides()
-          |> Map.fetch({{__MODULE__, component}, attr})
-          |> case do
-            {:ok, value} -> {:halt, value}
-            :error -> {:cont, nil}
-          end
-        end)
-        |> case do
-          {:pass_assigns_to, override} ->
-            override = maybe_merge_classes(assigns, attr, override.(assigns), opts)
-            assign(assigns, attr, override)
-
-          override when not is_nil(override) ->
-            assign(assigns, attr, maybe_merge_classes(assigns, attr, override, opts))
-
-          _ ->
-            if opts[:required?] do
-              raise """
-              No override set for "attr :#{attr}"
-
-                - Component: #{__MODULE__}.#{component}/1
-                - Prop: "attr :#{attr}"
-                - Reason: override required
-              """
-            else
-              assign(assigns, attr, maybe_merge_classes(assigns, attr, nil, opts))
-            end
-        end
-    end
-  end
-
   @doc false
+  # Internal tooling to merge classes at runtime
   def maybe_merge_classes(assigns, attr, override, %{class?: true}) do
     Tails.classes([override, assigns[attr]])
   end
 
-  @doc false
+  def maybe_merge_classes(assigns, attr, override, %{type: :tails_classes}) do
+    Tails.classes([override, assigns[attr]])
+  end
+
   def maybe_merge_classes(assigns, attr, override, _opts) do
     case assigns[attr] do
       nil -> override
       value -> value
     end
   end
+
+  @doc false
+  def __on_definition__(env, kind, name, args, _guards, _body) do
+    if length(args) == 1 && not String.starts_with?(to_string(name), "__") &&
+         Enum.find(args, fn {arg, _line, _} -> arg == :assigns end) do
+      # Get list of attribute line numbers for this component
+      attr_lines =
+        Module.get_attribute(env.module, :__components__)[name][:attrs]
+        |> Enum.map(& &1.line)
+
+      # Only include overrides that have the same line
+      attrs =
+        Module.get_attribute(env.module, :__overridable_attrs__)
+        |> Enum.filter(&(&1.line in attr_lines))
+        # We need to preserve definition order
+        |> Enum.reverse()
+
+      overrides = Enum.filter(attrs, & &1.overridable)
+
+      first_attr = List.first(attrs)
+
+      # Automatically mark the doc type as a component
+      Module.put_attribute(env.module, :doc, {first_attr.line - 1, type: :component})
+
+      if length(overrides) > 0 do
+        case first_attr do
+          %{name: :overrides, type: :list, opts: [default: nil, doc: _]} ->
+            :ok
+
+          attr ->
+            raise CompileError,
+              line: attr.line,
+              file: attr.file,
+              description: """
+
+
+              Phlegethon.Component - Missing :overrides Prop
+
+                * Prop: attr #{inspect(attr.name)}
+                * Problem: The first prop of the component must be :overrides
+                * Solution:
+
+                  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+                  attr #{inspect(attr.name)} # ...
+                  # ... other props
+                  #{kind} #{name} (assigns) do
+              """
+        end
+
+        components = Module.get_attribute(env.module, :__overridable_components__)
+
+        if Map.get(components, name) do
+          raise """
+          Phlegethon.Component: Component #{module_label(env.module)}.#{name}/1 already defined.
+          This is probably a Phlegethon bug, as this should never be possible.
+          """
+        end
+
+        Module.put_attribute(
+          env.module,
+          :__overridable_components__,
+          Map.put(components, name, %{kind: kind, overridable_attrs: overrides})
+        )
+      else
+        :ok
+      end
+
+      :ok
+    else
+      :ok
+    end
+  end
+
+  @doc false
+  defmacro __before_compile__(env) do
+    assign_overridable_calls = Module.get_attribute(env.module, :__assign_overridables_calls__)
+
+    overridable_components =
+    env.module
+    |> Module.get_attribute(:__overridable_components__)
+
+    overridable_components
+    |> Enum.each(fn {name, opts} ->
+      unless name in assign_overridable_calls do
+        raise CompileError,
+          file: env.file,
+          description: """
+
+
+          Phlegethon.Component - Missing Call to assign_overridables/1
+
+            * Component: #{module_label(env.module)}.#{name}/1
+            * Problem: assign_overridables/1 must be called by components with overridable props
+            * Solution:
+
+              #{opts[:kind]} #{name} (assigns) do
+                assigns = assign_overridables(assigns)
+          """
+      end
+    end)
+
+    override_docs =
+    if overridable_components && overridable_components != %{} do
+    """
+    ## Overridable Component Attributes
+
+    You can customize the components in this module by [configuring overrides](`Phlegethon.Overrides`).
+
+    The components in this module support the following overridable attributes:
+
+    #{overridable_components |> Enum.map(fn {component, %{overridable_attrs: attrs}} -> """
+      - `#{component}/1`
+      #{Enum.map_join(attrs, "\n", fn %{name: name, type: type, required: required} ->
+        "  - `#{inspect name}` `#{inspect type}`" <> (if required, do: " (required)", else: "")
+      end)}
+      """ end) |> Enum.join("\n")}
+    """
+    else
+       ""
+  end
+
+    quote do
+      @moduledoc (case @moduledoc do
+        false ->
+          false
+
+        nil ->
+          name =
+            __MODULE__
+            |> Module.split()
+            |> List.last()
+
+          unquote(override_docs)
+
+        docs ->
+          docs <> "\n" <> unquote(override_docs)
+      end)
+
+      def __overridable_components__() do
+        @__overridable_components__
+      end
+    end
+  end
+
+  @doc false
+  def __overridable_attr__!(module, name, type, opts, line, file)
+      when is_atom(name) and is_list(opts) do
+    {overridable, opts} = Keyword.pop(opts, :overridable, false)
+    {required, opts} = Keyword.pop(opts, :required, false)
+
+    overridable = %{
+      name: name,
+      overridable: overridable,
+      type: type,
+      required: required,
+      opts: opts,
+      file: file,
+      line: line
+    }
+
+    Module.put_attribute(
+      module,
+      :__overridable_attrs__,
+      overridable
+    )
+
+    :ok
+  end
+
+  defp expand_alias({:__aliases__, _, _} = alias, env),
+    do: Macro.expand(alias, %{env | function: {:__attr__, 3}})
+
+  defp expand_alias(other, _env), do: other
+
+
+  defp invalid_overridable_attr_option!(env, attr_name, problem, solution) do
+    raise CompileError,
+      line: env.line,
+      file: env.file,
+      description: """
+
+
+      Phlegethon.Component - Invalid Overridable Option
+
+        * Prop: attr #{inspect(attr_name)}
+        * Problem: #{problem}
+        * Solution: #{solution}
+      """
+  end
+
+  @spec module_label(module) :: String.t()
+  defp module_label(module),
+    do:
+      module
+      |> Module.split()
+      |> Enum.join(".")
 end
