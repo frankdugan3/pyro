@@ -362,7 +362,7 @@ defmodule Phlegethon.Component do
       # Automatically mark the doc type as a component
       Module.put_attribute(env.module, :doc, {first_attr.line - 1, type: :component})
 
-      if length(overrides) > 0 do
+      unless Enum.empty?(overrides) do
         case first_attr do
           %{name: :overrides, type: :list, opts: [default: nil, doc: _]} ->
             :ok

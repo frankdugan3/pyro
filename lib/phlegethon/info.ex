@@ -1107,7 +1107,7 @@ defmodule Phlegethon.Info do
   #        _actor,
   #        _opts
   #      )
-  #      when length(arguments) > 0 do
+  #      when is_list(arguments) and arguments != [] do
   #   # args =
   #   #   arguments
   #   #   |> Enum.filter(&(&1.allow_nil? == false))

@@ -159,7 +159,7 @@ defmodule Phlegethon.Resource.Transformers.ValidateFormActions do
 
     # Only validate if form is configured
     # TODO: Require form to be disabled by option, use that instead of length (because we want to explicitly disable forms rather than implicitly)
-    if length(form_actions) > 0 do
+    unless Enum.empty?(form_actions) do
       # No duplicate actions
       form_actions
       |> Enum.group_by(& &1.name)

@@ -265,7 +265,7 @@ defmodule Phlegethon.Components.Core do
     |> Map.new()
   end
 
-  defp any_flash?(flash), do: Map.keys(flash) > 0
+  defp any_flash?(flash), do: !Enum.empty?(Map.keys(flash))
 
   defp parse_flash(flash, kind) do
     flash
