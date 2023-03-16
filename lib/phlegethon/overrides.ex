@@ -192,7 +192,8 @@ defmodule Phlegethon.Overrides do
         |> Module.get_attribute(:__pass_assigns_to__)
         |> Map.put(name, true)
 
-      append = "This override is passed component assigns and executed while being assigned at runtime."
+      append =
+        "This override is passed component assigns and executed while being assigned at runtime."
 
       docs =
         case Module.get_attribute(env.module, :doc) do
@@ -356,10 +357,16 @@ defmodule Phlegethon.Overrides do
   def extend_colors do
     configured_overrides()
     |> Enum.reduce_while(nil, fn module, _ ->
-      module.extend_colors()
-      |> case do
-        %{} = value -> {:halt, value}
-        nil -> {:cont, nil}
+      case Code.ensure_compiled(module) do
+        {:module, _} ->
+          module.extend_colors()
+          |> case do
+            %{} = value -> {:halt, value}
+            nil -> {:cont, nil}
+          end
+
+        {:error, _} ->
+          {:cont, nil}
       end
     end)
   end
@@ -370,10 +377,16 @@ defmodule Phlegethon.Overrides do
   def global_style do
     configured_overrides()
     |> Enum.reduce_while(nil, fn module, _ ->
-      module.global_style()
-      |> case do
-        value when is_binary(value) -> {:halt, value}
-        nil -> {:cont, nil}
+      case Code.ensure_compiled(module) do
+        {:module, _} ->
+          module.global_style()
+          |> case do
+            value when is_binary(value) -> {:halt, value}
+            nil -> {:cont, nil}
+          end
+
+        {:error, _} ->
+          {:cont, nil}
       end
     end)
   end
@@ -385,20 +398,32 @@ defmodule Phlegethon.Overrides do
     light =
       configured_overrides()
       |> Enum.reduce_while(nil, fn module, _ ->
-        module.makeup_light()
-        |> case do
-          value when is_function(value, 0) -> {:halt, value}
-          nil -> {:cont, nil}
+        case Code.ensure_compiled(module) do
+          {:module, _} ->
+            module.makeup_light()
+            |> case do
+              value when is_function(value, 0) -> {:halt, value}
+              nil -> {:cont, nil}
+            end
+
+          {:error, _} ->
+            {:cont, nil}
         end
       end)
 
     dark =
       configured_overrides()
       |> Enum.reduce_while(nil, fn module, _ ->
-        module.makeup_dark()
-        |> case do
-          value when is_function(value, 0) -> {:halt, value}
-          nil -> {:cont, nil}
+        case Code.ensure_compiled(module) do
+          {:module, _} ->
+            module.makeup_dark()
+            |> case do
+              value when is_function(value, 0) -> {:halt, value}
+              nil -> {:cont, nil}
+            end
+
+          {:error, _} ->
+            {:cont, nil}
         end
       end)
 
@@ -412,11 +437,17 @@ defmodule Phlegethon.Overrides do
   def override_for(module, component, prop) do
     configured_overrides()
     |> Enum.reduce_while(nil, fn override_module, _ ->
-      override_module.overrides()
-      |> Map.fetch({{module, component}, prop})
-      |> case do
-        {:ok, value} -> {:halt, value}
-        :error -> {:cont, nil}
+      case Code.ensure_compiled(module) do
+        {:module, _} ->
+          override_module.overrides()
+          |> Map.fetch({{module, component}, prop})
+          |> case do
+            {:ok, value} -> {:halt, value}
+            :error -> {:cont, nil}
+          end
+
+        {:error, _} ->
+          {:cont, nil}
       end
     end)
   end

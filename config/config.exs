@@ -1,7 +1,5 @@
 import Config
 
-config :phlegethon, gettext: Phlegethon.Gettext
-
 config :spark, :formatter,
   remove_parens?: true,
   "Ash.Resource": [

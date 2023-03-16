@@ -39,7 +39,6 @@ defmodule Phlegethon.Component do
   > Only additional features will be documented here. Please see the `Phoenix.Component` docs for the rest, as they will not be duplicated here.
   '''
 
-  @gettext_backend Application.compile_env!(:phlegethon, :gettext)
   @overrides_attr_doc "Manually set the overrides for this component (instead of config/default)"
 
   defmacro __using__(opts \\ []) do
@@ -82,9 +81,6 @@ defmodule Phlegethon.Component do
 
         Module.delete_attribute(__MODULE__, :__overridable_attrs__)
         Module.delete_attribute(__MODULE__, :__assign_overridables_calls__)
-
-        import unquote(@gettext_backend)
-        @gettext_backend unquote(@gettext_backend)
       end
 
     [conditional, component, phlegethon]
@@ -233,44 +229,43 @@ defmodule Phlegethon.Component do
     # TODO: Check that it isn't already defined, implying it got called twice in the same component
     Module.put_attribute(module, :__assign_overridables_calls__, component_name)
 
-
     quote bind_quoted: [assigns: assigns, module: module, component_name: component_name] do
       __overridable_components__()[component_name][:overridable_attrs]
       |> Enum.reduce(assigns, fn %{name: name, required: required} = opts, assigns ->
-
         # TODO: Validate values at runtime; load overridable values if atom instead of list.
 
         override =
-          Map.get(assigns, :overrides) || Phlegethon.Overrides.configured_overrides()
-          |> Enum.reduce_while(nil, fn override_module, _ ->
-            override_module.overrides()
-            |> Map.fetch({{__MODULE__, component_name}, name})
-            |> case do
-              {:ok, value} -> {:halt, value}
-              :error -> {:cont, nil}
-            end
-          end)
-          |> case do
-            {:pass_assigns_to, override} ->
-              override = maybe_merge_classes(assigns, name, override.(assigns), opts)
-              assign(assigns, name, override)
-
-            override when not is_nil(override) ->
-              assign(assigns, name, maybe_merge_classes(assigns, name, override, opts))
-
-            _ ->
-              if required do
-                raise """
-                No override set for "attr #{inspect(name)}"
-
-                  * Component: #{__MODULE__}.#{component_name}/1
-                  * Prop: "attr #{inspect(name)}"
-                  * Problem: override is required to be set
-                """
-              else
-                assign(assigns, name, maybe_merge_classes(assigns, name, nil, opts))
+          Map.get(assigns, :overrides) ||
+            Phlegethon.Overrides.configured_overrides()
+            |> Enum.reduce_while(nil, fn override_module, _ ->
+              override_module.overrides()
+              |> Map.fetch({{__MODULE__, component_name}, name})
+              |> case do
+                {:ok, value} -> {:halt, value}
+                :error -> {:cont, nil}
               end
-          end
+            end)
+            |> case do
+              {:pass_assigns_to, override} ->
+                override = maybe_merge_classes(assigns, name, override.(assigns), opts)
+                assign(assigns, name, override)
+
+              override when not is_nil(override) ->
+                assign(assigns, name, maybe_merge_classes(assigns, name, override, opts))
+
+              _ ->
+                if required do
+                  raise """
+                  No override set for "attr #{inspect(name)}"
+
+                    * Component: #{__MODULE__}.#{component_name}/1
+                    * Prop: "attr #{inspect(name)}"
+                    * Problem: override is required to be set
+                  """
+                else
+                  assign(assigns, name, maybe_merge_classes(assigns, name, nil, opts))
+                end
+            end
       end)
     end
   end
@@ -416,8 +411,8 @@ defmodule Phlegethon.Component do
     assign_overridable_calls = Module.get_attribute(env.module, :__assign_overridables_calls__)
 
     overridable_components =
-    env.module
-    |> Module.get_attribute(:__overridable_components__)
+      env.module
+      |> Module.get_attribute(:__overridable_components__)
 
     overridable_components
     |> Enum.each(fn {name, opts} ->
@@ -440,41 +435,39 @@ defmodule Phlegethon.Component do
     end)
 
     override_docs =
-    if overridable_components && overridable_components != %{} do
-    """
-    ## Overridable Component Attributes
+      if overridable_components && overridable_components != %{} do
+        """
+        ## Overridable Component Attributes
 
-    You can customize the components in this module by [configuring overrides](`Phlegethon.Overrides`).
+        You can customize the components in this module by [configuring overrides](`Phlegethon.Overrides`).
 
-    The components in this module support the following overridable attributes:
+        The components in this module support the following overridable attributes:
 
-    #{overridable_components |> Enum.map(fn {component, %{overridable_attrs: attrs}} -> """
-      - `#{component}/1`
-      #{Enum.map_join(attrs, "\n", fn %{name: name, type: type, required: required} ->
-        "  - `#{inspect name}` `#{inspect type}`" <> (if required, do: " (required)", else: "")
-      end)}
-      """ end) |> Enum.join("\n")}
-    """
-    else
-       ""
-  end
+        #{overridable_components |> Enum.map(fn {component, %{overridable_attrs: attrs}} -> """
+          - `#{component}/1`
+          #{Enum.map_join(attrs, "\n", fn %{name: name, type: type, required: required} -> "  - `#{inspect(name)}` `#{inspect(type)}`" <> if required, do: " (required)", else: "" end)}
+          """ end) |> Enum.join("\n")}
+        """
+      else
+        ""
+      end
 
     quote do
       @moduledoc (case @moduledoc do
-        false ->
-          false
+                    false ->
+                      false
 
-        nil ->
-          name =
-            __MODULE__
-            |> Module.split()
-            |> List.last()
+                    nil ->
+                      name =
+                        __MODULE__
+                        |> Module.split()
+                        |> List.last()
 
-          unquote(override_docs)
+                      unquote(override_docs)
 
-        docs ->
-          docs <> "\n" <> unquote(override_docs)
-      end)
+                    docs ->
+                      docs <> "\n" <> unquote(override_docs)
+                  end)
 
       def __overridable_components__() do
         @__overridable_components__
@@ -511,7 +504,6 @@ defmodule Phlegethon.Component do
     do: Macro.expand(alias, %{env | function: {:__attr__, 3}})
 
   defp expand_alias(other, _env), do: other
-
 
   defp invalid_overridable_attr_option!(env, attr_name, problem, solution) do
     raise CompileError,

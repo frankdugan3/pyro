@@ -32,7 +32,6 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
    ```elixir
    config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")
    config :phlegethon, :overrides, [Phlegethon.Overrides.Default]
-   config :phlegethon, :gettext, MyAppWeb.Gettext
    ```
 
 3. Update your `tailwind.config.js`, and add the noted lines:
@@ -102,8 +101,6 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
    - `Phoenix.Component` with `Phlegethon.Component`
    - `Phoenix.LiveComponent` with `Phlegethon.LiveComponent`
    - `Phoenix.LiveView` with `Phlegethon.LiveView`
-
-   This is necessary because the default Phoenix validators don't know about Phlegethon's added features and will give false warnings.
 
    **Note:** _Only_ replace those top-level modules, _do not_ replace submodules, e.g. `Phoenix.LiveView.Router`.
 

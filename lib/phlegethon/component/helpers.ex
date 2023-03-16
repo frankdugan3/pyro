@@ -7,8 +7,6 @@ defmodule Phlegethon.Component.Helpers do
 
   alias Phoenix.LiveView.JS
 
-  @gettext_backend Application.compile_env!(:phlegethon, :gettext)
-
   @doc """
   Gets the `values` option for a given component and prop.
 
@@ -134,9 +132,9 @@ defmodule Phlegethon.Component.Helpers do
     # should be written to the errors.po file. The :count option is
     # set by Ecto and indicates we should also apply plural rules.
     if count = opts[:count] do
-      Gettext.dngettext(@gettext_backend, "errors", msg, msg, count, opts)
+      Gettext.dngettext(Phlegethon.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(@gettext_backend, "errors", msg, opts)
+      Gettext.dgettext(Phlegethon.Gettext, "errors", msg, opts)
     end
   end
 

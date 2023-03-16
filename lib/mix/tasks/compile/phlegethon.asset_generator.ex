@@ -3,8 +3,6 @@ defmodule Mix.Tasks.Compile.Phlegethon.AssetGenerator do
 
   use Mix.Task
 
-  @colors_file Application.compile_env!(:tails, :colors_file)
-
   @doc false
   def run(_args) do
     colors =
@@ -12,6 +10,8 @@ defmodule Mix.Tasks.Compile.Phlegethon.AssetGenerator do
       |> Map.put("transparent", "transparent")
       |> Map.put("current", "currentColor")
       |> Jason.encode!(pretty: true)
+
+    colors_file = Application.fetch_env!(:tails, :colors_file)
 
     css_file =
       Application.get_env(
@@ -31,7 +31,7 @@ defmodule Mix.Tasks.Compile.Phlegethon.AssetGenerator do
 
     Enum.each(
       [
-        {@colors_file, colors},
+        {colors_file, colors},
         {css_file, css}
       ],
       fn

@@ -1,6 +1,8 @@
 defmodule Phlegethon.Components.Extra do
   use Phlegethon.Component
 
+  import Phlegethon.Gettext
+
   @moduledoc """
   Original components provided by Phlegethon.
   """
