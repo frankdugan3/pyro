@@ -1,10 +1,10 @@
 defmodule Phlegethon.Components.SmartForm do
   use Phlegethon.Component
 
-  import Phlegethon.Gettext
+  # import Phlegethon.Gettext
   import Phlegethon.Components.Core, only: [button: 1, header: 1, input: 1]
 
-  alias Phlegethon.Info, as: UI
+  alias Phlegethon.Resource.Info, as: UI
 
   @doc """
   Renders a smart Ash form.
