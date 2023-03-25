@@ -922,22 +922,23 @@ defmodule Phlegethon.Components.Core do
     """
   end
 
-  @icons_dir Path.join(File.cwd!(), "priv/hero_icons")
-  @outline [@icons_dir, "optimized/24/outline"]
+  @icons_dir Path.join(File.cwd!(), "assets/vendor/heroicons/optimized")
+
+  @outline [@icons_dir, "24/outline"]
            |> Path.join()
            |> File.ls!()
            |> Enum.map(fn name ->
              "hero-#{Path.basename(name, ".svg")}"
            end)
 
-  @solid [@icons_dir, "optimized/24/solid"]
+  @solid [@icons_dir, "24/solid"]
          |> Path.join()
          |> File.ls!()
          |> Enum.map(fn name ->
            "hero-#{Path.basename(name, ".svg")}-solid"
          end)
 
-  @mini [@icons_dir, "optimized/20/solid"]
+  @mini [@icons_dir, "20/solid"]
         |> Path.join()
         |> File.ls!()
         |> Enum.map(fn name ->
