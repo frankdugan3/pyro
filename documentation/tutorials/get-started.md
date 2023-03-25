@@ -69,7 +69,7 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
 5. Add the following lines to `assets/js/app.js`:
 
    ```js
-   import { hooks, getTimezone } from '../deps/phlegethon/assets/js/phlegethon'
+   import { hooks, getTimezone } from 'phlegethon'
    // ...
    let liveSocket = new LiveSocket('/live', Socket, {
      params: { _csrf_token: csrfToken, timezone: getTimezone() },

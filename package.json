@@ -1,0 +1,26 @@
+{
+  "name": "phlegethon",
+  "version": "0.0.0",
+  "description": "Supporting utilities for Phlegethon components.",
+  "license": "MIT",
+  "module": "./priv/static/phlegethon.mjs",
+  "main": "./priv/static/phlegethon.cjs.js",
+  "unpkg": "./priv/static/phlegethon.min.js",
+  "jsdelivr": "./priv/static/phlegethon.min.js",
+  "exports": {
+    "import": "./priv/static/phlegethon.mjs",
+    "require": "./priv/static/phlegethon.cjs.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/frankdugan3/phlegethon.git"
+  },
+  "author": "Frank Dugan III <frank3@duganator.com> (https://frankdugan.com)",
+  "files": [
+    "README.md",
+    "LICENSE.md",
+    "package.json",
+    "priv/static/*",
+    "assets/js/phlegethon/*"
+  ]
+}

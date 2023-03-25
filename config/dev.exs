@@ -12,6 +12,14 @@ if Mix.env() == :dev do
   config :ash, :policies, show_policy_breakdowns?: true
   config :ash, :policies, log_policy_breakdowns: :info
 
+  phlegethon_esbuild = fn args ->
+    [
+      args: ~w(./js/phlegethon --bundle) ++ args,
+      cd: Path.expand("../assets", __DIR__),
+      env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+    ]
+  end
+
   # Configure esbuild (the version is required)
   config :esbuild,
     version: "0.16.17",
@@ -20,7 +28,17 @@ if Mix.env() == :dev do
         ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
       cd: Path.expand("../assets", __DIR__),
       env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-    ]
+    ],
+    module: phlegethon_esbuild.(~w(--format=esm --sourcemap --outfile=../priv/static/phlegethon.mjs)),
+    main: phlegethon_esbuild.(~w(--format=cjs --sourcemap --outfile=../priv/static/phlegethon.cjs.js)),
+    cdn:
+      phlegethon_esbuild.(
+        ~w(--target=es2016 --format=iife --global-name=Phlegethon --outfile=../priv/static/phlegethon.js)
+      ),
+    cdn_min:
+      phlegethon_esbuild.(
+        ~w(--target=es2016 --format=iife --global-name=Phlegethon --minify --outfile=../priv/static/phlegethon.min.js)
+      )
 
   # Configure tailwind (the version is required)
   config :tailwind,

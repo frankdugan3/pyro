@@ -102,12 +102,15 @@ export const hooks = {
       resetHideTTL(this)
     },
     updated() {
-      if (
-        document.querySelector(`#${this.el.id}-message`).innerHTML !==
-        this.oldMessageHTML
-      ) {
+      newMessageHTML = document.querySelector(
+        `#${this.el.id}-message`,
+      ).innerHTML
+      if (newMessageHTML !== this.oldMessageHTML) {
         this.oldEl = this.el
+        this.oldMessageHTML = newMessageHTML
         resetHideTTL(this)
+      } else {
+        el.value = this.countdown
       }
     },
     destroyed() {
@@ -120,6 +123,31 @@ export const hooks = {
     },
     updated() {
       nudge(this.el)
+    },
+  },
+  PhlegethonAutocompleteComponent: {
+    mounted() {
+      this.el.addEventListener('keydown', (event) => {
+        switch (event.key) {
+          case 'ArrowDown':
+            this.pushEvent('select_item', {
+              index: (this.el.selectedIndex + 1) % this.el.options.length,
+            })
+            break
+          case 'ArrowUp':
+            this.pushEvent('select_item', {
+              index:
+                (this.el.selectedIndex - 1 + this.el.options.length) %
+                this.el.options.length,
+            })
+            break
+          case 'Enter':
+            // Implement your desired action on item selection
+            break
+          default:
+            break
+        }
+      })
     },
   },
 }

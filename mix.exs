@@ -176,7 +176,8 @@ defmodule Phlegethon.MixProject do
         "compile",
         "deps.compile tails --force",
         "docs"
-      ],
+        ],
+      "assets.build": ["esbuild module", "esbuild cdn", "esbuild cdn_min", "esbuild main"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
     ]
   end
