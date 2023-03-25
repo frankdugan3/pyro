@@ -1,10 +1,10 @@
-defmodule Phlegethon.InfoTest do
+defmodule Phlegethon.Resource.InfoTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
   require Ash.Query
 
-  doctest Phlegethon.Info, import: true
+  doctest Phlegethon.Resource.Info, import: true
 
   defmodule User do
     @moduledoc false

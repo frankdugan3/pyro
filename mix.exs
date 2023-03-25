@@ -92,7 +92,7 @@ defmodule Phlegethon.MixProject do
         Phlegethon,
         Phlegethon.Components,
         Phlegethon.Resource,
-        Phlegethon.Info
+        Phlegethon.Resource.Info
       ],
       Overrides: [
         Phlegethon.Overrides,

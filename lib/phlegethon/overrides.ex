@@ -92,7 +92,7 @@ defmodule Phlegethon.Overrides do
         SmartForm
       }
 
-      alias Phlegethon.Info, as: UI
+      alias Phlegethon.Resource.Info, as: UI
       alias Phoenix.LiveView.JS
 
       Module.register_attribute(__MODULE__, :override, accumulate: true)

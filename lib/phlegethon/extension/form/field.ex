@@ -46,6 +46,24 @@ defmodule Phlegethon.Resource.Form.Field do
       type: {:list, :atom},
       required: false,
       doc: "Override the default path (nested paths are appended)."
+    ],
+    autocomplete_action: [
+      type: :atom,
+      required: false,
+      default: :autocomplete_search,
+      doc: "Override the default autocomplete search action."
+    ],
+    autocomplete_search_argument: [
+      type: :atom,
+      required: false,
+      default: :search,
+      doc: "Override the default autocomplete search argument."
+    ],
+    autocomplete_option_label_field: [
+      type: :atom,
+      required: false,
+      default: :label,
+      doc: "Override the default autocomplete field used as a label."
     ]
   ]
 

@@ -72,7 +72,7 @@ defmodule ComponentPreviewer do
     quote do
       # Import all Phlegethon components
       use Phlegethon.Components
-      alias Phlegethon.Info, as: UI
+      alias Phlegethon.Resource.Info, as: UI
 
       # HTML escaping functionality
       import Phoenix.HTML

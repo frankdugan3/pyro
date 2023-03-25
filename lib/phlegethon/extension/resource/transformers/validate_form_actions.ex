@@ -122,32 +122,36 @@ defmodule Phlegethon.Resource.Transformers.ValidateFormActions do
           end)
 
           all_fields
-          |> Enum.each(fn %{name: attribute_name, path: []} ->
+          |> Enum.each(fn %{name: field_name, path: []} ->
+            matching_argument = Enum.find(action.arguments, &(&1.name == field_name))
+
             cond do
-              attribute_name not in action.accept ->
+              field_name not in action.accept && !matching_argument ->
                 raise DslError,
                   path: [:phlegethon, :form, :action, action_name],
-                  message: "#{attribute_name} is not an accepted attribute"
+                  message: "#{field_name} is not an accepted attribute or argument"
 
-              MapSet.member?(writable_attribute_names, attribute_name) ->
+              MapSet.member?(writable_attribute_names, field_name) ->
                 :ok
 
-              MapSet.member?(private_attribute_names, attribute_name) ->
+              MapSet.member?(private_attribute_names, field_name) ->
                 raise DslError,
                   path: [:phlegethon, :form, :action, action_name],
-                  message: "#{attribute_name} is a private attribute"
+                  message: "#{field_name} is a private attribute"
 
-              MapSet.member?(unwritable_attribute_names, attribute_name) ->
+              MapSet.member?(unwritable_attribute_names, field_name) ->
                 raise DslError,
                   path: [:phlegethon, :form, :action, action_name],
-                  message: "#{attribute_name} is an unwritable attribute"
+                  message: "#{field_name} is an unwritable attribute"
+
+              # TODO: Validate arguments
+              !!matching_argument ->
+                :ok
 
               true ->
                 raise DslError,
                   path: [:phlegethon, :form, :action, action_name],
-                  message: "#{attribute_name} is not an attribute"
-
-                # TODO: Validate arguments
+                  message: "#{field_name} is not an attribute"
             end
           end)
 

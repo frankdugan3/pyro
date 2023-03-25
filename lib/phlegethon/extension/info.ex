@@ -1,4 +1,4 @@
-defmodule Phlegethon.Info do
+defmodule Phlegethon.Resource.Info do
   @moduledoc """
   Helpers to introspect the `Phlegethon.Resource` Ash extension. Intended for use in components that automatically build UI from resource configuration.
   """
