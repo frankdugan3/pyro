@@ -5,7 +5,22 @@ defmodule Phlegethon.Components.Autocomplete do
   # import Phlegethon.Gettext
 
   @doc """
+  A simple autocomplete component.
 
+  ## Examples
+
+      <.simple_form for={@form} phx-change="validate" phx-submit="save">
+        <.live_component
+          module={Phlegethon.Components.Autocomplete}
+          id="fiend_id_autocomplete"
+          field={@form[:friend_id]}
+          label="Friend"
+          search_fn={search_friends/1}
+          lookup_fn={lookup_friend/1} />
+        <:actions>
+          <.button>Save</.button>
+        </:actions>
+      </.simple_form>
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
