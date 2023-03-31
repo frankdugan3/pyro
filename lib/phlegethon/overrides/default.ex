@@ -369,6 +369,7 @@ defmodule Phlegethon.Overrides.Default do
     set :class, "h-4 w-4 inline-block align-text-bottom"
   end
 
+  @input_description_class "text-xs text-zinc-600 dark:text-zinc-400"
   override Core, :input do
     set :class, "grid gap-1 content-start"
     set :input_class, &__MODULE__.input_class/1
@@ -376,7 +377,7 @@ defmodule Phlegethon.Overrides.Default do
     set :input_check_label_class,
         "flex items-center gap-2 text-sm leading-6 text-zinc-800 dark:text-zinc-100 font-semibold"
 
-    set :description_class, "text-xs text-zinc-600 dark:text-zinc-400"
+    set :description_class, @input_description_class
     set :clear_on_escape, true
   end
 
@@ -391,7 +392,7 @@ defmodule Phlegethon.Overrides.Default do
 
     [
       "rounded-lg",
-      "block w-full  border-zinc-300 py-[7px] px-[11px]",
+      "block w-full border-zinc-300 py-[7px] px-[11px]",
       "sm:text-sm sm:leading-6",
       "bg-transparent text-zinc-900 dark:text-white",
       "focus:outline-none focus:ring-4",
@@ -598,6 +599,38 @@ defmodule Phlegethon.Overrides.Default do
   ##############################################################################
   ####    S M A R T    C O M P O N E N T S
   ##############################################################################
+
+  override Autocomplete, :render do
+    set :class, "grid gap-1 content-start"
+    set :input_class, &__MODULE__.input_class/1
+    set :description_class, @input_description_class
+    set :throttle_time, 212
+    set :option_label_key, :label
+    set :option_value_key, :id
+    set :prompt, "Search options"
+
+    set :listbox_class, [
+      "absolute z-10 grid content-start top-0 left-0",
+      "sm:text-sm sm:leading-6",
+      "bg-white text-zinc-900 dark:bg-gradient-to-tr dark:from-zinc-900 dark:to-zinc-800 dark:text-white",
+      "border border-zinc-300 rounded-lg",
+      # "ring-4 ring-zinc-800/5 dark:ring-zinc-50/25",
+      "shadow-lg "
+    ]
+
+    set :listbox_option_class, &__MODULE__.autocomplete_listbox_option_class/1
+  end
+
+  def autocomplete_listbox_option_class(passed_assigns) do
+    results = passed_assigns[:results]
+
+    [
+      "aria-selected:bg-brand aria-selected:tex-brand-fg",
+      "py-1 px-2 rounded-lg",
+      "cursor-pointer hover:bg-zinc-300 hover:text-zinc-900": results != [],
+      "cursor-default": results == []
+    ]
+  end
 
   override SmartForm, :smart_form do
     set :actions_class, "mt-2 flex items-center justify-between gap-6"

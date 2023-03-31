@@ -93,7 +93,7 @@ export const hooks = {
       this.oldMessageHTML = document.querySelector(
         `#${this.el.id}-message`,
       ).innerHTML
-      if (this.el.dataset.autoshow !== undefined) {
+      if (this.el.dataset?.autoshow !== undefined) {
         window.liveSocket.execJS(
           this.el,
           this.el.getAttribute('data-show-exec-js'),
@@ -127,26 +127,158 @@ export const hooks = {
   },
   PhlegethonAutocompleteComponent: {
     mounted() {
-      this.el.addEventListener('keydown', (event) => {
-        switch (event.key) {
-          case 'ArrowDown':
-            this.pushEvent('select_item', {
-              index: (this.el.selectedIndex + 1) % this.el.options.length,
-            })
-            break
-          case 'ArrowUp':
-            this.pushEvent('select_item', {
-              index:
-                (this.el.selectedIndex - 1 + this.el.options.length) %
-                this.el.options.length,
-            })
-            break
-          case 'Enter':
-            // Implement your desired action on item selection
-            break
-          default:
-            break
+      this.lastValueSent = null
+      const expanded = () => {
+        return booleanDataset(this.el.getAttribute('aria-expanded'))
+      }
+
+      const updateSearchThrottled = throttle(() => {
+        if (this.lastValueSent !== this.el.value || !expanded()) {
+          this.lastValueSent = this.el.value
+          this.pushEventTo(this.el.dataset.myself, 'search', this.el.value)
         }
+      }, this.el.dataset.throttleTime)
+
+      if (this.el.dataset.autofocus) {
+        focusAndSelect(this.el)
+      }
+
+      const selectedIndex = () => {
+        return parseInt(this.el.dataset.selectedIndex)
+      }
+      const options = () => {
+        const listbox = document.getElementById(
+          this.el.getAttribute('aria-controls'),
+        )
+
+        if (listbox?.children) {
+          return Array.from(listbox.children)
+        } else {
+          return []
+        }
+      }
+
+      const setSelectedIndex = (selectedIndex) => {
+        // Loop selectedIndex back to first or last result if out of bounds
+        const rc = parseInt(this.el.dataset.resultsCount)
+        selectedIndex = ((selectedIndex % rc) + rc) % rc
+        this.el.dataset.selectedIndex = selectedIndex
+
+        options().forEach((option, i) => {
+          if (i === selectedIndex) {
+            option.setAttribute('aria-selected', true)
+          } else {
+            option.removeAttribute('aria-selected')
+          }
+        })
+      }
+
+      const pick = (e) => {
+        const i = selectedIndex()
+        const input_el = document.getElementById(this.el.dataset.inputId)
+        let label = ''
+        let value = ''
+
+        if (i > -1) {
+          const option = options()[i]
+          label = option.dataset.label
+          value = option.dataset.value
+        }
+
+        e.preventDefault()
+        e.stopPropagation()
+        this.el.value = label
+        this.el.focus()
+        selectValue(this.el)
+        this.pushEventTo(this.el.dataset.myself, 'pick', {
+          label,
+          value,
+        })
+
+        input_el.value = value
+        input_el.dispatchEvent(new Event('input', { bubbles: true }))
+
+        return false
+      }
+
+      this.el.addEventListener('keydown', (e) => {
+        switch (e.key) {
+          case 'Tab':
+            if (expanded()) {
+              return pick(e)
+            } else {
+              return true
+            }
+          case 'Esc': // IE/Edge
+          case 'Escape':
+            if (this.el.value !== '' || !expanded()) {
+              e.preventDefault()
+              e.stopPropagation()
+              this.el.value = ''
+              this.el.dataset.selectedIndex = -1
+              options().forEach((option, i) => {
+                option.removeAttribute('aria-selected')
+              })
+              updateSearchThrottled()
+              return false
+            } else if (expanded()) {
+              e.preventDefault()
+              e.stopPropagation()
+              this.el.value = this.el.dataset.savedLabel || ''
+              selectValue(this.el)
+              this.pushEventTo(this.el.dataset.myself, 'cancel')
+              this.lastValueSent = null
+              return false
+            } else {
+              return true
+            }
+          case 'Enter':
+            if (expanded()) {
+              return pick(e)
+            } else {
+              this.el.value = ''
+              e.preventDefault()
+              e.stopPropagation()
+              updateSearchThrottled()
+              return false
+            }
+          case 'Up': // IE/Edge
+          case 'Down': // IE/Edge
+          case 'ArrowUp':
+          case 'ArrowDown':
+            if (expanded()) {
+              e.preventDefault()
+              e.stopPropagation()
+
+              let i = selectedIndex()
+              i = e.key === 'ArrowUp' || e.key === 'Up' ? i - 1 : i + 1
+              setSelectedIndex(i)
+
+              return false
+            } else {
+              return true
+            }
+          default:
+            return true
+        }
+      })
+      this.el.addEventListener('focus', (e) => {
+        selectValue(this.el)
+      })
+      this.el.addEventListener('input', (e) => {
+        switch (e.inputType) {
+          case 'insertText':
+          case 'deleteContentBackward':
+          case 'deleteContentForward':
+            updateSearchThrottled()
+            return true
+          default:
+            return false
+        }
+      })
+      this.el.addEventListener('pick', (e) => {
+        setSelectedIndex(e.detail.dispatcher.dataset.index)
+        return pick(e)
       })
     },
   },
@@ -157,8 +289,8 @@ function nudge(el) {
   let height = window.innerHeight
   let rect = el.getBoundingClientRect()
 
-  hOffset = el.dataset.horizontalOffset || 0
-  vOffset = el.dataset.verticalOffset || 0
+  hOffset = el.dataset?.horizontalOffset || 0
+  vOffset = el.dataset?.verticalOffset || 0
 
   // TODO: The 24 padding is arbitrary -- look into a better way to figure out extra padding.
 
@@ -183,8 +315,8 @@ function nudge(el) {
 
 function resetHideTTL(self) {
   clearInterval(self.ttlInterval)
-  if (self.el.dataset.ttl > 0) {
-    self.countdown = self.el.dataset.ttl
+  if (self.el.dataset?.ttl > 0) {
+    self.countdown = self.el.dataset?.ttl
     self.ttlInterval = setInterval(() => {
       self.countdown = self.countdown - 16.7
       if (self.countdown <= 0) {
@@ -202,4 +334,33 @@ function resetHideTTL(self) {
       }
     }, 16.7)
   }
+}
+
+export function throttle(callback, limit) {
+  let waiting = false
+  return function () {
+    if (!waiting) {
+      callback.apply(this, arguments)
+      waiting = true
+      setTimeout(function () {
+        callback.apply(this, arguments)
+        waiting = false
+      }, limit)
+    }
+  }
+}
+
+export function selectValue(el) {
+  if (typeof el.select === 'function') {
+    el.select()
+  }
+}
+
+export function focusAndSelect(el) {
+  el.focus()
+  selectValue(el)
+}
+
+export function booleanDataset(value) {
+  return ![null, undefined, false, 'false'].includes(value)
 }

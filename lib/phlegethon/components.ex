@@ -21,6 +21,7 @@ defmodule Phlegethon.Components do
       import Phlegethon.Components.Extra
       import Phlegethon.Components.SmartForm
       alias Phlegethon.Components.SmartDataTable
+      alias Phlegethon.Components.Autocomplete
     end
   end
 end

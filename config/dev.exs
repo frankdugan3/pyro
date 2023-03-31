@@ -22,15 +22,17 @@ if Mix.env() == :dev do
 
   # Configure esbuild (the version is required)
   config :esbuild,
-    version: "0.16.17",
+    version: "0.17.14",
     default: [
       args:
         ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
       cd: Path.expand("../assets", __DIR__),
       env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
     ],
-    module: phlegethon_esbuild.(~w(--format=esm --sourcemap --outfile=../priv/static/phlegethon.mjs)),
-    main: phlegethon_esbuild.(~w(--format=cjs --sourcemap --outfile=../priv/static/phlegethon.cjs.js)),
+    module:
+      phlegethon_esbuild.(~w(--format=esm --sourcemap --outfile=../priv/static/phlegethon.mjs)),
+    main:
+      phlegethon_esbuild.(~w(--format=cjs --sourcemap --outfile=../priv/static/phlegethon.cjs.js)),
     cdn:
       phlegethon_esbuild.(
         ~w(--target=es2016 --format=iife --global-name=Phlegethon --outfile=../priv/static/phlegethon.js)
@@ -42,7 +44,7 @@ if Mix.env() == :dev do
 
   # Configure tailwind (the version is required)
   config :tailwind,
-    version: "3.2.6",
+    version: "3.2.7",
     default: [
       args: ~w(
         --config=tailwind.config.js

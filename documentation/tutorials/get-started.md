@@ -53,6 +53,15 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
        },
      },
      // ...
+     plugins: [
+       // In addition to the normal `phx` variants, add the following:
+       plugin(({ addVariant }) =>
+         addVariant('aria-selected', '&[aria-selected]'),
+       ),
+       plugin(({ addVariant }) =>
+         addVariant('aria-checked', '&[aria-checked]'),
+       ),
+     ],
    }
    ```
 

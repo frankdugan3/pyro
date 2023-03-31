@@ -20,9 +20,14 @@ spark_locals_without_parens = [
   label: 1,
   module: 1,
   path: 1,
+  prompt: 1,
   resource_label: 1,
   route_path: 1,
-  type: 1
+  type: 1,
+  autocomplete_search_action: 1,
+  autocomplete_search_arg: 1,
+  autocomplete_option_label_key: 1,
+  autocomplete_option_value_key: 1
 ]
 
 phlegethon_locals_without_parens = [

@@ -22,6 +22,8 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/forms'),
+    plugin(({ addVariant }) => addVariant('aria-selected', '&[aria-selected]')),
+    plugin(({ addVariant }) => addVariant('aria-checked', '&[aria-checked]')),
     plugin(({ addVariant }) =>
       addVariant('phx-no-feedback', [
         '&.phx-no-feedback',

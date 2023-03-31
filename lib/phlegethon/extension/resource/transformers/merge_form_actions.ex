@@ -144,6 +144,9 @@ defmodule Phlegethon.Resource.Transformers.MergeFormActions do
   defp maybe_override(old, new, :class),
     do: Map.put(old, :class, Tails.classes([old.class, new.class]))
 
+  defp maybe_override(old, new, :input_class),
+    do: Map.put(old, :input_class, Tails.classes([old.class, new.class]))
+
   defp maybe_override(%{name: name, label: nil} = old, new, :label),
     do: maybe_override(Map.put(old, :label, default_label(name)), new, :label)
 
@@ -204,10 +207,18 @@ defmodule Phlegethon.Resource.Transformers.MergeFormActions do
     do:
       old
       |> maybe_override(new, :label)
-      |> maybe_override(new, :description)
-      |> maybe_override(new, :class)
-      |> maybe_override(new, :path)
       |> maybe_override(new, :type)
+      |> maybe_override(new, :label)
+      |> maybe_override(new, :description)
+      |> maybe_override(new, :path)
+      |> maybe_override(new, :class)
+      |> maybe_override(new, :input_class)
+      |> maybe_override(new, :autofocus)
+      |> maybe_override(new, :prompt)
+      |> maybe_override(new, :autocomplete_search_action)
+      |> maybe_override(new, :autocomplete_search_arg)
+      |> maybe_override(new, :autocomplete_option_label_key)
+      |> maybe_override(new, :autocomplete_option_value_keu)
 
   defp default_label(%{name: name}), do: default_label(name)
 

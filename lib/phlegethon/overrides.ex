@@ -86,6 +86,7 @@ defmodule Phlegethon.Overrides do
       import Phlegethon.Component.Helpers
 
       alias Phlegethon.Components.{
+        Autocomplete,
         Core,
         Extra,
         SmartDataTable,

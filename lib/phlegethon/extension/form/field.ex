@@ -2,7 +2,21 @@ defmodule Phlegethon.Resource.Form.Field do
   @moduledoc """
   The configuration of a form field in the `Phlegethon.Resource` extension.
   """
-  defstruct [:name, :type, :label, :description, :path, :class, :input_class, :autofocus]
+  defstruct [
+    :name,
+    :type,
+    :label,
+    :description,
+    :path,
+    :class,
+    :input_class,
+    :autofocus,
+    :prompt,
+    :autocomplete_search_action,
+    :autocomplete_search_arg,
+    :autocomplete_option_label_key,
+    :autocomplete_option_value_key
+  ]
 
   @schema [
     name: [
@@ -42,28 +56,37 @@ defmodule Phlegethon.Resource.Form.Field do
       default: false,
       doc: "Autofocus the field."
     ],
+    prompt: [
+      type: :string,
+      required: false,
+      doc: "Override the default prompt."
+    ],
     path: [
       type: {:list, :atom},
       required: false,
       doc: "Override the default path (nested paths are appended)."
     ],
-    autocomplete_action: [
+    autocomplete_search_action: [
       type: :atom,
-      required: false,
-      default: :autocomplete_search,
-      doc: "Override the default autocomplete search action."
+      default: :autocomplete,
+      doc: "Set the autocomplete search action name."
     ],
-    autocomplete_search_argument: [
+    autocomplete_search_arg: [
       type: :atom,
-      required: false,
       default: :search,
-      doc: "Override the default autocomplete search argument."
+      doc: "Set the autocomplete search argument key."
     ],
-    autocomplete_option_label_field: [
+    autocomplete_option_label_key: [
       type: :atom,
       required: false,
       default: :label,
-      doc: "Override the default autocomplete field used as a label."
+      doc: "Override the default autocomplete key used as a label."
+    ],
+    autocomplete_option_value_key: [
+      type: :atom,
+      required: false,
+      default: :id,
+      doc: "Override the default autocomplete key used as a value."
     ]
   ]
 

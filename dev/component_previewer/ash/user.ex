@@ -5,6 +5,8 @@ defmodule ComponentPreviewer.Ash.User do
     extensions: [Phlegethon.Resource],
     notifiers: [Ash.Notifier.PubSub]
 
+  require Ash.Query
+
   phlegethon do
     resource_label "User"
     default_display_mode :card_grid
@@ -35,6 +37,17 @@ defmodule ComponentPreviewer.Ash.User do
 
           field :active do
             label "Active"
+          end
+        end
+
+        field_group :friendships do
+          label "Friendships"
+
+          field :best_friend_id do
+            label "Best Friend"
+            type :autocomplete
+            prompt "Search friends for your bestie"
+            autocomplete_option_label_key :name_email
           end
         end
 
@@ -80,25 +93,63 @@ defmodule ComponentPreviewer.Ash.User do
   end
 
   relationships do
-    belongs_to :best_friend, __MODULE__
+    belongs_to :best_friend, __MODULE__, api: ComponentPreviewer.Ash.Api
+  end
+
+  calculations do
+    calculate :name_email, :ci_string do
+      calculation expr(name <> " (" <> email <> ")")
+    end
   end
 
   actions do
-    defaults [:read, :update, :destroy]
+    defaults [:read, :destroy]
 
     read :list do
       prepare build(sort: [:name])
     end
 
+    read :autocomplete do
+      argument :search, :ci_string
+
+      prepare fn query, _ ->
+        search_string = Ash.Query.get_argument(query, :search)
+
+        query
+        |> Ash.Query.filter(
+          if ^search_string != "" do
+            contains(name_email, ^search_string)
+          else
+            true
+          end
+        )
+        |> Ash.Query.load(:name_email)
+        |> Ash.Query.sort(:name_email)
+        |> Ash.Query.limit(10)
+      end
+    end
+
     create :create do
       primary? true
+
+      argument :best_friend_id, :uuid
+      change manage_relationship(:best_friend_id, :best_friend, type: :append_and_remove)
+
       description "Just an ordinary create action."
+    end
+
+    update :update do
+      primary? true
+
+      argument :best_friend_id, :uuid
+      change manage_relationship(:best_friend_id, :best_friend, type: :append_and_remove)
     end
   end
 
   code_interface do
     define_for ComponentPreviewer.Ash.Api
 
+    define :autocomplete, action: :autocomplete, args: [:search]
     define :list, action: :list
     define :by_id, action: :read, get_by: [:id]
     define :create, action: :create

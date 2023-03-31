@@ -134,6 +134,11 @@ defmodule Phlegethon.Resource.Transformers.ValidateFormActions do
               MapSet.member?(writable_attribute_names, field_name) ->
                 :ok
 
+              # TODO: Validate arguments
+              !!matching_argument ->
+                :ok
+
+              # Check these after argument validation, or will get false positives on private attributes
               MapSet.member?(private_attribute_names, field_name) ->
                 raise DslError,
                   path: [:phlegethon, :form, :action, action_name],
@@ -143,10 +148,6 @@ defmodule Phlegethon.Resource.Transformers.ValidateFormActions do
                 raise DslError,
                   path: [:phlegethon, :form, :action, action_name],
                   message: "#{field_name} is an unwritable attribute"
-
-              # TODO: Validate arguments
-              !!matching_argument ->
-                :ok
 
               true ->
                 raise DslError,
