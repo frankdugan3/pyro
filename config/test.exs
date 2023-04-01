@@ -12,5 +12,4 @@ config :logger, level: :warning
 config :phoenix, :plug_init_mode, :runtime
 
 config :phlegethon, :overrides, [Phlegethon.Overrides.Testing, Phlegethon.Overrides.Default]
-config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")
 config :ash, :use_all_identities_in_manage_relationship?, false

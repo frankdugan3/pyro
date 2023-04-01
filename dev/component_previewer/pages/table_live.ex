@@ -25,7 +25,7 @@ defmodule ComponentPreviewer.TableLive do
         <.button
           phx-click="delete_user"
           phx-value-id={user.id}
-          color="error"
+          color="red"
           confirm={"Are you sure you want to delete the user #{user.name}?"}
         >
           <.icon name="hero-trash-mini" class="block my-1" />

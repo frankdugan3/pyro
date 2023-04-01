@@ -13,13 +13,6 @@ module.exports = {
     '../dev/component_previewer/**/*.*ex',
     '../lib/phlegethon/**/*.*ex',
   ],
-  theme: {
-    extend: {
-      colors: {
-        ...require('./tailwind.phlegethon.colors.json'),
-      },
-    },
-  },
   plugins: [
     require('@tailwindcss/forms'),
     plugin(({ addVariant }) => addVariant('aria-selected', '&[aria-selected]')),

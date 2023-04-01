@@ -27,10 +27,9 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
    end
    ```
 
-2. Add the following lines to your `config.exs`:
+2. Add the following to your `config.exs`:
 
    ```elixir
-   config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")
    config :phlegethon, :overrides, [Phlegethon.Overrides.Default]
    ```
 
@@ -45,13 +44,6 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
        // ...
        '../deps/phlegethon/lib/phlegethon/**/*.*ex', // <-- Ensure Phlegethon components are included
      ],
-     theme: {
-       extend: {
-         colors: {
-           ...require('./tailwind.phlegethon.colors.json'), // <-- Include colors from Phlegethon
-         },
-       },
-     },
      // ...
      plugins: [
        // In addition to the normal `phx` variants, add the following:
@@ -116,7 +108,6 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
 8. (Optional) Add the generated files to your `.gitignore` if you don't want them tracked:
 
    ```
-   /assets/tailwind.phlegethon.colors.json
    /assets/css/phlegethon.css
    ```
 
@@ -132,4 +123,4 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
 
 10. Run `mix phlegethon.setup`.
 
-11. Note: `Tails` may occasionally complain about the `colors_file` being different in runtime than compile time. You simply need to run `mix deps.compile tails --force` to clear it up. If you are using the `Tails` helper functions for custom colors, you will also need to force a recompile if those change.
+11. Note: `Tails` may occasionally complain about the `colors_file` being different in runtime than compile time. You simply need to run `mix deps.compile tails --force` to clear it up. If you are using the `Tails` helper functions for custom colors, you will also need to force a recompile if those change. If you are extending the default color theme, you will need to [configure the colors](https://github.com/zachdaniel/tails#colors).

@@ -5,14 +5,6 @@ defmodule Mix.Tasks.Compile.Phlegethon.AssetGenerator do
 
   @doc false
   def run(_args) do
-    colors =
-      Phlegethon.Overrides.extend_colors()
-      |> Map.put("transparent", "transparent")
-      |> Map.put("current", "currentColor")
-      |> Jason.encode!(pretty: true)
-
-    colors_file = Application.fetch_env!(:tails, :colors_file)
-
     css_file =
       Application.get_env(
         :phlegethon,
@@ -31,7 +23,6 @@ defmodule Mix.Tasks.Compile.Phlegethon.AssetGenerator do
 
     Enum.each(
       [
-        {colors_file, colors},
         {css_file, css}
       ],
       fn

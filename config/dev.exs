@@ -2,8 +2,6 @@ import Config
 
 config :phlegethon, :ex_doc_server, "http://127.0.0.1:35729/"
 
-config :tails, colors_file: Path.join(File.cwd!(), "assets/tailwind.phlegethon.colors.json")
-
 config :ash, :use_all_identities_in_manage_relationship?, false
 
 config :ash, ash_apis: [ComponentPreviewer.Ash.Api]

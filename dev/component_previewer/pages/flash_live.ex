@@ -25,7 +25,7 @@ defmodule ComponentPreviewer.FlashLive do
         put_flash(
           socket,
           kind,
-          encode_flash(~s[This is a flash of kind "#{kind}"], ttl: Enum.random(5..15) * 1_000)
+          encode_flash(~s[This is a flash of kind "#{kind}"], ttl: Enum.random(10..30) * 1_000)
         )
       end)
       |> put_flash(
@@ -36,12 +36,12 @@ defmodule ComponentPreviewer.FlashLive do
             - Should *not* show up in app's floating flash tray
             - Should show up on the page's flash tray
             - Should not be dismissible
-            - Should have the "brand" style, but with an icon and title
+            - Should have the "orange" style, but with an icon and title
           """,
           ttl: 0,
           title: "A Different Kind of Flash",
           icon_name: "hero-light-bulb-mini",
-          style_for_kind: "brand",
+          style_for_kind: "orange",
           close: false
         )
       )

@@ -75,7 +75,6 @@ defmodule Phlegethon.Overrides do
   @doc false
   @spec __using__(any) :: Macro.t()
   defmacro __using__(env) do
-    extend_colors = env[:extend_colors]
     global_style = env[:global_style]
     makeup_light = env[:makeup_light]
     makeup_dark = env[:makeup_dark]
@@ -98,7 +97,6 @@ defmodule Phlegethon.Overrides do
 
       Module.register_attribute(__MODULE__, :override, accumulate: true)
       @component nil
-      @extend_colors unquote(extend_colors)
       @global_style unquote(global_style)
       @makeup_light unquote(makeup_light)
       @makeup_dark unquote(makeup_dark)
@@ -111,11 +109,6 @@ defmodule Phlegethon.Overrides do
       # Internally used for validation.
       @spec __pass_assigns_to__ :: map()
       def __pass_assigns_to__(), do: @__pass_assigns_to__
-
-      @doc false
-      # Internally used for asset generation.
-      @spec extend_colors :: map() | nil
-      def extend_colors(), do: @extend_colors
 
       @doc false
       # Internally used for asset generation.
@@ -273,21 +266,6 @@ defmodule Phlegethon.Overrides do
         ""
       end
 
-    extend_colors =
-      case Module.get_attribute(env.module, :extend_colors) do
-        %{} = colors ->
-          """
-          ## Extend Colors
-
-          ```elixir
-          #{inspect(colors, pretty: true)}
-          ```
-          """
-
-        _ ->
-          ""
-      end
-
     global_style =
       case Module.get_attribute(env.module, :global_style) do
         style when is_binary(style) ->
@@ -309,7 +287,6 @@ defmodule Phlegethon.Overrides do
     - Attrs with type `:tails_classes` utilize `Tails`, and are merged by the component to prevent weird precedence conflicts and HTML bloat
 
     #{makeup}
-    #{extend_colors}
     #{global_style}
 
     ## Overrides
@@ -350,26 +327,6 @@ defmodule Phlegethon.Overrides do
         unquote(Macro.escape(overrides))
       end
     end
-  end
-
-  @doc false
-  # Internally used for asset generation.
-  @spec extend_colors :: map() | nil
-  def extend_colors do
-    configured_overrides()
-    |> Enum.reduce_while(nil, fn module, _ ->
-      case Code.ensure_compiled(module) do
-        {:module, _} ->
-          module.extend_colors()
-          |> case do
-            %{} = value -> {:halt, value}
-            nil -> {:cont, nil}
-          end
-
-        {:error, _} ->
-          {:cont, nil}
-      end
-    end)
   end
 
   @doc false
