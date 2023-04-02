@@ -20,6 +20,7 @@ defmodule ComponentPreviewer.Router do
       live("/back", BackLive)
       live("/button", ButtonLive)
       live("/code", CodeLive)
+      live("/copy-to-clipboard", CopyToClipboardLive)
       live("/flash", FlashLive)
       live("/error", ErrorLive)
       live("/header", HeaderLive)

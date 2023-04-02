@@ -282,6 +282,26 @@ var Phlegethon = (() => {
           return pick(e);
         });
       }
+    },
+    PhlegethonCopyToClipboard: {
+      mounted() {
+        this.content = this.el.innerHTML;
+        let { value, message, ttl } = this.el.dataset;
+        this.el.addEventListener("click", (e) => {
+          e.preventDefault();
+          navigator.clipboard.writeText(value);
+          this.el.innerHTML = message || "Copied to clipboard!";
+          this.timeout = window.setTimeout(() => {
+            this.el.innerHTML = this.content;
+          }, ttl);
+        });
+      },
+      updated() {
+        window.clearTimeout(this.timeout);
+      },
+      destroyed() {
+        window.clearTimeout(this.timeout);
+      }
     }
   };
   function nudge(el2) {

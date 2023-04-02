@@ -102,6 +102,11 @@ defmodule Phlegethon.Components.Extra do
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :source, :string, required: true, doc: "The code snippet"
+  attr :id, :string, required: true
+  attr :copy, :boolean, overridable: true, required: true
+  attr :copy_label, :string, overridable: true, required: true
+  attr :copy_class, :tails_classes, overridable: true, required: true
+  attr :copy_message, :string, overridable: true
 
   attr :language, :string,
     default: "elixir",
@@ -117,7 +122,7 @@ defmodule Phlegethon.Components.Extra do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <code class={@class} phx-no-format><%= format_code(@source, @language) %></code>
+    <code class={@class} phx-no-format><.copy_to_clipboard :if={@copy} id={@id <> "-copy-btn"} value={@source} message={@copy_message} label={@copy_label} icon_name="hero-code-bracket" class={@copy_class} /><%= format_code(@source, @language) %></code>
     """
   end
 
@@ -127,6 +132,69 @@ defmodule Phlegethon.Components.Extra do
       lexer -> Makeup.highlight_inner_html(source, lexer: lexer)
     end
     |> Phoenix.HTML.raw()
+  end
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :id, :string, required: true
+  attr :value, :string, required: true, doc: "Text to copy"
+  attr :label, :string, default: nil, doc: "Button label, defaults to value"
+  attr :disabled, :boolean, default: false
+
+  attr :icon_name, :string,
+    default: nil,
+    doc:
+      "The name of the icon to display (nil for none); see [`icon/1`](`Phlegethon.Components.Core.icon/1`) for details"
+
+  attr :ttl, :integer,
+    overridable: true,
+    required: true,
+    doc: "How long to show the flash message after copying"
+
+  attr :case, :string,
+    overridable: true,
+    required: true,
+    values: ~w[uppercase normal-case lowercase capitalize],
+    doc: "The case of the text"
+
+  attr :color, :string, overridable: true, required: true, doc: "The color of the button"
+  attr :shape, :string, overridable: true, required: true, doc: "Shape of the button"
+  attr :size, :string, overridable: true, required: true, doc: "The size of the button"
+  attr :variant, :string, overridable: true, required: true, doc: "Style of button"
+  attr :class, :tails_classes, overridable: true, required: true
+
+  attr :message, :string,
+    overridable: true,
+    required: true,
+    doc: "Message to display after copying"
+
+  attr :icon_class, :tails_classes, overridable: true, required: true
+  attr :rest, :global
+
+  def copy_to_clipboard(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <button
+      id={@id}
+      type="button"
+      class={@class}
+      disabled={@disabled}
+      phx-hook="PhlegethonCopyToClipboard"
+      data-value={@value}
+      data-message={@message}
+      data-ttl={@ttl}
+      title="Copy to clipboard"
+      {@rest}
+    >
+      <Phlegethon.Components.Core.icon
+        :if={@icon_name}
+        overrides={@overrides}
+        name={@icon_name}
+        class={@icon_class}
+      />
+      <%= @label || @value %>
+    </button>
+    """
   end
 
   @doc """

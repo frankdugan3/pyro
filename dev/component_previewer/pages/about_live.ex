@@ -39,8 +39,13 @@ defmodule ComponentPreviewer.AboutLive do
       page for examples!
     </p>
 
-    <.code source={File.read!(User.__info__(:compile)[:source])} class="text-xs" />
     <.code
+      id="code-example-self"
+      source={File.read!(User.__info__(:compile)[:source])}
+      class="text-xs"
+    />
+    <.code
+      id="code-sample-smart-form"
       source={"# UI.form_for(User, :create)\n" <> inspect(UI.form_for(User, :create), pretty: true)}
       class="text-xs"
     />

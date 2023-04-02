@@ -346,97 +346,97 @@ defmodule Phlegethon.Overrides.Default do
       "border-2": variant in ["outline", "inverted"] && size == "md",
       "border-2": variant in ["outline", "inverted"] && size == "lg",
       "border-2": variant in ["outline", "inverted"] && size == "xl",
-
       "bg-slate-500 text-white": color == "slate" && variant == "solid",
-      "border-slate-500 text-slate-500 bg-white hover:bg-slate-500 hover:text-white": color == "slate" && variant == "inverted",
+      "border-slate-500 text-slate-500 bg-white hover:bg-slate-500 hover:text-white":
+        color == "slate" && variant == "inverted",
       "border-slate-500 text-slate-500": color == "red" && variant == "outline",
-
       "bg-gray-500 text-white": color == "gray" && variant == "solid",
-      "border-gray-500 text-gray-500 bg-white hover:bg-gray-500 hover:text-white": color == "gray" && variant == "inverted",
+      "border-gray-500 text-gray-500 bg-white hover:bg-gray-500 hover:text-white":
+        color == "gray" && variant == "inverted",
       "border-gray-500 text-gray-500": color == "red" && variant == "outline",
-
       "bg-zinc-500 text-white": color == "zinc" && variant == "solid",
-      "border-zinc-500 text-zinc-500 bg-white hover:bg-zinc-500 hover:text-white": color == "zinc" && variant == "inverted",
+      "border-zinc-500 text-zinc-500 bg-white hover:bg-zinc-500 hover:text-white":
+        color == "zinc" && variant == "inverted",
       "border-zinc-500 text-zinc-500": color == "red" && variant == "outline",
-
       "bg-neutral-500 text-white": color == "neutral" && variant == "solid",
-      "border-neutral-500 text-neutral-500 bg-white hover:bg-neutral-500 hover:text-white": color == "neutral" && variant == "inverted",
+      "border-neutral-500 text-neutral-500 bg-white hover:bg-neutral-500 hover:text-white":
+        color == "neutral" && variant == "inverted",
       "border-neutral-500 text-neutral-500": color == "red" && variant == "outline",
-
       "bg-neutral-500 text-white": color == "neutral" && variant == "solid",
-      "border-neutral-500 text-neutral-500 bg-white hover:bg-neutral-500 hover:text-white": color == "neutral" && variant == "inverted",
+      "border-neutral-500 text-neutral-500 bg-white hover:bg-neutral-500 hover:text-white":
+        color == "neutral" && variant == "inverted",
       "border-neutral-500 text-neutral-500": color == "red" && variant == "outline",
-
       "bg-stone-500 text-white": color == "stone" && variant == "solid",
-      "border-stone-500 text-stone-500 bg-white hover:bg-stone-500 hover:text-white": color == "stone" && variant == "inverted",
+      "border-stone-500 text-stone-500 bg-white hover:bg-stone-500 hover:text-white":
+        color == "stone" && variant == "inverted",
       "border-stone-500 text-stone-500": color == "red" && variant == "outline",
-
       "bg-red-500 text-white": color == "red" && variant == "solid",
-      "border-red-500 text-red-500 bg-white hover:bg-red-500 hover:text-white": color == "red" && variant == "inverted",
+      "border-red-500 text-red-500 bg-white hover:bg-red-500 hover:text-white":
+        color == "red" && variant == "inverted",
       "border-red-500 text-red-500": color == "red" && variant == "outline",
-
       "bg-orange-500 text-black": color == "orange" && variant == "solid",
-      "border-orange-500 text-orange-500 bg-black hover:bg-orange-500 hover:text-black": color == "orange" && variant == "inverted",
+      "border-orange-500 text-orange-500 bg-black hover:bg-orange-500 hover:text-black":
+        color == "orange" && variant == "inverted",
       "border-orange-500 text-orange-500": color == "orange" && variant == "outline",
-
       "bg-amber-500 text-black": color == "amber" && variant == "solid",
-      "border-amber-500 text-amber-500 bg-black hover:bg-amber-500 hover:text-black": color == "amber" && variant == "inverted",
+      "border-amber-500 text-amber-500 bg-black hover:bg-amber-500 hover:text-black":
+        color == "amber" && variant == "inverted",
       "border-amber-500 text-amber-500": color == "amber" && variant == "outline",
-
       "bg-yellow-500 text-black": color == "yellow" && variant == "solid",
-      "border-yellow-500 text-yellow-500 bg-black hover:bg-yellow-500 hover:text-black": color == "yellow" && variant == "inverted",
+      "border-yellow-500 text-yellow-500 bg-black hover:bg-yellow-500 hover:text-black":
+        color == "yellow" && variant == "inverted",
       "border-yellow-500 text-yellow-500": color == "yellow" && variant == "outline",
-
       "bg-lime-500 text-black": color == "lime" && variant == "solid",
-      "border-lime-500 text-lime-500 bg-black hover:bg-lime-500 hover:text-black": color == "lime" && variant == "inverted",
+      "border-lime-500 text-lime-500 bg-black hover:bg-lime-500 hover:text-black":
+        color == "lime" && variant == "inverted",
       "border-lime-500 text-lime-500": color == "lime" && variant == "outline",
-
       "bg-green-500 text-black": color == "green" && variant == "solid",
-      "border-green-500 text-green-500 bg-black hover:bg-green-500 hover:text-black": color == "green" && variant == "inverted",
+      "border-green-500 text-green-500 bg-black hover:bg-green-500 hover:text-black":
+        color == "green" && variant == "inverted",
       "border-green-500 text-green-500": color == "green" && variant == "outline",
-
       "bg-emerald-500 text-black": color == "emerald" && variant == "solid",
-      "border-emerald-500 text-emerald-500 bg-black hover:bg-emerald-500 hover:text-black": color == "emerald" && variant == "inverted",
+      "border-emerald-500 text-emerald-500 bg-black hover:bg-emerald-500 hover:text-black":
+        color == "emerald" && variant == "inverted",
       "border-emerald-500 text-emerald-500": color == "emerald" && variant == "outline",
-
       "bg-teal-500 text-black": color == "teal" && variant == "solid",
-      "border-teal-500 text-teal-500 bg-black hover:bg-teal-500 hover:text-black": color == "teal" && variant == "inverted",
+      "border-teal-500 text-teal-500 bg-black hover:bg-teal-500 hover:text-black":
+        color == "teal" && variant == "inverted",
       "border-teal-500 text-teal-500": color == "teal" && variant == "outline",
-
       "bg-cyan-500 text-black": color == "cyan" && variant == "solid",
-      "border-cyan-500 text-cyan-500 bg-black hover:bg-cyan-500 hover:text-black": color == "cyan" && variant == "inverted",
+      "border-cyan-500 text-cyan-500 bg-black hover:bg-cyan-500 hover:text-black":
+        color == "cyan" && variant == "inverted",
       "border-cyan-500 text-cyan-500": color == "cyan" && variant == "outline",
-
       "bg-sky-500 text-white": color == "sky" && variant == "solid",
-      "border-sky-500 text-sky-500 bg-white hover:bg-sky-500 hover:text-white": color == "sky" && variant == "inverted",
+      "border-sky-500 text-sky-500 bg-white hover:bg-sky-500 hover:text-white":
+        color == "sky" && variant == "inverted",
       "border-sky-500 text-sky-500": color == "sky" && variant == "outline",
-
       "bg-blue-500 text-white": color == "blue" && variant == "solid",
-      "border-blue-500 text-blue-500 bg-white hover:bg-blue-500 hover:text-white": color == "blue" && variant == "inverted",
+      "border-blue-500 text-blue-500 bg-white hover:bg-blue-500 hover:text-white":
+        color == "blue" && variant == "inverted",
       "border-blue-500 text-blue-500": color == "blue" && variant == "outline",
-
       "bg-indigo-500 text-white": color == "indigo" && variant == "solid",
-      "border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-500 hover:text-white": color == "indigo" && variant == "inverted",
+      "border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-500 hover:text-white":
+        color == "indigo" && variant == "inverted",
       "border-indigo-500 text-indigo-500": color == "indigo" && variant == "outline",
-
       "bg-violet-500 text-white": color == "violet" && variant == "solid",
-      "border-violet-500 text-violet-500 bg-white hover:bg-violet-500 hover:text-white": color == "violet" && variant == "inverted",
+      "border-violet-500 text-violet-500 bg-white hover:bg-violet-500 hover:text-white":
+        color == "violet" && variant == "inverted",
       "border-violet-500 text-violet-500": color == "violet" && variant == "outline",
-
       "bg-purple-500 text-white": color == "purple" && variant == "solid",
-      "border-purple-500 text-purple-500 bg-white hover:bg-purple-500 hover:text-white": color == "purple" && variant == "inverted",
+      "border-purple-500 text-purple-500 bg-white hover:bg-purple-500 hover:text-white":
+        color == "purple" && variant == "inverted",
       "border-purple-500 text-purple-500": color == "purple" && variant == "outline",
-
       "bg-fuchsia-500 text-white": color == "fuchsia" && variant == "solid",
-      "border-fuchsia-500 text-fuchsia-500 bg-white hover:bg-fuchsia-500 hover:text-white": color == "fuchsia" && variant == "inverted",
+      "border-fuchsia-500 text-fuchsia-500 bg-white hover:bg-fuchsia-500 hover:text-white":
+        color == "fuchsia" && variant == "inverted",
       "border-fuchsia-500 text-fuchsia-500": color == "fuchsia" && variant == "outline",
-
       "bg-pink-500 text-white": color == "pink" && variant == "solid",
-      "border-pink-500 text-pink-500 bg-white hover:bg-pink-500 hover:text-white": color == "pink" && variant == "inverted",
+      "border-pink-500 text-pink-500 bg-white hover:bg-pink-500 hover:text-white":
+        color == "pink" && variant == "inverted",
       "border-pink-500 text-pink-500": color == "pink" && variant == "outline",
-
       "bg-rose-500 text-white": color == "rose" && variant == "solid",
-      "border-rose-500 text-rose-500 bg-white hover:bg-rose-500 hover:text-white": color == "rose" && variant == "inverted",
+      "border-rose-500 text-rose-500 bg-white hover:bg-rose-500 hover:text-white":
+        color == "rose" && variant == "inverted",
       "border-rose-500 text-rose-500": color == "rose" && variant == "outline"
     ]
   end
@@ -523,28 +523,53 @@ defmodule Phlegethon.Overrides.Default do
       @shared_shadow_class,
       "pt-1": close || ttl > 0,
       "cursor-pointer": close,
-      "bg-slate-100 text-slate-900 ring-slate-500 fill-slate-900 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-500 dark:fill-slate-100": kind == "slate" || style_for_kind == "slate" || (style_for_kind not in @theme_colors and kind not in @theme_colors),
-      "bg-gray-100 text-gray-900 ring-gray-500 fill-gray-900 dark:bg-gray-900 dark:text-gray-100 dark:ring-gray-500 dark:fill-gray-100": kind == "gray" || style_for_kind == "gray",
-      "bg-zinc-100 text-zinc-900 ring-zinc-500 fill-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-500 dark:fill-zinc-100": kind == "zinc" || style_for_kind == "zinc",
-      "bg-neutral-100 text-neutral-900 ring-neutral-500 fill-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 dark:ring-neutral-500 dark:fill-neutral-100": kind == "neutral" || style_for_kind == "neutral",
-      "bg-stone-100 text-stone-900 ring-stone-500 fill-stone-900 dark:bg-stone-900 dark:text-stone-100 dark:ring-stone-500 dark:fill-stone-100": kind == "stone" || style_for_kind == "stone",
-      "bg-red-100 text-red-900 ring-red-500 fill-red-900 dark:bg-red-900 dark:text-red-100 dark:ring-red-500 dark:fill-red-100": kind == "red" || style_for_kind == "red" || kind == "error" || style_for_kind == "error",
-      "bg-orange-100 text-orange-900 ring-orange-500 fill-orange-900 dark:bg-orange-900 dark:text-orange-100 dark:ring-orange-500 dark:fill-orange-100": kind == "orange" || style_for_kind == "orange",
-      "bg-amber-100 text-amber-900 ring-amber-500 fill-amber-900 dark:bg-amber-900 dark:text-amber-100 dark:ring-amber-500 dark:fill-amber-100": kind == "amber" || style_for_kind == "amber",
-      "bg-yellow-100 text-yellow-900 ring-yellow-500 fill-yellow-900 dark:bg-yellow-900 dark:text-yellow-100 dark:ring-yellow-500 dark:fill-yellow-100": kind == "yellow" || style_for_kind == "yellow" || kind == "warning" || style_for_kind == "warning",
-      "bg-lime-100 text-lime-900 ring-lime-500 fill-lime-900 dark:bg-lime-900 dark:text-lime-100 dark:ring-lime-500 dark:fill-lime-100": kind == "lime" || style_for_kind == "lime",
-      "bg-green-100 text-green-900 ring-green-500 fill-green-900 dark:bg-green-900 dark:text-green-100 dark:ring-green-500 dark:fill-green-100": kind == "green" || style_for_kind == "green" || kind == "success" || style_for_kind == "success",
-      "bg-emerald-100 text-emerald-900 ring-emerald-500 fill-emerald-900 dark:bg-emerald-900 dark:text-emerald-100 dark:ring-emerald-500 dark:fill-emerald-100": kind == "emerald" || style_for_kind == "emerald",
-      "bg-teal-100 text-teal-900 ring-teal-500 fill-teal-900 dark:bg-teal-900 dark:text-teal-100 dark:ring-teal-500 dark:fill-teal-100": kind == "teal" || style_for_kind == "teal",
-      "bg-cyan-100 text-cyan-900 ring-cyan-500 fill-cyan-900 dark:bg-cyan-900 dark:text-cyan-100 dark:ring-cyan-500 dark:fill-cyan-100": kind == "cyan" || style_for_kind == "cyan",
-      "bg-sky-100 text-sky-900 ring-sky-500 fill-sky-900 dark:bg-sky-900 dark:text-sky-100 dark:ring-sky-500 dark:fill-sky-100": kind == "sky" || style_for_kind == "sky" || kind == "info" || style_for_kind == "info",
-      "bg-blue-100 text-blue-900 ring-blue-500 fill-blue-900 dark:bg-blue-900 dark:text-blue-100 dark:ring-blue-500 dark:fill-blue-100": kind == "blue" || style_for_kind == "blue",
-      "bg-indigo-100 text-indigo-900 ring-indigo-500 fill-indigo-900 dark:bg-indigo-900 dark:text-indigo-100 dark:ring-indigo-500 dark:fill-indigo-100": kind == "indigo" || style_for_kind == "indigo",
-      "bg-violet-100 text-violet-900 ring-violet-500 fill-violet-900 dark:bg-violet-900 dark:text-violet-100 dark:ring-violet-500 dark:fill-violet-100": kind == "violet" || style_for_kind == "violet",
-      "bg-purple-100 text-purple-900 ring-purple-500 fill-purple-900 dark:bg-purple-900 dark:text-purple-100 dark:ring-purple-500 dark:fill-purple-100": kind == "purple" || style_for_kind == "purple",
-      "bg-fuchsia-100 text-fuchsia-900 ring-fuchsia-500 fill-fuchsia-900 dark:bg-fuchsia-900 dark:text-fuchsia-100 dark:ring-fuchsia-500 dark:fill-fuchsia-100": kind == "fuchsia" || style_for_kind == "fuchsia",
-      "bg-pink-100 text-pink-900 ring-pink-500 fill-pink-900 dark:bg-pink-900 dark:text-pink-100 dark:ring-pink-500 dark:fill-pink-100": kind == "pink" || style_for_kind == "pink",
-      "bg-rose-100 text-rose-900 ring-rose-500 fill-rose-900 dark:bg-rose-900 dark:text-rose-100 dark:ring-rose-500 dark:fill-rose-100": kind == "rose" || style_for_kind == "rose",
+      "bg-slate-100 text-slate-900 ring-slate-500 fill-slate-900 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-500 dark:fill-slate-100":
+        kind == "slate" || style_for_kind == "slate" ||
+          (style_for_kind not in @theme_colors and kind not in @theme_colors),
+      "bg-gray-100 text-gray-900 ring-gray-500 fill-gray-900 dark:bg-gray-900 dark:text-gray-100 dark:ring-gray-500 dark:fill-gray-100":
+        kind == "gray" || style_for_kind == "gray",
+      "bg-zinc-100 text-zinc-900 ring-zinc-500 fill-zinc-900 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-500 dark:fill-zinc-100":
+        kind == "zinc" || style_for_kind == "zinc",
+      "bg-neutral-100 text-neutral-900 ring-neutral-500 fill-neutral-900 dark:bg-neutral-900 dark:text-neutral-100 dark:ring-neutral-500 dark:fill-neutral-100":
+        kind == "neutral" || style_for_kind == "neutral",
+      "bg-stone-100 text-stone-900 ring-stone-500 fill-stone-900 dark:bg-stone-900 dark:text-stone-100 dark:ring-stone-500 dark:fill-stone-100":
+        kind == "stone" || style_for_kind == "stone",
+      "bg-red-100 text-red-900 ring-red-500 fill-red-900 dark:bg-red-900 dark:text-red-100 dark:ring-red-500 dark:fill-red-100":
+        kind == "red" || style_for_kind == "red" || kind == "error" || style_for_kind == "error",
+      "bg-orange-100 text-orange-900 ring-orange-500 fill-orange-900 dark:bg-orange-900 dark:text-orange-100 dark:ring-orange-500 dark:fill-orange-100":
+        kind == "orange" || style_for_kind == "orange",
+      "bg-amber-100 text-amber-900 ring-amber-500 fill-amber-900 dark:bg-amber-900 dark:text-amber-100 dark:ring-amber-500 dark:fill-amber-100":
+        kind == "amber" || style_for_kind == "amber",
+      "bg-yellow-100 text-yellow-900 ring-yellow-500 fill-yellow-900 dark:bg-yellow-900 dark:text-yellow-100 dark:ring-yellow-500 dark:fill-yellow-100":
+        kind == "yellow" || style_for_kind == "yellow" || kind == "warning" ||
+          style_for_kind == "warning",
+      "bg-lime-100 text-lime-900 ring-lime-500 fill-lime-900 dark:bg-lime-900 dark:text-lime-100 dark:ring-lime-500 dark:fill-lime-100":
+        kind == "lime" || style_for_kind == "lime",
+      "bg-green-100 text-green-900 ring-green-500 fill-green-900 dark:bg-green-900 dark:text-green-100 dark:ring-green-500 dark:fill-green-100":
+        kind == "green" || style_for_kind == "green" || kind == "success" ||
+          style_for_kind == "success",
+      "bg-emerald-100 text-emerald-900 ring-emerald-500 fill-emerald-900 dark:bg-emerald-900 dark:text-emerald-100 dark:ring-emerald-500 dark:fill-emerald-100":
+        kind == "emerald" || style_for_kind == "emerald",
+      "bg-teal-100 text-teal-900 ring-teal-500 fill-teal-900 dark:bg-teal-900 dark:text-teal-100 dark:ring-teal-500 dark:fill-teal-100":
+        kind == "teal" || style_for_kind == "teal",
+      "bg-cyan-100 text-cyan-900 ring-cyan-500 fill-cyan-900 dark:bg-cyan-900 dark:text-cyan-100 dark:ring-cyan-500 dark:fill-cyan-100":
+        kind == "cyan" || style_for_kind == "cyan",
+      "bg-sky-100 text-sky-900 ring-sky-500 fill-sky-900 dark:bg-sky-900 dark:text-sky-100 dark:ring-sky-500 dark:fill-sky-100":
+        kind == "sky" || style_for_kind == "sky" || kind == "info" || style_for_kind == "info",
+      "bg-blue-100 text-blue-900 ring-blue-500 fill-blue-900 dark:bg-blue-900 dark:text-blue-100 dark:ring-blue-500 dark:fill-blue-100":
+        kind == "blue" || style_for_kind == "blue",
+      "bg-indigo-100 text-indigo-900 ring-indigo-500 fill-indigo-900 dark:bg-indigo-900 dark:text-indigo-100 dark:ring-indigo-500 dark:fill-indigo-100":
+        kind == "indigo" || style_for_kind == "indigo",
+      "bg-violet-100 text-violet-900 ring-violet-500 fill-violet-900 dark:bg-violet-900 dark:text-violet-100 dark:ring-violet-500 dark:fill-violet-100":
+        kind == "violet" || style_for_kind == "violet",
+      "bg-purple-100 text-purple-900 ring-purple-500 fill-purple-900 dark:bg-purple-900 dark:text-purple-100 dark:ring-purple-500 dark:fill-purple-100":
+        kind == "purple" || style_for_kind == "purple",
+      "bg-fuchsia-100 text-fuchsia-900 ring-fuchsia-500 fill-fuchsia-900 dark:bg-fuchsia-900 dark:text-fuchsia-100 dark:ring-fuchsia-500 dark:fill-fuchsia-100":
+        kind == "fuchsia" || style_for_kind == "fuchsia",
+      "bg-pink-100 text-pink-900 ring-pink-500 fill-pink-900 dark:bg-pink-900 dark:text-pink-100 dark:ring-pink-500 dark:fill-pink-100":
+        kind == "pink" || style_for_kind == "pink",
+      "bg-rose-100 text-rose-900 ring-rose-500 fill-rose-900 dark:bg-rose-900 dark:text-rose-100 dark:ring-rose-500 dark:fill-rose-100":
+        kind == "rose" || style_for_kind == "rose"
     ]
   end
 
@@ -729,7 +754,27 @@ defmodule Phlegethon.Overrides.Default do
 
   override Extra, :code do
     set :class,
-        ["makeup whitespace-pre-wrap p-4 rounded", @shared_shadow_class]
+        ["makeup whitespace-pre-wrap p-4 rounded relative", @shared_shadow_class]
+
+    set :copy, true
+    set :copy_label, "Copy"
+    set :copy_class, "absolute top-1 right-1"
+  end
+
+  override Extra, :copy_to_clipboard do
+    set :class, &__MODULE__.button_class/1
+    set :icon_class, &__MODULE__.button_icon_class/1
+    set :colors, @theme_colors
+    set :color, "sky"
+    set :variant, "solid"
+    set :variants, ~w[solid inverted outline]
+    set :shape, "rounded"
+    set :shapes, ~w[rounded square pill]
+    set :size, "md"
+    set :sizes, ~w[xs sm md lg xl]
+    set :case, "uppercase"
+    set :message, "Copied! 📋"
+    set :ttl, 3_000
   end
 
   override Extra, :nav_link do
@@ -767,13 +812,15 @@ defmodule Phlegethon.Overrides.Default do
   end
 
   def progress_class(passed_assigns) do
-    color = case passed_assigns[:color] do
-      "error" -> "red"
-      "info" -> "sky"
-      "warning" -> "yellow"
-      "success" -> "green"
-      color -> color
-    end
+    color =
+      case passed_assigns[:color] do
+        "error" -> "red"
+        "info" -> "sky"
+        "warning" -> "yellow"
+        "success" -> "green"
+        color -> color
+      end
+
     size = passed_assigns[:size]
 
     [

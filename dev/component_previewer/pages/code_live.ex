@@ -11,7 +11,7 @@ defmodule ComponentPreviewer.CodeLive do
       </:actions>
     </.header>
 
-    <.code source={File.read!(__MODULE__.__info__(:compile)[:source])} />
+    <.code id="code-example" source={File.read!(__MODULE__.__info__(:compile)[:source])} />
     """
   end
 

@@ -15,6 +15,7 @@ defmodule ComponentPreviewer.SmartFormLive do
     </.header>
 
     <.code
+      id="code-example-create"
       source="<.smart_form resource={User} action={:create} for={@create_user_form} ... />"
       language="heex"
       class="text-xs"

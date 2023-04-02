@@ -12,6 +12,7 @@ defmodule ComponentPreviewer.BackLive do
     </.header>
 
     <.code
+      id="code-example-default"
       language="heex"
       class="text-sm"
       source={~s|<.back navigate={~p"/"}>Go back to the about page.</.back>|}
@@ -21,6 +22,7 @@ defmodule ComponentPreviewer.BackLive do
     </p>
 
     <.code
+      id="code-example-custom"
       language="heex"
       class="text-sm"
       source={
