@@ -21,7 +21,7 @@ defmodule ComponentPreviewer.ButtonLive do
       Otherwise, it renders an HTML <var>button</var> with some added niceties.
     </p>
 
-    <ul class="flex gap-2">
+    <ul class="flex flex-wrap gap-2">
       <%= for color <- Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :button, :colors) do %>
         <li>
           <.a href={"#color-#{color}"}><%= color %></.a>
