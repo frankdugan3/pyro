@@ -21,23 +21,48 @@ defmodule Phlegethon.Overrides.Default do
     makeup_dark: &Makeup.Styles.HTML.StyleMap.native_style/0,
     global_style: """
     @layer root {
+      ::selection,
+      ::-moz-selection {
+        @apply text-white bg-sky-500 bg-opacity-100;
+      }
+
+      :root {
+        --scrollbar-width: 0.5rem;
+      }
+
       /* Firefox */
+
       * {
-        scrollbar-width: thin;
+        scrollbar-width: auto;
+        scrollbar-height: auto;
         scrollbar-color: theme(colors.sky.500) transparent;
       }
 
       /* Chrome, Edge, and Safari */
+
       *::-webkit-scrollbar {
-        @apply w-1;
+        width: var(--scrollbar-width);
+        height: var(--scrollbar-width);
+      }
+
+      *::-webkit-scrollbar-button {
+        @apply bg-transparent h-0 w-0;
+      }
+
+      ::-webkit-scrollbar-corner {
+        @apply bg-transparent;
       }
 
       *::-webkit-scrollbar-track {
         background: transparent;
       }
 
+      *::-webkit-scrollbar-track-piece {
+        @apply bg-transparent;
+      }
+
       *::-webkit-scrollbar-thumb {
-        @apply border-none bg-sky-500 rounded;
+        @apply bg-sky-500 border-none rounded-full;
       }
 
       var {
@@ -657,8 +682,7 @@ defmodule Phlegethon.Overrides.Default do
         !errors?,
       "border-red-600 focus:border-red-600 focus:ring-red-600/10 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500/25":
         errors?,
-      "w-auto rounded text-sky-500 focus:ring-sky-500 dark:text-sky-500 dark:focus:ring-sky-500":
-        type == "checkbox",
+      "w-auto rounded text-sky-500 dark:text-sky-500": type == "checkbox",
       "py-2 px-3": type == "select",
       "min-h-[6rem]": type == "textarea"
     ]
