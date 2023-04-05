@@ -4,6 +4,10 @@ spark_locals_without_parens = [
   action: 2,
   action_type: 1,
   action_type: 2,
+  autocomplete_option_label_key: 1,
+  autocomplete_option_value_key: 1,
+  autocomplete_search_action: 1,
+  autocomplete_search_arg: 1,
   autofocus: 1,
   class: 1,
   default_card_fields: 1,
@@ -23,11 +27,7 @@ spark_locals_without_parens = [
   prompt: 1,
   resource_label: 1,
   route_path: 1,
-  type: 1,
-  autocomplete_search_action: 1,
-  autocomplete_search_arg: 1,
-  autocomplete_option_label_key: 1,
-  autocomplete_option_value_key: 1
+  type: 1
 ]
 
 phlegethon_locals_without_parens = [

@@ -133,9 +133,9 @@ defmodule Phlegethon.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ash_phoenix, "~> 1.2"},
-      {:ash, "~> 2.4"},
-      {:bandit, ">= 0.6.4"},
+      {:ash_phoenix, "~> 1.2", optional: true},
+      {:ash, "~> 2.4", optional: true},
+      {:bandit, ">= 0.6.4", only: [:dev]},
       {:credo, ">= 0.0.0", only: [:dev], runtime: false},
       {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
       {:doctor, ">= 0.0.0", only: [:dev], runtime: false},
