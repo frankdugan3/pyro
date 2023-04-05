@@ -12,7 +12,9 @@ defmodule Phlegethon.Components.Core do
   - A powerful [override system](#module-overridable-component-attributes) for customization
   - A special `:tails_classes` type that merges [Tailwind CSS](https://tailwindcss.com) classes via `Tails`
   - The button component implements both button and anchor tags (button-styled links!)
-  - Inputs: `autofocus` prop to enable a hook for reliable focus on mount
+  - Inputs
+    - `autofocus` prop to enable a hook for reliable focus on mount
+    - `hidden` input type with a slot for custom content
   - A rich flash experience
     - Auto-remove after (configurable) timeout
     - Progress bar for auto-removed flash messages
@@ -634,7 +636,7 @@ defmodule Phlegethon.Components.Core do
     <div class={@class} phx-feedback-for={@name}>
       <.label for={@id} overrides={@overrides}><%= @label %></.label>
       <select
-        id={@id}
+        id={@id || @name}
         name={@name}
         class={@input_class}
         multiple={@multiple}
@@ -662,6 +664,26 @@ defmodule Phlegethon.Components.Core do
         phx-mounted={!@autofocus || JS.focus()}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
+      <p :if={@description} class={@description_class}>
+        <%= @description %>
+      </p>
+      <.error :for={msg <- @errors} overrides={@overrides}><%= msg %></.error>
+    </div>
+    """
+  end
+
+  defp render_input(%{type: "hidden"} = assigns) do
+    ~H"""
+    <div phx-feedback-for={@name} class={@class}>
+      <.label for={@id} overrides={@overrides}><%= @label %></.label>
+      <input
+        type="hidden"
+        name={@name}
+        id={@id || @name}
+        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+        {@rest}
+      />
+      <%= render_slot(@inner_block) %>
       <p :if={@description} class={@description_class}>
         <%= @description %>
       </p>
