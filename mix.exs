@@ -168,6 +168,11 @@ defmodule Phlegethon.MixProject do
 
   defp aliases do
     [
+      build: [
+        "spark.formatter --extensions Phlegethon.Resource",
+        "format",
+        "assets.build"
+      ],
       setup: [
         "cmd ./setup.sh",
         "deps.get",
@@ -177,8 +182,7 @@ defmodule Phlegethon.MixProject do
         "deps.compile tails --force",
         "docs"
       ],
-      "assets.build": ["esbuild module", "esbuild cdn", "esbuild cdn_min", "esbuild main"],
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.build": ["esbuild module", "esbuild cdn", "esbuild cdn_min", "esbuild main"]
     ]
   end
 end
