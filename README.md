@@ -46,7 +46,7 @@ iex -S mix phx.server
 There are links to the generated docs on each page of the component previewer. If you are working on the docs, there is a handy watcher script you can run to automatically rebuild/reload the docs:
 
 ```sh
-./wath_docs.sh
+./watch_docs.sh
 ```
 
 If you want to help, here's what you can PR no questions asked:
