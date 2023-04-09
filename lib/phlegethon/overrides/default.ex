@@ -12,7 +12,7 @@ defmodule Phlegethon.Overrides.Default do
   @theme_colors ~w[slate gray zinc neutral stone red orange amber yellow lime green emerald teal cyan sky blue indigo violet purple fuchsia pink rose]
   @flash_kinds ~w[info error warning success] ++ @theme_colors
   @bg_gradient "dark:bg-gradient-to-tr dark:from-slate-900 dark:to-slate-800"
-  @root_theme "bg-white text-slate-900  dark:text-white #{@bg_gradient}"
+  @root_theme "bg-white text-slate-900 dark:text-white #{@bg_gradient}"
   @shared_link_class "font-black border-b-2 border-dotted text-slate-900 border-slate-900 dark:text-white dark:border-white hover:text-sky-500 hover:border-sky-500 active:text-sky-500 active:border-sky-500 active:border-solid"
   @shared_shadow_class "shadow-md shadow-slate-900/5 dark:shadow-slate-300/5"
 
