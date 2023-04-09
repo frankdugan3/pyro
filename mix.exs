@@ -174,12 +174,10 @@ defmodule Phlegethon.MixProject do
         "assets.build"
       ],
       setup: [
-        "cmd ./setup.sh",
         "deps.get",
         "esbuild.install --if-missing",
         "tailwind.install --if-missing",
         "compile",
-        "deps.compile tails --force",
         "docs"
       ],
       "assets.build": ["esbuild module", "esbuild cdn", "esbuild cdn_min", "esbuild main"]

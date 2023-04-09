@@ -121,6 +121,4 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
        # ...
    ```
 
-10. Run `mix phlegethon.setup`.
-
-11. Note: `Tails` may occasionally complain about the `colors_file` being different in runtime than compile time. You simply need to run `mix deps.compile tails --force` to clear it up. If you are using the `Tails` helper functions for custom colors, you will also need to force a recompile if those change. If you are extending the default color theme, you will need to [configure the colors](https://github.com/zachdaniel/tails#colors).
+10. Note: `Tails` may occasionally complain about the `colors_file` being different in runtime than compile time. You simply need to run `mix deps.compile tails --force` to clear it up. If you are using the `Tails` helper functions for custom colors, you will also need to force a recompile if those change. If you are extending the default color theme, you will need to [configure the colors](https://github.com/zachdaniel/tails#colors).
