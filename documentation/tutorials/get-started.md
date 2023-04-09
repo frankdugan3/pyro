@@ -118,6 +118,8 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
      quote do
        # Import all Phlegethon components
        use Phlegethon.Components
+       # Don't import CoreComponents since Phlegethon replaces it and will conflict
+       # import MyAppWeb.CoreComponents
        # ...
    ```
 
