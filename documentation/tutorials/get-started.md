@@ -22,7 +22,7 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
    ```elixir
    def deps do
      [
-       {:phlegethon, github: "https://github.com/frankdugan3/phlegethon", branch: "main"}
+       {:phlegethon, github: "frankdugan3/phlegethon", branch: "main"}
      ]
    end
    ```
