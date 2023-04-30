@@ -24,7 +24,7 @@ if Code.ensure_loaded?(Ash) do
       class: [
         type: :string,
         required: false,
-        doc: "Override the default class (defaults to whatever is set by the action type)."
+        doc: "Merge/override the default class."
       ]
     ]
 

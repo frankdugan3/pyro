@@ -19,8 +19,7 @@ if Code.ensure_loaded?(Ash) do
       class: [
         type: :string,
         required: false,
-        doc: "Override the default class.",
-        default: "grid col-span-full"
+        doc: "Merge/override the default class."
       ],
       path: [
         type: {:list, :atom},

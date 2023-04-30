@@ -114,11 +114,9 @@ if Code.ensure_loaded?(Ash) do
       do: raise("Invalid action_type \"#{type}\"!")
 
     defp merge_action_types(entities, type, dsl) do
-      default_class = Form.ActionType.default_class()
-
       Enum.reduce(
         entities,
-        %Form.ActionType{name: type, class: default_class, fields: []},
+        %Form.ActionType{name: type, fields: []},
         fn
           %Form.ActionType{name: names} = action_type, acc
           when is_list(names) ->
@@ -160,7 +158,7 @@ if Code.ensure_loaded?(Ash) do
 
     defp merge_fields(old, new, dsl) do
       {field_keys, field_values} =
-        Enum.concat(old.fields, new.fields)
+        Enum.concat(old.fields || [], new.fields || [])
         |> Enum.reduce({[], %{}}, fn
           %Form.Field{name: name} = field, {keys, field_values} ->
             key = {Form.Field, name}

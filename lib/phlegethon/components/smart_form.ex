@@ -6,6 +6,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     import Phlegethon.Components.Core, only: [button: 1, header: 1, input: 1]
 
     alias Phlegethon.Resource.Info, as: UI
+    alias Ash.Resource.Info, as: ResourceInfo
 
     require Ash.Query
 
@@ -31,7 +32,7 @@ if Code.ensure_loaded?(AshPhoenix) do
 
     def smart_form(%{action_info: nil} = assigns) do
       assigns
-      |> assign(:action_info, UI.action(assigns[:resource], assigns[:action]))
+      |> assign(:action_info, ResourceInfo.action(assigns[:resource], assigns[:action]))
       |> smart_form()
     end
 
@@ -47,7 +48,7 @@ if Code.ensure_loaded?(AshPhoenix) do
       ~H"""
       <.form :let={f} class={@class} for={@for} as={@as} autocomplete={@autocomplete} {@rest}>
         <.header overrides={@overrides}>
-          <%= @phlegethon_form.label %> <%= UI.resource_label(@resource) %>
+          <%= @phlegethon_form.label %>
           <:subtitle :if={@phlegethon_form.description || @action_info.description}>
             <%= @phlegethon_form.description || @action_info.description %>
           </:subtitle>
@@ -106,7 +107,7 @@ if Code.ensure_loaded?(AshPhoenix) do
          ) do
       {attribute, argument} =
         case Enum.find(action_info.arguments, &(&1.name == name)) do
-          nil -> {UI.attribute(resource, name), nil}
+          nil -> {ResourceInfo.attribute(resource, name), nil}
           argument -> {nil, argument}
         end
 

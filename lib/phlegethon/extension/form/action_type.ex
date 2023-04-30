@@ -7,8 +7,6 @@ if Code.ensure_loaded?(Ash) do
 
     @action_types {:one_of, [:create, :update, :destroy]}
 
-    @default_class "grid"
-
     @schema [
       name: [
         type: {:or, [@action_types, {:list, @action_types}]},
@@ -18,11 +16,9 @@ if Code.ensure_loaded?(Ash) do
       class: [
         type: :string,
         required: false,
-        doc: "Merge/override the default class (defaults to \"#{@default_class}\")."
+        doc: "Merge/override the default class."
       ]
     ]
-
-    def default_class, do: @default_class
 
     def schema, do: @schema
   end
