@@ -1,6 +1,6 @@
 import Config
 
-config :phlegethon, :ex_doc_server, "http://127.0.0.1:35729/"
+config :pyro, :ex_doc_server, "http://127.0.0.1:35729/"
 
 config :ash, :use_all_identities_in_manage_relationship?, false
 
@@ -10,9 +10,9 @@ if Mix.env() == :dev do
   config :ash, :policies, show_policy_breakdowns?: true
   config :ash, :policies, log_policy_breakdowns: :info
 
-  phlegethon_esbuild = fn args ->
+  pyro_esbuild = fn args ->
     [
-      args: ~w(./js/phlegethon --bundle) ++ args,
+      args: ~w(./js/pyro --bundle) ++ args,
       cd: Path.expand("../assets", __DIR__),
       env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
     ]
@@ -28,16 +28,16 @@ if Mix.env() == :dev do
       env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
     ],
     module:
-      phlegethon_esbuild.(~w(--format=esm --sourcemap --outfile=../priv/static/phlegethon.mjs)),
+      pyro_esbuild.(~w(--format=esm --sourcemap --outfile=../priv/static/pyro.mjs)),
     main:
-      phlegethon_esbuild.(~w(--format=cjs --sourcemap --outfile=../priv/static/phlegethon.cjs.js)),
+      pyro_esbuild.(~w(--format=cjs --sourcemap --outfile=../priv/static/pyro.cjs.js)),
     cdn:
-      phlegethon_esbuild.(
-        ~w(--target=es2016 --format=iife --global-name=Phlegethon --outfile=../priv/static/phlegethon.js)
+      pyro_esbuild.(
+        ~w(--target=es2016 --format=iife --global-name=Pyro --outfile=../priv/static/pyro.js)
       ),
     cdn_min:
-      phlegethon_esbuild.(
-        ~w(--target=es2016 --format=iife --global-name=Phlegethon --minify --outfile=../priv/static/phlegethon.min.js)
+      pyro_esbuild.(
+        ~w(--target=es2016 --format=iife --global-name=Pyro --minify --outfile=../priv/static/pyro.min.js)
       )
 
   # Configure tailwind (the version is required)
@@ -55,7 +55,7 @@ if Mix.env() == :dev do
   # Use Jason for JSON parsing in Phoenix
   config :phoenix, :json_library, Jason
 
-  config :phlegethon, ComponentPreviewer.Endpoint,
+  config :pyro, ComponentPreviewer.Endpoint,
     adapter: Bandit.PhoenixAdapter,
     url: [host: "localhost"],
     render_errors: [
@@ -75,12 +75,12 @@ if Mix.env() == :dev do
       esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
       tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
     ],
-    reloadable_compilers: [:elixir, :app, :phlegethon],
+    reloadable_compilers: [:elixir, :app, :pyro],
     live_reload: [
       patterns: [
         ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg|ico)$",
         ~r"priv/gettext/.*(po)$",
-        ~r"lib/phlegethon/.*(ex)$",
+        ~r"lib/pyro/.*(ex)$",
         ~r"dev/component_previewer/(pages)/.*(ex)$",
         ~r"dev/component_previewer/layouts/.*(eex)$"
       ]
@@ -94,7 +94,7 @@ if Mix.env() == :dev do
   config :git_ops,
     mix_project: Mix.Project.get!(),
     changelog_file: "CHANGELOG.md",
-    repository_url: "https://github.com/frankdugan3/phlegethon",
+    repository_url: "https://github.com/frankdugan3/pyro",
     types: [
       # Makes an allowed commit type called `tidbit` that is not
       # shown in the changelog

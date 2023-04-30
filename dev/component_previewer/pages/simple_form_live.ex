@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.SimpleFormLive do
     ~H"""
     <.header>
       &lt;.simple_form&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#simple_form/1" />
+        <.doc_url page="Pyro.Components.Core.html#simple_form/1" />
       </:actions>
     </.header>
     """

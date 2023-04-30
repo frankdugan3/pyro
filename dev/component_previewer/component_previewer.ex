@@ -35,7 +35,7 @@ defmodule ComponentPreviewer do
 
   def live_view do
     quote do
-      use Phlegethon.LiveView,
+      use Pyro.LiveView,
         layout: {ComponentPreviewer.Layouts, :app},
         container:
           {:main,
@@ -49,7 +49,7 @@ defmodule ComponentPreviewer do
 
   def live_component do
     quote do
-      use Phlegethon.LiveComponent
+      use Pyro.LiveComponent
 
       unquote(html_helpers())
     end
@@ -57,7 +57,7 @@ defmodule ComponentPreviewer do
 
   def html do
     quote do
-      use Phlegethon.Component
+      use Pyro.Component
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -70,9 +70,9 @@ defmodule ComponentPreviewer do
 
   defp html_helpers do
     quote do
-      # Import all Phlegethon components
-      use Phlegethon.Components
-      alias Phlegethon.Resource.Info, as: UI
+      # Import all Pyro components
+      use Pyro.Components
+      alias Pyro.Resource.Info, as: UI
 
       # HTML escaping functionality
       import Phoenix.HTML

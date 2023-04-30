@@ -1,13 +1,13 @@
 defmodule ComponentPreviewer.Endpoint do
   @moduledoc false
-  use Phoenix.Endpoint, otp_app: :phlegethon
+  use Phoenix.Endpoint, otp_app: :pyro
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_phlegethon_key",
+    key: "_pyro_key",
     signing_salt: "p9XlOXa7",
     same_site: "Lax"
   ]
@@ -20,7 +20,7 @@ defmodule ComponentPreviewer.Endpoint do
   # when deploying your static files in production.
   plug(Plug.Static,
     at: "/",
-    from: :phlegethon,
+    from: :pyro,
     gzip: false,
     only: ComponentPreviewer.static_paths() ++ ["doc"]
   )

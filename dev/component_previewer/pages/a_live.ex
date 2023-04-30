@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.ALive do
     ~H"""
     <.header>
       &lt;.a&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Extra.html#a/1" />
+        <.doc_url page="Pyro.Components.Extra.html#a/1" />
       </:actions>
     </.header>
 

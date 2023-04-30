@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.ListLive do
     ~H"""
     <.header>
       &lt;.list&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#list/1" />
+        <.doc_url page="Pyro.Components.Core.html#list/1" />
       </:actions>
     </.header>
 

@@ -11,7 +11,7 @@ defmodule ComponentPreviewer.SmartDataTableLive do
       &lt;.table&gt;
       <:actions>
         <.button phx-click="generate_user">Generate User</.button>
-        <.doc_url page="Phlegethon.Components.SmartDataTable.html#smart_data_table/1" />
+        <.doc_url page="Pyro.Components.SmartDataTable.html#smart_data_table/1" />
       </:actions>
     </.header>
 

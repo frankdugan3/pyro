@@ -2,12 +2,12 @@ defmodule ComponentPreviewer.Ash.User do
   @moduledoc false
   use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
-    extensions: [Phlegethon.Resource],
+    extensions: [Pyro.Resource],
     notifiers: [Ash.Notifier.PubSub]
 
   require Ash.Query
 
-  phlegethon do
+  pyro do
     resource_label "User"
     default_display_mode :card_grid
 

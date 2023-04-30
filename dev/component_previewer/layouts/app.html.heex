@@ -1,27 +1,27 @@
 <header class="grid col-span-2 grid-cols-[auto,1fr,auto,auto,auto] gap-2 items-center">
   <span class="font-black text-3xl">
     <.icon name="hero-fire-solid" class="h-8 w-8 text-orange-500" />
-    Phlegethon Component Previewer
+    Pyro Component Previewer
   </span>
   <div />
   <.button
     type="button"
     class="whitespace-nowrap"
-    phx-click={JS.dispatch("phlegethon:theme-system")}
+    phx-click={JS.dispatch("pyro:theme-system")}
   >
     <.icon name="hero-computer-desktop-mini" /> System
   </.button>
   <.button
     type="button"
     class="whitespace-nowrap"
-    phx-click={JS.dispatch("phlegethon:theme-dark")}
+    phx-click={JS.dispatch("pyro:theme-dark")}
   >
     <.icon name="hero-moon-mini" /> Dark
   </.button>
   <.button
     type="button"
     class="whitespace-nowrap"
-    phx-click={JS.dispatch("phlegethon:theme-light")}
+    phx-click={JS.dispatch("pyro:theme-light")}
   >
     <.icon name="hero-sun-mini" /> Light
   </.button>
@@ -56,7 +56,6 @@
   <h1 class="font-black text-xl border-b-2 border-1 w-full text-center">
     Smart
   </h1>
-  <.nav_link uri={~p"/smart-data-table"} label="<.smart_data_table>" current_uri={@uri} />
   <.nav_link uri={~p"/smart-form"} label="<.smart_form>" current_uri={@uri} />
 </nav>
 <article class="grid gap-2 overflow-auto content-start p-2 pr-4">

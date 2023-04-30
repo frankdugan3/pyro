@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.TooltipLive do
     ~H"""
     <.header>
       &lt;.tooltip&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Extra.html#tooltip/1" />
+        <.doc_url page="Pyro.Components.Extra.html#tooltip/1" />
       </:actions>
     </.header>
 

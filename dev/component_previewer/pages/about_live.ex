@@ -14,9 +14,9 @@ defmodule ComponentPreviewer.AboutLive do
     </p>
 
     <p>
-      You can find the source for Phlegethon on
+      You can find the source for Pyro on
       <.button
-        href="https://github.com/frankdugan3/phlegethon"
+        href="https://github.com/frankdugan3/pyro"
         target="_blank"
         class="whitespace-nowrap"
         size="sm"
@@ -28,7 +28,7 @@ defmodule ComponentPreviewer.AboutLive do
 
     <p>
       The premiere feature of this library, aside from highly the extensible generic components, is the <strong>smart components</strong>.
-      The <var>phlegethon</var>
+      The <var>pyro</var>
       extension integrates with the smart components to automatically render UI components, like complex forms and data tables.
       Like many things in Ash, there are multiple "escape hatches" and ways to override defaults at many levels.
     </p>

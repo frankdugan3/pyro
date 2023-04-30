@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.SpinnerLive do
     ~H"""
     <.header>
       &lt;.spinner&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Extra.html#spinner/1" />
+        <.doc_url page="Pyro.Components.Extra.html#spinner/1" />
       </:actions>
     </.header>
 

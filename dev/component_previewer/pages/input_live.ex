@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.InputLive do
     ~H"""
     <.header>
       &lt;.input&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#input/1" />
+        <.doc_url page="Pyro.Components.Core.html#input/1" />
       </:actions>
     </.header>
     """

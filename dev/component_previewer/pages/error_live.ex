@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.ErrorLive do
     ~H"""
     <.header>
       &lt;.error&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#error/1" />
+        <.doc_url page="Pyro.Components.Core.html#error/1" />
       </:actions>
     </.header>
 

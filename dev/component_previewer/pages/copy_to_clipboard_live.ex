@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.CopyToClipboardLive do
     ~H"""
     <.header>
       &lt;.copy_to_clipboard&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Extra.html#copy_to_clipboard/1" />
+        <.doc_url page="Pyro.Components.Extra.html#copy_to_clipboard/1" />
       </:actions>
     </.header>
 

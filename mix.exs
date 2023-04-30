@@ -1,15 +1,15 @@
-defmodule Phlegethon.MixProject do
+defmodule Pyro.MixProject do
   @moduledoc false
   use Mix.Project
 
-  @source_url "https://github.com/frankdugan3/phlegethon"
+  @source_url "https://github.com/frankdugan3/pyro"
   @version "0.0.0"
   @description """
   An Ash user interface extension with smart Phoenix components.
   """
   def project do
     [
-      app: :phlegethon,
+      app: :pyro,
       version: @version,
       description: @description,
       elixir: "~> 1.14",
@@ -18,11 +18,11 @@ defmodule Phlegethon.MixProject do
       deps: deps(),
       docs: docs(),
       test_paths: ["lib"],
-      name: "Phlegethon",
+      name: "Pyro",
       source_url: @source_url,
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
-      compilers: Mix.compilers() ++ [:phlegethon]
+      compilers: Mix.compilers() ++ [:pyro]
     ]
   end
 
@@ -77,7 +77,7 @@ defmodule Phlegethon.MixProject do
 
   defp package do
     [
-      name: :phlegethon,
+      name: :pyro,
       maintainers: ["Frank Dugan III"],
       licenses: ["MIT"],
       files: ~w(lib .formatter.exs mix.exs README* LICENSE*
@@ -89,29 +89,29 @@ defmodule Phlegethon.MixProject do
   defp groups_for_modules() do
     [
       Core: [
-        Phlegethon,
-        Phlegethon.Components,
-        Phlegethon.Resource,
-        Phlegethon.Resource.Info
+        Pyro,
+        Pyro.Components,
+        Pyro.Resource,
+        Pyro.Resource.Info
       ],
       Overrides: [
-        Phlegethon.Overrides,
+        Pyro.Overrides,
         ~r/\.Overrides\./
       ],
       "Resource Extension": [
-        Phlegethon.Resource.Form.Action,
-        Phlegethon.Resource.Form.ActionType,
-        Phlegethon.Resource.Form.Field,
-        Phlegethon.Resource.Form.FieldGroup
+        Pyro.Resource.Form.Action,
+        Pyro.Resource.Form.ActionType,
+        Pyro.Resource.Form.Field,
+        Pyro.Resource.Form.FieldGroup
       ],
       Components: [~r/\.Components\./],
       "Component Tooling": [
-        Phlegethon.Component,
-        Phlegethon.LiveComponent,
-        Phlegethon.LiveView,
-        Phlegethon.Component.Overridable,
-        Phlegethon.Component.Helpers,
-        Phlegethon.Makeup.Style
+        Pyro.Component,
+        Pyro.LiveComponent,
+        Pyro.LiveView,
+        Pyro.Component.Overridable,
+        Pyro.Component.Helpers,
+        Pyro.Makeup.Style
       ]
     ]
   end
@@ -169,7 +169,7 @@ defmodule Phlegethon.MixProject do
   defp aliases do
     [
       build: [
-        "spark.formatter --extensions Phlegethon.Resource",
+        "spark.formatter --extensions Pyro.Resource",
         "format",
         "assets.build"
       ],

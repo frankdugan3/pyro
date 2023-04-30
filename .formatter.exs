@@ -30,7 +30,7 @@ spark_locals_without_parens = [
   type: 1
 ]
 
-phlegethon_locals_without_parens = [
+pyro_locals_without_parens = [
   set: 2
 ]
 
@@ -42,9 +42,9 @@ phlegethon_locals_without_parens = [
     # :ash_authentication_phoenix
   ],
   subdirectories: ["priv/*/migrations"],
-  locals_without_parens: spark_locals_without_parens ++ phlegethon_locals_without_parens,
+  locals_without_parens: spark_locals_without_parens ++ pyro_locals_without_parens,
   export: [
-    locals_without_parens: spark_locals_without_parens ++ phlegethon_locals_without_parens
+    locals_without_parens: spark_locals_without_parens ++ pyro_locals_without_parens
   ],
   plugins: [Spark.Formatter, Phoenix.LiveView.HTMLFormatter],
   inputs: ["*.{heex,ex,exs}", "{config,lib,dev}/**/*.{heex,ex,exs}"]

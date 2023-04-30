@@ -1,4 +1,4 @@
-defmodule Phlegethon.Gettext do
+defmodule Pyro.Gettext do
   @moduledoc false
-  use Gettext, otp_app: :phlegethon
+  use Gettext, otp_app: :pyro
 end

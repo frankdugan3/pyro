@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.HeaderLive do
     ~H"""
     <.header>
       &lt;.header&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#header/1" />
+        <.doc_url page="Pyro.Components.Core.html#header/1" />
       </:actions>
     </.header>
 

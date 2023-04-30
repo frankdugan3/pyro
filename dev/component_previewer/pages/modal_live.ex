@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.ModalLive do
     ~H"""
     <.header>
       &lt;.modal&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#modal/1" />
+        <.doc_url page="Pyro.Components.Core.html#modal/1" />
       </:actions>
     </.header>
 

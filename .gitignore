@@ -20,7 +20,7 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-phlegethon-*.tar
+pyro-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
@@ -28,7 +28,7 @@ phlegethon-*.tar
 /.elixir_ls/
 
 # Generated files
-/assets/tailwind.phlegethon.colors.json
-/assets/css/phlegethon.css
+/assets/tailwind.pyro.colors.json
+/assets/css/pyro.css
 /priv/static/assets
 /priv/static/doc

@@ -1,5 +1,5 @@
 [
   tools: [
-    {:spark_formatter, "mix spark.formatter --check --extensions Phlegethon.Resource"}
+    {:spark_formatter, "mix spark.formatter --check --extensions Pyro.Resource"}
   ]
 ]

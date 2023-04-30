@@ -1,7 +1,7 @@
 defmodule ComponentPreviewer.Components do
   @moduledoc false
-  use Phlegethon.Component
-  import Phlegethon.Components.Core, only: [button: 1]
+  use Pyro.Component
+  import Pyro.Components.Core, only: [button: 1]
 
   attr :page, :string, required: true
 
@@ -10,7 +10,7 @@ defmodule ComponentPreviewer.Components do
 
     assigns =
       assign_new(assigns, :uri, fn ->
-        with server <- Application.get_env(:phlegethon, :ex_doc_server),
+        with server <- Application.get_env(:pyro, :ex_doc_server),
              uri <- Path.join([server, page]),
              {:ok, %{status: 200}} <-
                Finch.build(:get, uri) |> Finch.request(ComponentPreviewer.Finch) do

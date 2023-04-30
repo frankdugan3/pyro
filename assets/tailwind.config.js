@@ -13,7 +13,7 @@ module.exports = {
     './js/**/*.js',
     '../dev/component_previewer/*_web.*ex',
     '../dev/component_previewer/**/*.*ex',
-    '../lib/phlegethon/**/*.*ex',
+    '../lib/pyro/**/*.*ex',
   ],
   plugins: [
     require('@tailwindcss/forms'),

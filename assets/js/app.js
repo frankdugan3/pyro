@@ -1,4 +1,4 @@
-import { hooks, getTimezone } from './phlegethon'
+import { hooks, getTimezone } from './pyro'
 import 'phoenix_html'
 import { Socket } from 'phoenix'
 import { LiveSocket } from 'phoenix_live_view'

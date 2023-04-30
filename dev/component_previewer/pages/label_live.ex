@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.LabelLive do
     ~H"""
     <.header>
       &lt;.label&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#label/1" />
+        <.doc_url page="Pyro.Components.Core.html#label/1" />
       </:actions>
     </.header>
 

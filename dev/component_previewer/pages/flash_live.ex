@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.FlashLive do
     ~H"""
     <.header>
       &lt;.flash&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#flash/1" />
+        <.doc_url page="Pyro.Components.Core.html#flash/1" />
       </:actions>
     </.header>
 
@@ -20,7 +20,7 @@ defmodule ComponentPreviewer.FlashLive do
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      Phlegethon.Overrides.override_for(Phlegethon.Components.Core, :flash, :kinds)
+      Pyro.Overrides.override_for(Pyro.Components.Core, :flash, :kinds)
       |> Enum.reduce(socket, fn kind, socket ->
         put_flash(
           socket,

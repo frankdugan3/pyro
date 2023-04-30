@@ -10,7 +10,7 @@ defmodule ComponentPreviewer.SmartFormLive do
     <.header>
       &lt;.smart_form&gt;
       <:actions>
-        <.doc_url page="Phlegethon.Components.SmartForm.html#smart_form/1" />
+        <.doc_url page="Pyro.Components.SmartForm.html#smart_form/1" />
       </:actions>
     </.header>
 

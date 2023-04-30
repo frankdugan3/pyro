@@ -11,7 +11,7 @@ defmodule ComponentPreviewer.TableLive do
       &lt;.table&gt;
       <:actions>
         <.button phx-click="generate_user">Generate User</.button>
-        <.doc_url page="Phlegethon.Components.Core.html#table/1" />
+        <.doc_url page="Pyro.Components.Core.html#table/1" />
       </:actions>
     </.header>
 

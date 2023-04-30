@@ -1,19 +1,19 @@
 {
-  "name": "phlegethon",
+  "name": "pyro",
   "version": "0.0.0",
-  "description": "Supporting utilities for Phlegethon components.",
+  "description": "Supporting utilities for Pyro components.",
   "license": "MIT",
-  "module": "./priv/static/phlegethon.mjs",
-  "main": "./priv/static/phlegethon.cjs.js",
-  "unpkg": "./priv/static/phlegethon.min.js",
-  "jsdelivr": "./priv/static/phlegethon.min.js",
+  "module": "./priv/static/pyro.mjs",
+  "main": "./priv/static/pyro.cjs.js",
+  "unpkg": "./priv/static/pyro.min.js",
+  "jsdelivr": "./priv/static/pyro.min.js",
   "exports": {
-    "import": "./priv/static/phlegethon.mjs",
-    "require": "./priv/static/phlegethon.cjs.js"
+    "import": "./priv/static/pyro.mjs",
+    "require": "./priv/static/pyro.cjs.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/frankdugan3/phlegethon.git"
+    "url": "git://github.com/frankdugan3/pyro.git"
   },
   "author": "Frank Dugan III <frank3@duganator.com> (https://frankdugan.com)",
   "files": [
@@ -21,6 +21,6 @@
     "LICENSE.md",
     "package.json",
     "priv/static/*",
-    "assets/js/phlegethon/*"
+    "assets/js/pyro/*"
   ]
 }

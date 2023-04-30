@@ -1,10 +1,10 @@
 # Get Started
 
-Wow, you must be courageous! Be sure to [check out open issues](https://github.com/frankdugan3/phlegethon/issues) before proceeding.
+Wow, you must be courageous! Be sure to [check out open issues](https://github.com/frankdugan3/pyro/issues) before proceeding.
 
 ## Installation
 
-The installation process is currently pretty involved, and may be omitting some required steps. This will [improve over time](https://github.com/frankdugan3/phlegethon/issues/2), pinky-promise!
+The installation process is currently pretty involved, and may be omitting some required steps. This will [improve over time](https://github.com/frankdugan3/pyro/issues/2), pinky-promise!
 
 ### Requirements
 
@@ -15,14 +15,14 @@ This library is for Phoenix LiveView & Ash Framework
 
 ### Steps
 
-These steps assume you are adding Phlegethon to an existing Phoenix LiveView app as generated from the `v1.7.1+` `phx.new`.
+These steps assume you are adding Pyro to an existing Phoenix LiveView app as generated from the `v1.7.1+` `phx.new`.
 
 1. Until we approach a stable release candidate, there will be no releases on Hex, so install via GitHub:
 
    ```elixir
    def deps do
      [
-       {:phlegethon, github: "frankdugan3/phlegethon", branch: "main"}
+       {:pyro, github: "frankdugan3/pyro", branch: "main"}
      ]
    end
    ```
@@ -30,7 +30,7 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
 2. Add the following to your `config.exs`:
 
    ```elixir
-   config :phlegethon, :overrides, [Phlegethon.Overrides.Default]
+   config :pyro, :overrides, [Pyro.Overrides.Default]
    ```
 
 3. Update your `tailwind.config.js`, and add the noted lines:
@@ -42,7 +42,7 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
      darkMode: 'class', // <-- Dark theme support
      content: [
        // ...
-       '../deps/phlegethon/lib/phlegethon/**/*.*ex', // <-- Ensure Phlegethon components are included
+       '../deps/pyro/lib/pyro/**/*.*ex', // <-- Ensure Pyro components are included
      ],
      // ...
      plugins: [
@@ -57,20 +57,20 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
    }
    ```
 
-4. Add `phlegethon` CSS imports to `assets/css/app.css`:
+4. Add `pyro` CSS imports to `assets/css/app.css`:
 
    ```css
    @import 'tailwindcss/base';
    @import 'tailwindcss/components';
    @import 'tailwindcss/utilities';
 
-   @import './phlegethon.css';
+   @import './pyro.css';
    ```
 
 5. Add the following lines to `assets/js/app.js`:
 
    ```js
-   import { hooks, getTimezone } from 'phlegethon'
+   import { hooks, getTimezone } from 'pyro'
    // ...
    let liveSocket = new LiveSocket('/live', Socket, {
      params: { _csrf_token: csrfToken, timezone: getTimezone() },
@@ -78,47 +78,47 @@ These steps assume you are adding Phlegethon to an existing Phoenix LiveView app
    })
    ```
 
-6. Update `mix.exs`, adding the `:phlegethon` compiler to the list of compilers:
+6. Update `mix.exs`, adding the `:pyro` compiler to the list of compilers:
 
    ```elixir
    def project do
      [
        # ...
-       compilers: Mix.compilers() ++ [:phlegethon]
+       compilers: Mix.compilers() ++ [:pyro]
      ]
    end
    ```
 
-   And update `config/dev.exs` to include `:phlegethon` in the list of `:reloadable_compilers` in your endpoint:
+   And update `config/dev.exs` to include `:pyro` in the list of `:reloadable_compilers` in your endpoint:
 
    ```elixir
    config :my_app, MyAppWeb.Endpoint,
      # ...
-     reloadable_compilers: [:elixir, :app, :phlegethon],
+     reloadable_compilers: [:elixir, :app, :pyro],
    ```
 
 7. Edit your `my_app_web.ex` file, replacing:
 
-   - `Phoenix.Component` with `Phlegethon.Component`
-   - `Phoenix.LiveComponent` with `Phlegethon.LiveComponent`
-   - `Phoenix.LiveView` with `Phlegethon.LiveView`
+   - `Phoenix.Component` with `Pyro.Component`
+   - `Phoenix.LiveComponent` with `Pyro.LiveComponent`
+   - `Phoenix.LiveView` with `Pyro.LiveView`
 
    **Note:** _Only_ replace those top-level modules, _do not_ replace submodules, e.g. `Phoenix.LiveView.Router`.
 
 8. (Optional) Add the generated files to your `.gitignore` if you don't want them tracked:
 
    ```
-   /assets/css/phlegethon.css
+   /assets/css/pyro.css
    ```
 
-9. (Optional) Import the Phlegethon components into your `my_app_web.ex` helpers to make the available in your views/components:
+9. (Optional) Import the Pyro components into your `my_app_web.ex` helpers to make the available in your views/components:
 
    ```elixir
    defp html_helpers do
      quote do
-       # Import all Phlegethon components
-       use Phlegethon.Components
-       # Don't import CoreComponents since Phlegethon replaces it and will conflict
+       # Import all Pyro components
+       use Pyro.Components
+       # Don't import CoreComponents since Pyro replaces it and will conflict
        # import MyAppWeb.CoreComponents
        # ...
    ```

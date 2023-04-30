@@ -27,8 +27,8 @@ A clear and concise description of the use case fulfilled or problems solved by 
 **Component mockup (optional)**
 
 ```elixir
-defmodule Phlegethon.Components.SomeComponent do
-  use Phlegethon.Component
+defmodule Pyro.Components.SomeComponent do
+  use Pyro.Component
 
   def some_component(assigns) do
     ~H"""

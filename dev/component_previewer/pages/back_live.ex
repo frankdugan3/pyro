@@ -7,7 +7,7 @@ defmodule ComponentPreviewer.BackLive do
     ~H"""
     <.header>
       &lt;.back&gt;<:actions>
-        <.doc_url page="Phlegethon.Components.Core.html#back/1" />
+        <.doc_url page="Pyro.Components.Core.html#back/1" />
       </:actions>
     </.header>
 
