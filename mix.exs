@@ -158,8 +158,7 @@ defmodule Pyro.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.18.0"},
       {:phoenix, "~> 1.7.1"},
-      {:tails, github: "zachdaniel/tails", branch: "main"},
-      # {:tails, "~> 0.1.4"},
+      {:tails, "~> 0.1.5"},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
       {:timex, "~> 3.0"},
       {:tzdata, "~> 1.1.0"}
