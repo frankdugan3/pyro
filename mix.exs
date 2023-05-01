@@ -60,7 +60,7 @@ defmodule Pyro.MixProject do
   defp docs do
     [
       main: "get-started",
-      # Can't use version until we start tagging releases!
+      logo: "logos/logo.png",
       # source_ref: "v#{@version}",
       output: "priv/static/doc",
       source_url: @source_url,
