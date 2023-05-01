@@ -1,6 +1,5 @@
 {
   "name": "pyro",
-  "version": "0.0.0",
   "description": "Supporting utilities for Pyro components.",
   "license": "MIT",
   "module": "./priv/static/pyro.mjs",

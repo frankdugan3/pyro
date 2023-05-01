@@ -1,5 +1,5 @@
 defmodule Pyro do
   @moduledoc """
-  Documentation for `Pyro`.
+  `Pyro` is a component library for `Phoenix` with (optional) declarative UI for [`Ash Framework`](`Ash`).
   """
 end

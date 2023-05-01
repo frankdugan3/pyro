@@ -16,7 +16,7 @@ defmodule ComponentPreviewer.Components do
                Finch.build(:get, uri) |> Finch.request(ComponentPreviewer.Finch) do
           uri
         else
-          _ -> Path.join("/doc/", page)
+          _ -> Path.join("https://hexdocs.pm/pyro/", page)
         end
       end)
 

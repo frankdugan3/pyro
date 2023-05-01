@@ -31,4 +31,3 @@ pyro-*.tar
 /assets/tailwind.pyro.colors.json
 /assets/css/pyro.css
 /priv/static/assets
-/priv/static/doc

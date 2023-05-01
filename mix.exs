@@ -5,7 +5,7 @@ defmodule Pyro.MixProject do
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.0.1"
   @description """
-  An Ash user interface extension with smart Phoenix components.
+  Phoenix components and tooling with (optional) declarative UI for Ash Framework.
   """
   def project do
     [
@@ -59,10 +59,10 @@ defmodule Pyro.MixProject do
 
   defp docs do
     [
-      main: "get-started",
+      main: "about",
       logo: "logos/logo.png",
-      # source_ref: "v#{@version}",
-      output: "priv/static/doc",
+      source_ref: "v#{@version}",
+      output: "doc",
       source_url: @source_url,
       extra_section: "GUIDES",
       extras: extras(),

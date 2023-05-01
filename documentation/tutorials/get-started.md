@@ -1,28 +1,23 @@
 # Get Started
 
-Wow, you must be courageous! Be sure to [check out open issues](https://github.com/frankdugan3/pyro/issues) before proceeding.
+This guide steps through the installation process for `Pyro`.
 
 ## Installation
 
 The installation process is currently pretty involved, and may be omitting some required steps. This will [improve over time](https://github.com/frankdugan3/pyro/issues/2), pinky-promise!
 
-### Requirements
-
-This library is for Phoenix LiveView & Ash Framework
-
-- Phoenix v1.7.1+
-- Tailwind
-
 ### Steps
 
-These steps assume you are adding Pyro to an existing Phoenix LiveView app as generated from the `v1.7.1+` `phx.new`.
+These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as generated from the `v1.7.2+` `phx.new`.
 
-1. Until we approach a stable release candidate, there will be no releases on Hex, so install via GitHub:
+1. Add `:pyro` to your dependencies:
 
    ```elixir
    def deps do
      [
-       {:pyro, github: "frankdugan3/pyro", branch: "main"}
+       {:pyro, "~> 0.0.1"},
+       {:ash_phoenix, "~> 1.2"}, # <-- Optional: Ash integration
+       {:ash, "~> 2.8"}, # <-- Optional: Ash integration
      ]
    end
    ```
