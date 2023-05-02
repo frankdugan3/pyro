@@ -60,25 +60,25 @@ For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page
   - [x] [`progress/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#progress/1)
   - [x] [`spinner/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#spinner/1)
   - [x] [`tooltip/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#tooltip/1)
-  - [ ] Navbar/NavItem #5
-  - [ ] SlideOver #4
-  - [ ] Tabs #13
-  - [ ] Breadcrumbs #11
-  - [ ] Dark/Light theme selector #3
+  - [ ] Navbar/NavItem [#5](https://github.com/frankdugan3/pyro/issues/5)
+  - [ ] SlideOver [#4](https://github.com/frankdugan3/pyro/issues/4)
+  - [ ] Tabs [#13](https://github.com/frankdugan3/pyro/issues/13)
+  - [ ] Breadcrumbs [#11](https://github.com/frankdugan3/pyro/issues/11)
+  - [ ] Dark/Light theme selector [#3](https://github.com/frankdugan3/pyro/issues/3)
 - [ ] Live Components
   - [x] [`Pyro.Components.Autocomplete`](https://hexdocs.pm/pyro/Pyro.Components.Autocomplete.html)
 - [ ] Smart Components
   - [x] [`Pyro.Components.SmartForm`](https://hexdocs.pm/pyro/Pyro.Components.SmartForm.html)
-  - [ ] `Pyro.Components.SmartDataTable` #16
-  - [ ] `Pyro.Components.SmartCardGrid` #10
-  - [ ] Extensible AshAuthentication support #15
+  - [ ] `Pyro.Components.SmartDataTable` [#16](https://github.com/frankdugan3/pyro/issues/16)
+  - [ ] `Pyro.Components.SmartCardGrid` [#10](https://github.com/frankdugan3/pyro/issues/10)
+  - [ ] Extensible AshAuthentication support [#15](https://github.com/frankdugan3/pyro/issues/15)
 - [ ] DX
-  - [ ] Simplified setup #2
+  - [ ] Simplified setup [#2](https://github.com/frankdugan3/pyro/issues/2)
     - [ ] Create a Tailwind plugin
     - [ ] Figure out a better way to avoid needing to include `:reloadable_compilers` and `mix.exs` compilers config
   - [ ] Strong test suite
   - [ ] More override presets
-  - [ ] Code patching tools #1
+  - [ ] Code patching tools [#1](https://github.com/frankdugan3/pyro/issues/1)
 
 ## Development
 
@@ -119,5 +119,5 @@ Also open to more component ideas. Since it's easy to make your own components, 
 ## Prior Art
 
 - [petal](https://petal.build/): Petal is an established project with a robust set of components, and served as a substantial inspiration for this project.
-- [Surface UI](https://surface-ui.org/): Surface changed the game for LiveView. Many of its improvements have made it upstream, with the exceptions of special handling of classes and code patching tooling. Pyro has already tackled classes, and there are plans to do the same for code patching. #1](https://github.com/frankdugan3pyro/issues/1)
+- [Surface UI](https://surface-ui.org/): Surface changed the game for LiveView. Many of its improvements have made it upstream, with the exceptions of special handling of classes and code patching tooling. Pyro has already tackled classes, and there are plans to do the same for code patching. [#1](https://github.com/frankdugan3/pyro/issues/1)
 - [AshAuthenticationPhoenix](https://github.com/team-alembic/ash_authentication_phoenix): The component override system is pretty awesome, and directly inspired Pyro's override system.
