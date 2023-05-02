@@ -66,9 +66,9 @@ For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page
   - [ ] Breadcrumbs [#11]
   - [ ] Dark/Light theme selector [#3]
 - [ ] Live Components
-  - [x] [`Pyro.Components.Autocomplete`](https://hexdocs.pm/pyro/Pyro.Components.Autocomplete)
+  - [x] [`Pyro.Components.Autocomplete`](https://hexdocs.pm/pyro/Pyro.Components.Autocomplete.html)
 - [ ] Smart Components
-  - [x] [`Pyro.Components.SmartForm`](https://hexdocs.pm/pyro/Pyro.Components.SmartForm)
+  - [x] [`Pyro.Components.SmartForm`](https://hexdocs.pm/pyro/Pyro.Components.SmartForm.html)
   - [ ] `Pyro.Components.SmartDataTable` [#16]
   - [ ] `Pyro.Components.SmartCardGrid` [#10]
   - [ ] Extensible AshAuthentication support [#15]
