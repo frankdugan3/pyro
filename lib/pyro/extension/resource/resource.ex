@@ -10,8 +10,7 @@ if Code.ensure_loaded?(Ash) do
     }
 
     @field_group %Spark.Dsl.Entity{
-      describe:
-        "Configure the appearance of form field groups in the `Pyro.Resource` extension.",
+      describe: "Configure the appearance of form field groups in the `Pyro.Resource` extension.",
       name: :field_group,
       schema: Pyro.Resource.Form.FieldGroup.schema(),
       target: Pyro.Resource.Form.FieldGroup,

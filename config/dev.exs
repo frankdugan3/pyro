@@ -27,10 +27,8 @@ if Mix.env() == :dev do
       cd: Path.expand("../assets", __DIR__),
       env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
     ],
-    module:
-      pyro_esbuild.(~w(--format=esm --sourcemap --outfile=../priv/static/pyro.mjs)),
-    main:
-      pyro_esbuild.(~w(--format=cjs --sourcemap --outfile=../priv/static/pyro.cjs.js)),
+    module: pyro_esbuild.(~w(--format=esm --sourcemap --outfile=../priv/static/pyro.mjs)),
+    main: pyro_esbuild.(~w(--format=cjs --sourcemap --outfile=../priv/static/pyro.cjs.js)),
     cdn:
       pyro_esbuild.(
         ~w(--target=es2016 --format=iife --global-name=Pyro --outfile=../priv/static/pyro.js)

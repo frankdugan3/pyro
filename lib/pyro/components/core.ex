@@ -944,7 +944,7 @@ defmodule Pyro.Components.Core do
     """
   end
 
-  @icons_dir Path.join(File.cwd!(), "assets/vendor/heroicons/optimized")
+  @icons_dir Path.join(File.cwd!(), "priv/static/heroicons/optimized")
 
   @outline [@icons_dir, "24/outline"]
            |> Path.join()

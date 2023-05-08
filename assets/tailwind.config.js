@@ -43,11 +43,8 @@ module.exports = {
         '.phx-change-loading &',
       ]),
     ),
-    // Embeds Hero Icons (https://heroicons.com) into your app.css bundle
-    // See your `CoreComponents.icon/1` for more information.
-    //
     plugin(function ({ matchComponents, theme }) {
-      let iconsDir = path.join(__dirname, './vendor/heroicons/optimized')
+      let iconsDir = path.join(__dirname, '../priv/static/heroicons/optimized')
       let values = {}
       let icons = [
         ['', '/24/outline'],
