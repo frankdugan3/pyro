@@ -14,7 +14,7 @@ The default model of Phoenix is to generate, then customize. While this does pro
 
 The tricky part is handling all the bespoke features in each app while sharing as much as possible. The goal is to provide a wide array of helpers and components with sane defaults, while allowing _very_ granular overrides.
 
-[`Ash Framework`](`Ash`) provides an _excellent_ foundation for this on the backend. It's deep extensibility allows the DSL to be extended, and that's exactly where Pyro shifts into overdrive. By combining the flexible configuration of components with Ash's extensible DSL, Pyro can seamlessly add declarative UI config.
+[`Ash Framework`](`Ash`) provides an _excellent_ foundation for this on the backend. Its deep extensibility allows the DSL to be extended, and that's exactly where Pyro pours on the gas! By combining the flexible configuration of components with Ash's extensible DSL, Pyro can seamlessly add declarative UI config to Phoenix LiveView.
 
 ## General Principles
 
