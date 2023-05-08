@@ -3,7 +3,7 @@ defmodule Pyro.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/frankdugan3/pyro"
-  @version "0.0.2"
+  @version "0.0.3"
   @description """
   Phoenix components and tooling with (optional) declarative UI for Ash Framework.
   """

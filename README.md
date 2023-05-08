@@ -19,7 +19,7 @@ Pyro's documentation is housed on [hexdocs](https://hexdocs.pm/pyro), which incl
 ```elixir
 def deps do
   [
-    {:pyro, "~> 0.0.2"},
+    {:pyro, "~> 0.0.3"},
     {:ash_phoenix, "~> 1.2"}, # Optional: Ash integration
     {:ash, "~> 2.8"}, # Optional: Ash integration
   ]

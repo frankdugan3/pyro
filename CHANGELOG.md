@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.0.3](https://github.com/frankdugan3/pyro/compare/v0.0.2...v0.0.3) (2023-05-08)
+
+
+
+
+### Bug Fixes:
+
+* move heroicons to priv so it's in release
+
 ## [v0.0.2](https://github.com/frankdugan3/pyro/compare/v0.0.1...v0.0.2) (2023-05-01)
 
 
