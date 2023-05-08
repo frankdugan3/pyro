@@ -82,7 +82,10 @@ defmodule Pyro.MixProject do
       licenses: ["MIT"],
       files: ~w(lib .formatter.exs mix.exs README* LICENSE*
       CHANGELOG* documentation),
-      links: %{GitHub: @source_url}
+      links: %{GitHub: @source_url},
+      files:
+        ~w(assets/js/pyro lib priv) ++
+          ~w(CHANGELOG.md LICENSE.md mix.exs package.json README.md .formatter.exs)
     ]
   end
 
