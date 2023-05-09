@@ -85,7 +85,7 @@ defmodule Pyro.MixProject do
       links: %{GitHub: @source_url},
       files:
         ~w(assets/js/pyro lib priv) ++
-          ~w(CHANGELOG.md LICENSE.md mix.exs package.json README.md .formatter.exs)
+          ~w(CHANGELOG.md LICENSE mix.exs package.json README.md .formatter.exs)
     ]
   end
 
