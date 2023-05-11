@@ -1,4 +1,5 @@
 defmodule Pyro.Overrides.Default do
+  # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
   @moduledoc """
   This is the default style configuration for Pyro components.
 
@@ -944,7 +945,9 @@ defmodule Pyro.Overrides.Default do
   def smart_form_class(passed_assigns) do
     [
       "grid gap-2",
-      get_by_path(passed_assigns, [:pyro_form, :class])
+      passed_assigns
+      |> Map.get(:pyro_form)
+      |> Map.get(:class)
     ]
   end
 
@@ -957,7 +960,9 @@ defmodule Pyro.Overrides.Default do
     [
       "grid col-span-full gap-2 p-2 border border-solid rounded-lg",
       "border-slate-300 dark:border-slate-700",
-      get_by_path(passed_assigns, [:field, :class])
+      passed_assigns
+      |> Map.get(:field)
+      |> Map.get(:class)
     ]
   end
 

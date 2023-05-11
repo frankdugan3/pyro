@@ -1,5 +1,9 @@
 if Code.ensure_loaded?(AshPhoenix) do
   defmodule Pyro.Components.SmartForm do
+    @moduledoc """
+    A smart component that auto-renders Forms for Ash from a given pyro DSL configuration.
+    """
+
     use Pyro.Component
 
     # import Pyro.Gettext
@@ -353,39 +357,8 @@ if Code.ensure_loaded?(AshPhoenix) do
 
     defp extract_change(%Ash.Resource.Actions.Argument{name: name}, resource, action_info) do
       Enum.reduce_while(action_info.changes, nil, fn
-        %{change: {Ash.Resource.Change.ManageRelationship, manage_opts}}, acc ->
-          if Keyword.get(manage_opts, :argument) == name do
-            relationship = Ash.Resource.Info.relationship(resource, manage_opts[:relationship])
-
-            # Extract expanded management options
-            manage_opts = manage_opts[:opts]
-
-            {defaults, manage_opts} =
-              case Keyword.pop(manage_opts, :type) do
-                {nil, opts} ->
-                  {[], opts}
-
-                {type, opts} ->
-                  {Ash.Changeset.manage_relationship_opts(type), opts}
-              end
-
-            manage_opts =
-              Ash.Changeset.ManagedRelationshipHelpers.sanitize_opts(
-                relationship,
-                Keyword.merge(defaults, manage_opts)
-              )
-              |> Enum.into(%{})
-
-            change = %{
-              type: Ash.Resource.Change.ManageRelationship,
-              relationship: relationship,
-              manage_opts: manage_opts
-            }
-
-            {:halt, change}
-          else
-            {:cont, acc}
-          end
+        %{change: {Ash.Resource.Change.ManageRelationship, manage_opts}}, _ ->
+          process_change(manage_opts, name, resource)
 
         _, acc ->
           {:cont, acc}
@@ -393,5 +366,39 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     defp extract_change(_, _, _), do: nil
+
+    defp process_change(manage_opts, name, resource) do
+      if manage_opts[:argument] == name do
+        relationship = Ash.Resource.Info.relationship(resource, manage_opts[:relationship])
+
+        # Extract expanded management options
+        manage_opts = manage_opts[:opts] || []
+
+        {defaults, manage_opts} = get_defaults_and_options(manage_opts)
+
+        manage_opts =
+          Ash.Changeset.ManagedRelationshipHelpers.sanitize_opts(
+            relationship,
+            Keyword.merge(defaults, manage_opts)
+          )
+          |> Enum.into(%{})
+
+        change = %{
+          type: Ash.Resource.Change.ManageRelationship,
+          relationship: relationship,
+          manage_opts: manage_opts
+        }
+
+        {:halt, change}
+      else
+        {:cont, nil}
+      end
+    end
+
+    defp get_defaults_and_options(manage_opts) do
+      {type, opts} = Keyword.pop(manage_opts, :type)
+      defaults = (type && Ash.Changeset.manage_relationship_opts(type)) || []
+      {defaults, opts}
+    end
   end
 end

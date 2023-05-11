@@ -5,6 +5,14 @@ if Code.ensure_loaded?(Ash) do
     """
     defstruct [:name, :label, :class, :path, :fields]
 
+    @type t :: %__MODULE__{
+            name: String.t(),
+            label: String.t(),
+            class: String.t(),
+            path: [atom()],
+            fields: [Pyro.Resource.Form.Field.t()]
+          }
+
     @schema [
       name: [
         type: :atom,

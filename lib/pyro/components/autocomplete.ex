@@ -1,4 +1,7 @@
 defmodule Pyro.Components.Autocomplete do
+  @moduledoc """
+  A flexible autocomplete component for Phoenix forms.
+  """
   use Pyro.LiveComponent
 
   import Pyro.Components.Core, only: [error: 1, label: 1]

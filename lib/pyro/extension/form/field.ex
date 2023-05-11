@@ -19,6 +19,24 @@ if Code.ensure_loaded?(Ash) do
       :autocomplete_option_value_key
     ]
 
+    @type field_type :: :default | :long_text | :short_text | :autocomplete | :nested_form
+
+    @type t :: %__MODULE__{
+            name: atom(),
+            type: field_type(),
+            label: String.t(),
+            description: String.t(),
+            path: [atom()],
+            class: String.t(),
+            input_class: String.t(),
+            autofocus: boolean(),
+            prompt: String.t(),
+            autocomplete_search_action: atom(),
+            autocomplete_search_arg: atom(),
+            autocomplete_option_label_key: atom(),
+            autocomplete_option_value_key: atom()
+          }
+
     @schema [
       name: [
         type: :atom,
