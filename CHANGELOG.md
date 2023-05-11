@@ -5,6 +5,19 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.0.4](https://github.com/frankdugan3/pyro/compare/v0.0.3...v0.0.4) (2023-05-11)
+
+
+
+
+### Bug Fixes:
+
+* broken compilation
+
+* correct license file name
+
+* include priv files
+
 ## [v0.0.3](https://github.com/frankdugan3/pyro/compare/v0.0.2...v0.0.3) (2023-05-08)
 
 

@@ -15,7 +15,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    ```elixir
    def deps do
      [
-       {:pyro, "~> 0.0.3"},
+       {:pyro, "~> 0.0.4"},
        {:ash_phoenix, "~> 1.2"}, # <-- Optional: Ash integration
        {:ash, "~> 2.8"}, # <-- Optional: Ash integration
      ]
