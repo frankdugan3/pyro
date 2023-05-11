@@ -62,6 +62,7 @@
     "parens",
     "PHXHTML",
     "preproc",
+    "prewalk",
     "Pyro",
     "referrerpolicy",
     "reloadable",
