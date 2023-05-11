@@ -6,7 +6,7 @@ defmodule Pyro.Component do
   * `:overridable` flag
   * `:values` supports an atom value (override key)
 
-  Pyro also provides `assign_overridables/1`, which automatically assigns all flagged `overridable` attrs with defautls from `Pyro.Overrides`
+  Pyro also provides `assign_overridables/1`, which automatically assigns all flagged `overridable` attrs with defaults from `Pyro.Overrides`
 
   ## Example
 
