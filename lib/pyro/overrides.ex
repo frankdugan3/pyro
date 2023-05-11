@@ -117,12 +117,12 @@ defmodule Pyro.Overrides do
 
       @doc false
       # Internally used for asset generation.
-      @spec makeup_light :: map() | nil
+      @spec makeup_light :: any()
       def makeup_light(), do: @makeup_light
 
       @doc false
       # Internally used for asset generation.
-      @spec makeup_dark :: map() | nil
+      @spec makeup_dark :: any()
       def makeup_dark(), do: @makeup_dark
     end
   end

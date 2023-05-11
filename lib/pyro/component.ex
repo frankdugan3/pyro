@@ -221,7 +221,6 @@ defmodule Pyro.Component do
       assigns = assign_overridables(assigns)
   ```
   """
-  @spec assign_overridables(map) :: map
   defmacro assign_overridables(assigns) do
     module = __CALLER__.module
     {component_name, 1} = __CALLER__.function
