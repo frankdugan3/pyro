@@ -1,5 +1,7 @@
 import Config
 
+config :pyro, :css_file, Path.join(File.cwd!(), "assets/css/pyro.css")
+
 config :spark, :formatter,
   remove_parens?: true,
   "Ash.Resource": [

@@ -22,7 +22,8 @@ defmodule Pyro.MixProject do
       source_url: @source_url,
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
-      compilers: Mix.compilers() ++ [:pyro]
+      compilers: Mix.compilers() ++ [:pyro],
+      dialyzer: [plt_add_apps: [:ash, :ash_phoenix, :spark, :ecto, :mix]]
     ]
   end
 

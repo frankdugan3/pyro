@@ -5,12 +5,7 @@ defmodule Mix.Tasks.Compile.Pyro.AssetGenerator do
 
   @doc false
   def run(_args) do
-    css_file =
-      Application.get_env(
-        :pyro,
-        :css_file,
-        Path.join(File.cwd!(), "assets/css/pyro.css")
-      )
+    css_file = Application.fetch_env!(:pyro, :css_file)
 
     global_style =
       "/* ### GLOBAL STYLE ### */\n\n" <>

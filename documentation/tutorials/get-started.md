@@ -26,6 +26,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    ```elixir
    config :pyro, :overrides, [Pyro.Overrides.Default]
+   config :pyro, :css_file, Path.join(File.cwd!(), "assets/css/pyro.css")
    ```
 
 3. Update your `tailwind.config.js`, and add the noted lines:
@@ -82,14 +83,6 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
        compilers: Mix.compilers() ++ [:pyro]
      ]
    end
-   ```
-
-   And update `config/dev.exs` to include `:pyro` in the list of `:reloadable_compilers` in your endpoint:
-
-   ```elixir
-   config :my_app, MyAppWeb.Endpoint,
-     # ...
-     reloadable_compilers: [:elixir, :app, :pyro],
    ```
 
 7. Edit your `my_app_web.ex` file, replacing:
