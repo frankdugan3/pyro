@@ -336,6 +336,7 @@ defmodule Pyro.Overrides.Default do
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]
     set :case, "uppercase"
+    set :cases, ~w[uppercase normal-case lowercase capitalize]
   end
 
   def button_class(passed_assigns) do
@@ -798,6 +799,7 @@ defmodule Pyro.Overrides.Default do
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]
     set :case, "uppercase"
+    set :cases, ~w[uppercase normal-case lowercase capitalize]
     set :message, "Copied! 📋"
     set :ttl, 3_000
   end
