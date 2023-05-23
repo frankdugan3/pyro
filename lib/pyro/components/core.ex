@@ -165,7 +165,7 @@ defmodule Pyro.Components.Core do
   attr :show_js, :any, overridable: true, required: true
   attr :title, :string, overridable: true
   attr :ttl, :integer, overridable: true, required: true
-  attr :kind, :string, overridable: true, required: true, doc: "Used for styling and flash lookup"
+  attr :kind, :atom, overridable: true, required: true, doc: "Used for styling and flash lookup"
 
   attr :style_for_kind, :string,
     overridable: true,
