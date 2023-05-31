@@ -207,6 +207,7 @@ if Code.ensure_loaded?(Ash) do
         old
         |> maybe_override(new, :label)
         |> maybe_override(new, :type)
+        |> maybe_override(new, :options)
         |> maybe_override(new, :label)
         |> maybe_override(new, :description)
         |> maybe_override(new, :path)

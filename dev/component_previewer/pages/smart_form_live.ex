@@ -16,14 +16,13 @@ defmodule ComponentPreviewer.SmartFormLive do
 
     <.code
       id="code-example-create"
-      source="<.smart_form resource={User} action={:create} for={@create_user_form} ... />"
+      source="<.smart_form resource={User} for={@create_user_form} ... />"
       language="heex"
       class="text-xs"
     />
 
     <.smart_form
       resource={User}
-      action={:create}
       for={@create_user_form}
       phx-change="validate_create_user_form"
       phx-submit="save_create_user_form"

@@ -19,9 +19,8 @@ if Code.ensure_loaded?(AshPhoenix) do
     """
 
     attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-    attr :action_info, :map, default: nil
-    attr :pyro_form, :map, default: nil
-    attr :action, :atom, required: true, doc: "The action to be used"
+    attr :action_info, :any, default: :unassigned
+    attr :pyro_form, :any, default: :unassigned
     attr :as, :any, default: nil, doc: "The server side parameter to collect all input under"
     attr :for, :map, required: true, doc: "The datastructure for the form"
     attr :resource, :atom, required: true, doc: "The resource of the form"
@@ -34,15 +33,15 @@ if Code.ensure_loaded?(AshPhoenix) do
       include: ~w(name rel action enctype method novalidate target),
       doc: "The arbitrary HTML attributes to apply to the form tag"
 
-    def smart_form(%{action_info: nil} = assigns) do
+    def smart_form(%{action_info: :unassigned, for: %{action: action}} = assigns) do
       assigns
-      |> assign(:action_info, ResourceInfo.action(assigns[:resource], assigns[:action]))
+      |> assign(:action_info, ResourceInfo.action(assigns[:resource], action))
       |> smart_form()
     end
 
-    def smart_form(%{pyro_form: nil} = assigns) do
+    def smart_form(%{pyro_form: :unassigned, for: %{action: action}} = assigns) do
       assigns
-      |> assign(:pyro_form, UI.form_for(assigns[:resource], assigns[:action]))
+      |> assign(:pyro_form, UI.form_for(assigns[:resource], action))
       |> smart_form()
     end
 
@@ -121,9 +120,16 @@ if Code.ensure_loaded?(AshPhoenix) do
         raise "Unable to find attribute or argument #{name}"
       end
 
+      multiple = case {attribute, argument} do
+        {%{type: {:array, _}}, _} -> true
+        {_, %{type: {:array, _}}} -> true
+        _ -> false
+      end
+
       assigns
       |> assign(:attribute, attribute)
       |> assign(:argument, argument)
+      |> assign(:multiple, multiple)
       |> assign(:change, change)
       |> render_field
     end
@@ -146,6 +152,24 @@ if Code.ensure_loaded?(AshPhoenix) do
           />
         <% end %>
       </fieldset>
+      """
+    end
+
+    defp render_field(%{field: %Pyro.Resource.Form.Field{type: :select}} = assigns) do
+
+      ~H"""
+      <.input
+        overrides={@overrides}
+        field={@form[@field.name]}
+        type="select"
+        multiple={@multiple}
+        class={@field.class}
+        options={@field.options}
+        input_class={@field.input_class}
+        label={@field.label}
+        autofocus={@field.autofocus}
+        description={@field.description || @attribute.description}
+      />
       """
     end
 
