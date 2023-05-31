@@ -20,7 +20,8 @@ if Code.ensure_loaded?(Ash) do
       :autocomplete_option_value_key
     ]
 
-    @type field_type :: :default | :long_text | :short_text | :autocomplete | :select | :nested_form
+    @type field_type ::
+            :default | :long_text | :short_text | :autocomplete | :select | :nested_form
 
     @type t :: %__MODULE__{
             name: atom(),

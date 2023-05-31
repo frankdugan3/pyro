@@ -36,7 +36,7 @@ defmodule ComponentPreviewer.Ash.User do
           field :roles do
             label "Roles"
             type :select
-            options ComponentPreviewer.Ash.UserRole.values()
+            options(ComponentPreviewer.Ash.UserRole.values())
           end
 
           field :active do

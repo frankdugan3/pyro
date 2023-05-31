@@ -120,11 +120,12 @@ if Code.ensure_loaded?(AshPhoenix) do
         raise "Unable to find attribute or argument #{name}"
       end
 
-      multiple = case {attribute, argument} do
-        {%{type: {:array, _}}, _} -> true
-        {_, %{type: {:array, _}}} -> true
-        _ -> false
-      end
+      multiple =
+        case {attribute, argument} do
+          {%{type: {:array, _}}, _} -> true
+          {_, %{type: {:array, _}}} -> true
+          _ -> false
+        end
 
       assigns
       |> assign(:attribute, attribute)
@@ -156,7 +157,6 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     defp render_field(%{field: %Pyro.Resource.Form.Field{type: :select}} = assigns) do
-
       ~H"""
       <.input
         overrides={@overrides}
