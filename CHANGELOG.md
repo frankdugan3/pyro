@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.1.1](https://github.com/frankdugan3/pyro/compare/v0.1.0...v0.1.1) (2023-05-31)
+
+
+
+
+### Bug Fixes:
+
+* compilation errors
+
 ## [v0.1.0](https://github.com/frankdugan3/pyro/compare/v0.0.4...v0.1.0) (2023-05-31)
 
 
