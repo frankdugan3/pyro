@@ -148,6 +148,7 @@ if Code.ensure_loaded?(AshPhoenix) do
             overrides={@overrides}
             resource={@resource}
             action_info={@action_info}
+            actor={@actor}
             field={child_field}
             form={@form}
           />
