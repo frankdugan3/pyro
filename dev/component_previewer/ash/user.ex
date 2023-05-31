@@ -36,7 +36,7 @@ defmodule ComponentPreviewer.Ash.User do
           field :roles do
             label "Roles"
             type :select
-            options(ComponentPreviewer.Ash.UserRole.values())
+            options UserRole.values()
           end
 
           field :active do
@@ -98,9 +98,7 @@ defmodule ComponentPreviewer.Ash.User do
   end
 
   calculations do
-    calculate :name_email, :ci_string do
-      calculation expr(name <> " (" <> email <> ")")
-    end
+    calculate :name_email, :ci_string, expr(name <> " (" <> email <> ")")
   end
 
   actions do
