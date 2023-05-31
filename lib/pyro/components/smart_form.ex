@@ -28,6 +28,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :autocomplete, :string, overridable: true, required: true
     attr :actions_class, :tails_classes, overridable: true, required: true
     attr :class, :tails_classes, overridable: true, required: true
+    slot :actions, doc: "Extra form actions"
 
     attr :rest, :global,
       include: ~w(name rel action enctype method novalidate target),
@@ -69,6 +70,9 @@ if Code.ensure_loaded?(AshPhoenix) do
         <% end %>
 
         <section class={@actions_class}>
+          <%= for action <- @actions do %>
+            <%= render_slot(action, f) %>
+          <% end %>
           <.button
             overrides={@overrides}
             disabled={!f.source.changed?}
