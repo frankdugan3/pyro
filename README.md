@@ -1,8 +1,10 @@
 ![Logo](https://github.com/frankdugan3/pyro/blob/main/logos/logo.png?raw=true)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Hex version badge](https://img.shields.io/hexpm/v/pyro.svg)](https://hex.pm/packages/pyro)
+[![hex.pm](https://img.shields.io/hexpm/l/pyro.svg)](https://hex.pm/packages/pyro)
+[![hex.pm](https://img.shields.io/hexpm/v/pyro.svg)](https://hex.pm/packages/pyro)
 [![Documentation](https://img.shields.io/badge/documentation-gray)](https://hexdocs.pm/pyro)
+[![hex.pm](https://img.shields.io/hexpm/dt/pyro.svg)](https://hex.pm/packages/pyro)
+[![github.com](https://img.shields.io/github/last-commit/frankdugan3/pyro.svg)](https://github.com/frankdugan3/pyro)
 
 # Pyro
 
