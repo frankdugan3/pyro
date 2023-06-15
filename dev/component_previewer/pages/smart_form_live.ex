@@ -16,18 +16,22 @@ defmodule ComponentPreviewer.SmartFormLive do
 
     <.code
       id="code-example-create"
-      source="<.smart_form resource={User} action={:create} for={@create_user_form} ... />"
+      source="<.smart_form resource={User} for={@create_user_form} ... />"
       language="heex"
       class="text-xs"
     />
 
     <.smart_form
       resource={User}
-      action={:create}
       for={@create_user_form}
       phx-change="validate_create_user_form"
       phx-submit="save_create_user_form"
-    />
+      actor={%{name: "Somedude"}}
+    >
+      <:actions>
+        <.button phx-click="extra">Extra Button</.button>
+      </:actions>
+    </.smart_form>
     """
   end
 
@@ -66,6 +70,11 @@ defmodule ComponentPreviewer.SmartFormLive do
   @impl true
   def handle_event("reset_create_user_form", _params, socket) do
     {:noreply, assign(socket, :create_user_form, reset_create_user_form())}
+  end
+
+  @impl true
+  def handle_event("extra", _params, socket) do
+    {:noreply, put_flash(socket, :purple, ~s|The extra button is handled in the live view!|)}
   end
 
   defp reset_create_user_form(),

@@ -5,6 +5,8 @@ defmodule ComponentPreviewer.Ash.User do
     extensions: [Pyro.Resource],
     notifiers: [Ash.Notifier.PubSub]
 
+  alias ComponentPreviewer.Ash.UserRole
+
   require Ash.Query
 
   pyro do
@@ -31,8 +33,10 @@ defmodule ComponentPreviewer.Ash.User do
           label "Authorization"
           class "md:grid-cols-2"
 
-          field :role do
-            label "Role"
+          field :roles do
+            label "Roles"
+            type :select
+            options UserRole.values()
           end
 
           field :active do
@@ -84,10 +88,7 @@ defmodule ComponentPreviewer.Ash.User do
 
     attribute :active, :boolean, allow_nil?: false, default: true
 
-    attribute :role, :atom,
-      allow_nil?: false,
-      constraints: [one_of: ~w[reader author editor admin]a],
-      default: :reader
+    attribute :roles, {:array, UserRole}, allow_nil?: false, default: []
 
     attribute :notes, :string, description: "Note anything unusual about yourself"
   end
@@ -97,9 +98,7 @@ defmodule ComponentPreviewer.Ash.User do
   end
 
   calculations do
-    calculate :name_email, :ci_string do
-      calculation expr(name <> " (" <> email <> ")")
-    end
+    calculate :name_email, :ci_string, expr(name <> " (" <> email <> ")")
   end
 
   actions do

@@ -15,7 +15,7 @@ if Code.ensure_loaded?(Ash) do
       schema: Pyro.Resource.Form.FieldGroup.schema(),
       target: Pyro.Resource.Form.FieldGroup,
       recursive_as: :fields,
-      args: [:name, :label],
+      args: [:name],
       entities: [
         fields: [@field]
       ]

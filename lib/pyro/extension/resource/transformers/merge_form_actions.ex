@@ -205,14 +205,14 @@ if Code.ensure_loaded?(Ash) do
     defp merge_field(old, new),
       do:
         old
-        |> maybe_override(new, :label)
         |> maybe_override(new, :type)
+        |> maybe_override(new, :options)
         |> maybe_override(new, :label)
         |> maybe_override(new, :description)
         |> maybe_override(new, :path)
         |> maybe_override(new, :class)
-        |> maybe_override(new, :input_class)
         |> maybe_override(new, :autofocus)
+        |> maybe_override(new, :input_class)
         |> maybe_override(new, :prompt)
         |> maybe_override(new, :autocomplete_search_action)
         |> maybe_override(new, :autocomplete_search_arg)

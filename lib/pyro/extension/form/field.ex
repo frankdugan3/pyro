@@ -6,6 +6,7 @@ if Code.ensure_loaded?(Ash) do
     defstruct [
       :name,
       :type,
+      :options,
       :label,
       :description,
       :path,
@@ -19,11 +20,13 @@ if Code.ensure_loaded?(Ash) do
       :autocomplete_option_value_key
     ]
 
-    @type field_type :: :default | :long_text | :short_text | :autocomplete | :nested_form
+    @type field_type ::
+            :default | :long_text | :short_text | :autocomplete | :select | :nested_form
 
     @type t :: %__MODULE__{
             name: atom(),
             type: field_type(),
+            options: list(),
             label: String.t(),
             description: String.t(),
             path: [atom()],
@@ -44,10 +47,16 @@ if Code.ensure_loaded?(Ash) do
         doc: "The name of the field to be modified"
       ],
       type: [
-        type: {:in, [:default, :long_text, :short_text, :autocomplete, :nested_form]},
+        type: {:in, [:default, :long_text, :short_text, :autocomplete, :select, :nested_form]},
         required: false,
         doc: "The type of the value in the form.",
         default: :default
+      ],
+      options: [
+        type: {:list, :any},
+        required: false,
+        doc: "The options for a select type input.",
+        default: []
       ],
       label: [
         type: :string,

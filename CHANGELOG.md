@@ -5,6 +5,37 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.0](https://github.com/frankdugan3/pyro/compare/v0.1.1...v0.2.0) (2023-05-31)
+
+
+
+
+### Features:
+
+* add extra actions slot to smart_form
+
+### Bug Fixes:
+
+* properly pass actor to smart_form fields
+
+## [v0.1.1](https://github.com/frankdugan3/pyro/compare/v0.1.0...v0.1.1) (2023-05-31)
+
+
+
+
+### Bug Fixes:
+
+* compilation errors
+
+## [v0.1.0](https://github.com/frankdugan3/pyro/compare/v0.0.4...v0.1.0) (2023-05-31)
+
+
+
+
+### Features:
+
+* support select type in smart form
+
 ## [v0.0.4](https://github.com/frankdugan3/pyro/compare/v0.0.3...v0.0.4) (2023-05-11)
 
 
