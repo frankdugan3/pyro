@@ -339,12 +339,12 @@ defmodule Pyro.Component do
          Enum.find(args, fn {arg, _line, _} -> arg == :assigns end) do
       # Get list of attribute line numbers for this component
       attr_lines =
-        Module.get_attribute(env.module, :__components__)[name][:attrs]
+        (Module.get_attribute(env.module, :__components__)[name][:attrs] || [])
         |> Enum.map(& &1.line)
 
       # Only include overrides that have the same line
       attrs =
-        Module.get_attribute(env.module, :__overridable_attrs__)
+        (Module.get_attribute(env.module, :__overridable_attrs__) || [])
         |> Enum.filter(&(&1.line in attr_lines))
         # We need to preserve definition order
         |> Enum.reverse()
