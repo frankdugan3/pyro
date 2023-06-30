@@ -106,7 +106,7 @@ defmodule Pyro.Resource.InfoTest do
 
     calculations do
       calculate :name_email, :ci_string do
-        calculation expr(name <> " (" <> email <> ")")
+        expr(name <> " (" <> email <> ")")
       end
     end
 
