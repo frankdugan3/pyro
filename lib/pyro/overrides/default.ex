@@ -21,7 +21,7 @@ defmodule Pyro.Overrides.Default do
     makeup_light: &Makeup.Styles.HTML.StyleMap.default_style/0,
     makeup_dark: &Makeup.Styles.HTML.StyleMap.native_style/0,
     global_style: """
-    @layer root {
+    @layer base {
       ::selection,
       ::-moz-selection {
         @apply text-white bg-sky-500 bg-opacity-100;
