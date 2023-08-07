@@ -49,33 +49,24 @@ defmodule Pyro.Components.Extra do
 
   attr :csrf_token, :any,
     default: true,
-    doc: """
-    A boolean or custom token to use for links with an HTTP method other than `get`.
-    """
+    doc: "a boolean or custom token to use for links with an HTTP method other than `get`"
 
   attr :replace, :boolean,
     overridable: true,
     required: true,
-    doc: """
-    When using `:patch` or `:navigate`,
-    should the browser's history be replaced with `pushState`?
-    """
+    doc: "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
 
   attr :class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Merge/override default classes of the `code` element"
+    doc: "merge/override default classes of the `code` element"
 
   attr :rest, :global,
-    doc: """
-    Additional HTML attributes added to the `a` tag.
-    """
+    doc: "additional HTML attributes added to the `a` tag"
 
   slot :inner_block,
     required: true,
-    doc: """
-    The content rendered inside of the `a` tag.
-    """
+    doc: "the content rendered inside of the `a` tag"
 
   def a(assigns) do
     assigns = assign_overridables(assigns)
@@ -101,7 +92,7 @@ defmodule Pyro.Components.Extra do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :source, :string, required: true, doc: "The code snippet"
+  attr :source, :string, required: true, doc: "the code snippet"
   attr :id, :string, required: true
   attr :copy, :boolean, overridable: true, required: true
   attr :copy_label, :string, overridable: true, required: true
@@ -111,12 +102,12 @@ defmodule Pyro.Components.Extra do
   attr :language, :string,
     default: "elixir",
     values: ~w[elixir heex html none],
-    doc: "Language of the code snippet"
+    doc: "language of the code snippet"
 
   attr :class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Merge/override default classes of the `code` element"
+    doc: "merge/override default classes of the `code` element"
 
   def code(assigns) do
     assigns = assign_overridables(assigns)
@@ -136,36 +127,36 @@ defmodule Pyro.Components.Extra do
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :id, :string, required: true
-  attr :value, :string, required: true, doc: "Text to copy"
-  attr :label, :string, default: nil, doc: "Button label, defaults to value"
+  attr :value, :string, required: true, doc: "text to copy"
+  attr :label, :string, default: nil, doc: "button label, defaults to value"
   attr :disabled, :boolean, default: false
 
   attr :icon_name, :string,
     default: nil,
     doc:
-      "The name of the icon to display (nil for none); see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+      "the name of the icon to display (nil for none); see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
   attr :ttl, :integer,
     overridable: true,
     required: true,
-    doc: "How long to show the flash message after copying"
+    doc: "how long to show the flash message after copying"
 
   attr :case, :string,
     overridable: true,
     required: true,
     values: ~w[uppercase normal-case lowercase capitalize],
-    doc: "The case of the text"
+    doc: "the case of the text"
 
-  attr :color, :string, overridable: true, required: true, doc: "The color of the button"
-  attr :shape, :string, overridable: true, required: true, doc: "Shape of the button"
-  attr :size, :string, overridable: true, required: true, doc: "The size of the button"
-  attr :variant, :string, overridable: true, required: true, doc: "Style of button"
+  attr :color, :string, overridable: true, required: true, doc: "the color of the button"
+  attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the button"
+  attr :variant, :string, overridable: true, required: true, doc: "style of button"
   attr :class, :tails_classes, overridable: true, required: true
 
   attr :message, :string,
     overridable: true,
     required: true,
-    doc: "Message to display after copying"
+    doc: "message to display after copying"
 
   attr :icon_class, :tails_classes, overridable: true, required: true
   attr :rest, :global
@@ -202,19 +193,19 @@ defmodule Pyro.Components.Extra do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :label, :string, required: true, doc: "The label of of the link"
-  attr :uri, :string, required: true, doc: "The URI of the link"
-  attr :current_uri, :string, required: true, doc: "The current URI of the page"
+  attr :label, :string, required: true, doc: "the label of of the link"
+  attr :uri, :string, required: true, doc: "the URI of the link"
+  attr :current_uri, :string, required: true, doc: "the current URI of the page"
 
   attr :is_current, :boolean,
     overridable: true,
     required: true,
-    doc: "Does `:uri` match `:current_uri`?"
+    doc: "does `:uri` match `:current_uri`?"
 
   attr :class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "The class of the navigation link"
+    doc: "the class of the navigation link"
 
   def nav_link(assigns) do
     assigns = assign_overridables(assigns)
@@ -236,13 +227,13 @@ defmodule Pyro.Components.Extra do
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :max, :integer, default: 100
   attr :value, :integer, default: 0
-  attr :color, :string, overridable: true, required: true, doc: "The color of the progress bar"
-  attr :size, :string, overridable: true, required: true, doc: "The size of the progress bar"
+  attr :color, :string, overridable: true, required: true, doc: "the color of the progress bar"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the progress bar"
 
   attr :class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "The class of the progress bar"
+    doc: "the class of the progress bar"
 
   attr :rest, :global
 
@@ -259,9 +250,9 @@ defmodule Pyro.Components.Extra do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :show, :boolean, default: true, doc: "Show or hide spinner"
+  attr :show, :boolean, default: true, doc: "show or hide spinner"
   attr :rest, :global
-  attr :size, :string, overridable: true, required: true, doc: "The size of the spinner"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the spinner"
   attr :class, :tails_classes, overridable: true, required: true
 
   def spinner(assigns) do
@@ -312,7 +303,7 @@ defmodule Pyro.Components.Extra do
   attr :icon_name, :string,
     overridable: true,
     required: true,
-    doc: "The name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+    doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
   attr :class, :tails_classes, overridable: true, required: true
 

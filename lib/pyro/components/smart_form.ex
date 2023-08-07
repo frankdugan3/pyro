@@ -21,18 +21,18 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :overrides, :list, default: nil, doc: @overrides_attr_doc
     attr :action_info, :any, default: :unassigned
     attr :pyro_form, :any, default: :unassigned
-    attr :as, :any, default: nil, doc: "The server side parameter to collect all input under"
-    attr :for, :map, required: true, doc: "The datastructure for the form"
-    attr :resource, :atom, required: true, doc: "The resource of the form"
-    attr :actor, :map, default: nil, doc: "The actor to be passed to actions"
+    attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+    attr :for, :map, required: true, doc: "the datastructure for the form"
+    attr :resource, :atom, required: true, doc: "the resource of the form"
+    attr :actor, :map, default: nil, doc: "the actor to be passed to actions"
     attr :autocomplete, :string, overridable: true, required: true
     attr :actions_class, :tails_classes, overridable: true, required: true
     attr :class, :tails_classes, overridable: true, required: true
-    slot :actions, doc: "Extra form actions"
+    slot :actions, doc: "extra form actions"
 
     attr :rest, :global,
       include: ~w(name rel action enctype method novalidate target),
-      doc: "The arbitrary HTML attributes to apply to the form tag"
+      doc: "the arbitrary HTML attributes to apply to the form tag"
 
     def smart_form(%{action_info: :unassigned, for: %{action: action}} = assigns) do
       assigns
@@ -92,11 +92,11 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-    attr :actor, :map, default: nil, doc: "The actor to be passed to actions"
-    attr :resource, :atom, required: true, doc: "The resource of the form"
+    attr :actor, :map, default: nil, doc: "the actor to be passed to actions"
+    attr :resource, :atom, required: true, doc: "the resource of the form"
     attr :action_info, :map, required: true
-    attr :field, :map, required: true, doc: "The pyro field/field_group"
-    attr :form, :map, required: true, doc: "The form"
+    attr :field, :map, required: true, doc: "the pyro field/field_group"
+    attr :form, :map, required: true, doc: "the form"
     attr :attribute, Ash.Resource.Attribute, default: nil
     attr :argument, Ash.Resource.Actions.Argument, default: nil
     attr :change, :map, default: nil

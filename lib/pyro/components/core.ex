@@ -151,25 +151,25 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :flash, :map, default: %{}, doc: "The map of flash messages to display."
+  attr :flash, :map, default: %{}, doc: "the map of flash messages to display."
 
   attr :autoshow, :boolean,
     overridable: true,
     required: true,
-    doc: "Whether to auto show the flash on mount"
+    doc: "whether to auto show the flash on mount"
 
-  attr :close, :boolean, overridable: true, required: true, doc: "Whether the flash can be closed"
+  attr :close, :boolean, overridable: true, required: true, doc: "whether the flash can be closed"
   attr :close_icon_name, :string, overridable: true, required: true
   attr :icon_name, :string, overridable: true, required: true
   attr :hide_js, :any, overridable: true, required: true
   attr :show_js, :any, overridable: true, required: true
   attr :title, :string, overridable: true
   attr :ttl, :integer, overridable: true, required: true
-  attr :kind, :string, overridable: true, required: true, doc: "Used for styling and flash lookup"
+  attr :kind, :string, overridable: true, required: true, doc: "used for styling and flash lookup"
 
   attr :style_for_kind, :string,
     overridable: true,
-    doc: "Used for styling a flash with a different kind"
+    doc: "used for styling a flash with a different kind"
 
   attr :class, :tails_classes, overridable: true, required: true
   attr :control_class, :tails_classes, overridable: true
@@ -179,9 +179,9 @@ defmodule Pyro.Components.Core do
   attr :progress_class, :tails_classes, overridable: true, required: true
   attr :title_class, :tails_classes, overridable: true, required: true
   attr :title_icon_class, :tails_classes, overridable: true
-  attr :rest, :global, doc: "The arbitrary HTML attributes to add to the flash container"
+  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
 
-  slot :inner_block, doc: "The optional inner block to render the flash message"
+  slot :inner_block, doc: "the optional inner block to render the flash message"
 
   def flash(assigns) do
     assigns = assign_overridables(assigns)
@@ -237,15 +237,15 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :flash, :map, required: true, doc: "The map of flash messages to display"
+  attr :flash, :map, required: true, doc: "the map of flash messages to display"
 
   attr :include_kinds, :list,
     overridable: true,
     required: true,
-    doc: "The kinds of flashes to display"
+    doc: "the kinds of flashes to display"
 
   attr :class, :tails_classes, overridable: true, required: true
-  attr :rest, :global, doc: "The arbitrary HTML attributes to add to the flash tray"
+  attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash tray"
 
   def flash_group(assigns) do
     assigns = assign_overridables(assigns)
@@ -320,18 +320,18 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :as, :any, default: nil, doc: "The server side parameter to collect all input under"
-  attr :for, :any, required: true, doc: "The datastructure for the form"
+  attr :for, :any, required: true, doc: "the datastructure for the form"
+  attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
 
   attr :class, :tails_classes, overridable: true, required: true
   attr :actions_class, :tails_classes, overridable: true, required: true
 
   attr :rest, :global,
-    include: ~w(autocomplete name rel action enctype method novalidate target),
-    doc: "The arbitrary HTML attributes to apply to the form tag"
+    include: ~w(autocomplete name rel action enctype method novalidate target multipart),
+    doc: "the arbitrary HTML attributes to apply to the form tag"
 
   slot :inner_block, required: true
-  slot :actions, doc: "The slot for form actions, such as a submit button"
+  slot :actions, doc: "the slot for form actions, such as a submit button"
 
   def simple_form(assigns) do
     assigns = assign_overridables(assigns)
@@ -368,7 +368,7 @@ defmodule Pyro.Components.Core do
 
   attr :confirm, :string,
     default: nil,
-    doc: "Text to display in a confirm dialog before emitting click event"
+    doc: "text to display in a confirm dialog before emitting click event"
 
   attr :csrf_token, :string, default: nil
   attr :disabled, :boolean, default: false
@@ -377,36 +377,36 @@ defmodule Pyro.Components.Core do
   attr :icon_name, :string,
     default: nil,
     doc:
-      "The name of the icon to display (nil for none); see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+      "the name of the icon to display (nil for none); see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
-  attr :loading, :boolean, default: false, doc: "Display a loading spinner"
+  attr :loading, :boolean, default: false, doc: "display a loading spinner"
   attr :method, :string, default: "get"
   attr :navigate, :string
   attr :patch, :string
-  attr :ping, :boolean, default: false, doc: "Show a ping indicator"
+  attr :ping, :boolean, default: false, doc: "show a ping indicator"
   attr :replace, :boolean, default: false
-  attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target type]
+  attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target form name value]
 
   attr :type, :string,
     default: "button",
     values: ~w[button reset submit],
-    doc: "Type of the button"
+    doc: "type of the button"
 
   attr :case, :string,
     overridable: true,
     required: true,
     values: ~w[uppercase normal-case lowercase capitalize],
-    doc: "The case of the text"
+    doc: "the case of the text"
 
-  attr :color, :string, overridable: true, required: true, doc: "The color of the button"
-  attr :shape, :string, overridable: true, required: true, doc: "Shape of the button"
-  attr :size, :string, overridable: true, required: true, doc: "The size of the button"
-  attr :variant, :string, overridable: true, required: true, doc: "Style of button"
+  attr :color, :string, overridable: true, required: true, doc: "the color of the button"
+  attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the button"
+  attr :variant, :string, overridable: true, required: true, doc: "style of button"
   attr :class, :tails_classes, overridable: true, required: true
   attr :icon_class, :tails_classes, overridable: true, required: true
   attr :ping_class, :tails_classes, overridable: true, required: true
 
-  slot :inner_block, required: true, doc: "The content of the button"
+  slot :inner_block, required: true, doc: "the content of the button"
 
   def button(assigns) do
     assigns
@@ -538,22 +538,22 @@ defmodule Pyro.Components.Core do
 
   attr :autofocus, :boolean,
     default: false,
-    doc: "Enable autofocus hook to reliably focus input on mount"
+    doc: "enable autofocus hook to reliably focus input on mount"
 
-  attr :checked, :boolean, doc: "The checked flag for checkbox inputs"
+  attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
   attr :description, :string, default: nil
   attr :errors, :list, default: []
 
   attr :field, Phoenix.HTML.FormField,
-    doc: "A form field struct retrieved from the form, for example: @form[:email]"
+    doc: "a form field struct retrieved from the form, for example: @form[:email]"
 
   attr :id, :any, default: nil
 
   attr :label, :string, default: nil
-  attr :multiple, :boolean, default: false, doc: "The multiple flag for select inputs"
+  attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
   attr :name, :any
-  attr :options, :list, doc: "The options to pass to Phoenix.HTML.Form.options_for_select/2"
-  attr :prompt, :string, default: nil, doc: "The prompt for select inputs"
+  attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
+  attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
 
   attr :type, :string,
     default: "text",
@@ -565,29 +565,29 @@ defmodule Pyro.Components.Core do
   attr :clear_on_escape, :boolean,
     overridable: true,
     required: true,
-    doc: "Clear input value on pressing Escape"
+    doc: "clear input value on pressing Escape"
 
   attr :class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the field container element"
+    doc: "class of the field container element"
 
   attr :input_class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the input element"
+    doc: "class of the input element"
 
   attr :input_check_label_class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the label element for a check input"
+    doc: "class of the label element for a check input"
 
   attr :description_class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the field description"
+    doc: "class of the field description"
 
-  attr :rest, :global, include: ~w(autocomplete cols disabled form max maxlength min minlength
+  attr :rest, :global, include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                                    pattern placeholder readonly required rows size step)
   slot :inner_block
 
@@ -743,7 +743,7 @@ defmodule Pyro.Components.Core do
   attr :icon_name, :string,
     overridable: true,
     required: true,
-    doc: "The name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+    doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
   attr :icon_class, :tails_classes, overridable: true
   attr :class, :tails_classes, overridable: true, required: true
@@ -807,17 +807,17 @@ defmodule Pyro.Components.Core do
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :id, :string
-  attr :row_click, :any, default: nil
+  attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
 
   attr :row_id, :any,
     default: nil,
-    doc: "The function for generating the row id (will automatically extract from a LiveStream)"
+    doc: "the function for generating the row id"
 
   attr :row_item, :any,
     default: &Function.identity/1,
-    doc: "The function for mapping each row before calling the :col and :action slots"
+    doc: "the function for mapping each row before calling the :col and :action slots"
 
-  attr :rows, :list, required: true, doc: "Supports a list or LiveStream"
+  attr :rows, :list, required: true
 
   attr :class, :tails_classes, overridable: true, required: true
   attr :action_class, :tails_classes, overridable: true, required: true
@@ -834,7 +834,7 @@ defmodule Pyro.Components.Core do
     attr :label, :string
   end
 
-  slot(:action, doc: "The slot for showing user actions in the last table column")
+  slot(:action, doc: "the slot for showing user actions in the last table column")
 
   def table(assigns) do
     assigns = assign_overridables(assigns)
@@ -925,7 +925,7 @@ defmodule Pyro.Components.Core do
   attr :icon_name, :string,
     overridable: true,
     required: true,
-    doc: "The name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+    doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
   attr :class, :tails_classes, overridable: true, required: true
   attr :icon_class, :tails_classes, overridable: true, required: true
@@ -995,10 +995,10 @@ defmodule Pyro.Components.Core do
   attr :name, :string,
     required: true,
     values: @icon_name_options,
-    doc: "The icon name"
+    doc: "the icon name"
 
   attr :rest, :global,
-    doc: "The arbitrary HTML attributes for the svg container",
+    doc: "the arbitrary HTML attributes for the svg container",
     include: ~w(fill stroke stroke-width)
 
   def icon(assigns) do

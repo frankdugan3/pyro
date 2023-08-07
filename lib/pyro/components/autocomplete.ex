@@ -30,56 +30,56 @@ defmodule Pyro.Components.Autocomplete do
   attr :throttle_time, :integer, overridable: true, required: true
   attr :option_label_key, :atom, overridable: true, required: true
   attr :option_value_key, :atom, overridable: true, required: true
-  attr :prompt, :string, overridable: true, required: true, doc: "The prompt for search input"
+  attr :prompt, :string, overridable: true, required: true, doc: "the prompt for search input"
   attr :description, :string, default: nil
   attr :errors, :list, default: []
   attr :label, :string, default: nil
   attr :input_id, :any, default: nil
-  attr :multiple, :boolean, default: false, doc: "The multiple flag for select inputs"
+  attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
   attr :required, :boolean, default: false
   attr :name, :any
   attr :value, :any
 
   attr :search_fn, :any,
     required: true,
-    doc: "The arity-1 function to get options from search term"
+    doc: "the arity-1 function to get options from search term"
 
   attr :lookup_fn, :any,
     required: true,
-    doc: "The arity-1 function to get lookup/convert value to option"
+    doc: "the arity-1 function to get lookup/convert value to option"
 
   attr :no_results_message, :string,
     default: "[no results]",
-    doc: "The message to display if there are no results for the search phrase"
+    doc: "the message to display if there are no results for the search phrase"
 
   attr :field, Phoenix.HTML.FormField,
-    doc: "A form field struct retrieved from the form, for example: @form[:email]"
+    doc: "a form field struct retrieved from the form, for example: @form[:email]"
 
   attr :autofocus, :boolean,
     default: false,
-    doc: "Enable autofocus hook to reliably focus input on mount"
+    doc: "enable autofocus hook to reliably focus input on mount"
 
   attr :class, :tails_classes, overridable: true, required: true
 
   attr :input_class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the input element"
+    doc: "class of the input element"
 
   attr :listbox_class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the listbox element"
+    doc: "class of the listbox element"
 
   attr :listbox_option_class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the listbox option element"
+    doc: "class of the listbox option element"
 
   attr :description_class, :tails_classes,
     overridable: true,
     required: true,
-    doc: "Class of the field description"
+    doc: "class of the field description"
 
   slot :option_template
 
