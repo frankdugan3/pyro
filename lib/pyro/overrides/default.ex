@@ -769,7 +769,7 @@ defmodule Pyro.Overrides.Default do
   end
 
   ##############################################################################
-  ####    P H L E G E T H O N    C O M P O N E N T S
+  ####    P Y R O    C O M P O N E N T S
   ##############################################################################
 
   override Extra, :a do
