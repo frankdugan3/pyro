@@ -523,10 +523,22 @@ defmodule Pyro.Components.Core do
   @doc """
   Renders an input with label and error messages.
 
-  A `%Phoenix.HTML.Form{}` and field name may be passed to the input
-  to build input names and error messages, or all the attributes and
-  errors may be passed explicitly.
+  A `Phoenix.HTML.FormField` may be passed as argument,
+  which is used to retrieve the input name, id, and values.
+  Otherwise all attributes may be passed explicitly.
 
+  ## Types
+
+  This function accepts all HTML input types, considering that:
+
+    * You may also set `type="select"` to render a `<select>` tag
+
+    * `type="checkbox"` is used exclusively to render boolean values
+
+    * For live file uploads, see `Phoenix.Component.live_file_input/1`
+
+  See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
+  for more information.
 
   ## Examples
 
@@ -616,7 +628,7 @@ defmodule Pyro.Components.Core do
         <input type="hidden" name={@name} value="false" />
         <input
           type="checkbox"
-          id={@id || @name}
+          id={@id}
           name={@name}
           value="true"
           checked={@checked}
@@ -636,7 +648,7 @@ defmodule Pyro.Components.Core do
     <div class={@class} phx-feedback-for={@name}>
       <.label for={@id} overrides={@overrides}><%= @label %></.label>
       <select
-        id={@id || @name}
+        id={@id}
         name={@name}
         class={@input_class}
         multiple={@multiple}
@@ -646,6 +658,10 @@ defmodule Pyro.Components.Core do
         <option :if={@prompt} value=""><%= @prompt %></option>
         <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
       </select>
+      <%= render_slot(@inner_block) %>
+      <p :if={@description} class={@description_class}>
+        <%= @description %>
+      </p>
       <.error :for={msg <- @errors} overrides={@overrides}><%= msg %></.error>
     </div>
     """
@@ -656,7 +672,7 @@ defmodule Pyro.Components.Core do
     <div phx-feedback-for={@name} class={@class}>
       <.label for={@id} overrides={@overrides}><%= @label %></.label>
       <textarea
-        id={@id || @name}
+        id={@id}
         name={@name}
         class={@input_class}
         phx-keydown={!@clear_on_escape || JS.dispatch("pyro:clear")}
@@ -664,6 +680,7 @@ defmodule Pyro.Components.Core do
         phx-mounted={!@autofocus || JS.focus()}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
+      <%= render_slot(@inner_block) %>
       <p :if={@description} class={@description_class}>
         <%= @description %>
       </p>
@@ -679,7 +696,7 @@ defmodule Pyro.Components.Core do
       <input
         type="hidden"
         name={@name}
-        id={@id || @name}
+        id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         {@rest}
       />
@@ -699,7 +716,7 @@ defmodule Pyro.Components.Core do
       <input
         type={@type}
         name={@name}
-        id={@id || @name}
+        id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={@input_class}
         phx-keydown={!@clear_on_escape || JS.dispatch("pyro:clear")}
@@ -707,6 +724,7 @@ defmodule Pyro.Components.Core do
         phx-mounted={!@autofocus || JS.focus()}
         {@rest}
       />
+      <%= render_slot(@inner_block) %>
       <p :if={@description} class={@description_class}>
         <%= @description %>
       </p>
@@ -849,9 +867,7 @@ defmodule Pyro.Components.Core do
       <thead class={@thead_class}>
         <tr>
           <th :for={col <- @col} class={@th_label_class}><%= col[:label] %></th>
-          <th class={@th_action_class}>
-            <span class="sr-only"><%= gettext("Actions") %></span>
-          </th>
+          <th class={@th_action_class}><span class="sr-only"><%= gettext("Actions") %></span></th>
         </tr>
       </thead>
       <tbody
@@ -981,12 +997,8 @@ defmodule Pyro.Components.Core do
 
   ## Examples
 
-  ```heex
-  <.icon name="hero-arrow-left" />
-  ```
-  ```heex
-  <.icon name="hero-arrow-right-solid" class="block" />
-  ```
+      <.icon name="hero-x-mark-solid" />
+      <.icon name="hero-arrow-path" class="ml-1 w-3 h-3 animate-spin" />
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
