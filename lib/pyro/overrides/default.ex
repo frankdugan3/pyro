@@ -900,6 +900,27 @@ defmodule Pyro.Overrides.Default do
     set :horizontal_offset, "0"
   end
 
+  @theme :system
+
+  override Extra, :color_theme_switcher do
+    set :class, &__MODULE__.color_theme_switcher_class/1
+    set :theme, &__MODULE__.color_theme_switcher_theme/1
+    set :label_system, "System"
+    set :label_light, "Light"
+    set :label_dark, "Dark"
+    set :icon_system, "hero-computer-desktop-mini"
+    set :icon_light, "hero-sun-solid"
+    set :icon_dark, "hero-moon-solid"
+  end
+
+  def color_theme_switcher_class(passed_assigns) do
+    ["whitespace-nowrap", passed_assigns[:class], "color-theme-switcher"]
+  end
+
+  def color_theme_switcher_theme(passed_assigns) do
+    passed_assigns[:theme] || @theme
+  end
+
   ##############################################################################
   ####    S M A R T    C O M P O N E N T S
   ##############################################################################

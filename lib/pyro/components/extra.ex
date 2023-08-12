@@ -54,15 +54,15 @@ defmodule Pyro.Components.Extra do
   attr :replace, :boolean,
     overridable: true,
     required: true,
-    doc: "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
+    doc:
+      "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
 
   attr :class, :tails_classes,
     overridable: true,
     required: true,
     doc: "merge/override default classes of the `code` element"
 
-  attr :rest, :global,
-    doc: "additional HTML attributes added to the `a` tag"
+  attr :rest, :global, doc: "additional HTML attributes added to the `a` tag"
 
   slot :inner_block,
     required: true,
@@ -337,6 +337,68 @@ defmodule Pyro.Components.Extra do
         <% end %>
       </span>
     </span>
+    """
+  end
+
+  @doc """
+  A color theme switch component.
+
+  - Toggle through light, dark, and system color themes
+  - Optionally show labels for each theme
+  - Optionally override the default labels for each theme with `label_system`, `label_dark`, and `label_light`
+  - Optionally override the default icons for each theme with `icon_system`, `icon_dark`, and `icon_light`
+
+  ## Examples
+
+      <.color_theme_switcher />
+
+      <.color_theme_switcher theme="light" />
+      <.color_theme_switcher theme="dark" />
+      <.color_theme_switcher theme="system" />
+
+      <.color_theme_switcher show_labels />
+
+      <.color_theme_switcher label_system="System" label_dark="Dunkel" label_light="Hell" />
+      <.color_theme_switcher icon_system="hero-computer-desktop-solid" icon_dark="hero-moon-solid" icon_light="hero-sun-solid" />
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :class, :tails_classes, overridable: true, required: true
+  attr :theme, :atom, overridable: true, required: true, doc: "the theme used to initialize the color theme switcher"
+
+  attr :label_system, :string, overridable: true, required: false, doc: "the label for the system theme"
+  attr :label_dark, :string, overridable: true, required: false, doc: "the label for the dark theme"
+  attr :label_light, :string, overridable: true, required: false, doc: "the label for the light theme"
+
+  attr :icon_system, :string, overridable: true, required: false, doc: "the icon for the system theme"
+  attr :icon_dark, :string, overridable: true, required: false, doc: "the icon for the dark theme"
+  attr :icon_light, :string, overridable: true, required: false, doc: "the icon for the light theme"
+
+  attr :show_labels, :boolean, default: false, doc: "show or hide labels"
+
+  def color_theme_switcher(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <Pyro.Components.Core.button
+      id={Ecto.UUID.generate()}
+      class={@class}
+      phx-hook="PyroColorThemeHook"
+      theme={@theme}
+    >
+      <div class="color-theme-system-icon">
+        <Pyro.Components.Core.icon name={@icon_system} />
+        <span :if={@show_labels}> <%= @label_system %></span>
+      </div>
+      <div class="color-theme-dark-icon hidden">
+        <Pyro.Components.Core.icon name={@icon_dark} />
+        <span :if={@show_labels}> <%= @label_dark %></span>
+      </div>
+      <div class="color-theme-light-icon hidden">
+        <Pyro.Components.Core.icon name={@icon_light} />
+        <span :if={@show_labels}> <%= @label_light %></span>
+      </div>
+    </Pyro.Components.Core.button>
     """
   end
 end

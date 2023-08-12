@@ -2,39 +2,82 @@
 // ####    T H E M E    M A N A G E M E N T
 // #############################################################################
 
-// Load user or system preference for dark or light theme
-if (
-  localStorage.theme === 'dark' ||
-  (!('theme' in localStorage) &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches)
-) {
-  document.documentElement.classList.add('dark')
-} else {
-  document.documentElement.classList.remove('dark')
+// Apply theme
+window.applyTheme = function (theme) {
+  if (theme === 'light') {
+    document.documentElement.classList.add('light')
+    document.documentElement.classList.remove('dark', 'system')
+    document
+      .querySelectorAll('.color-theme-system-icon')
+      .forEach((el) => el.classList.remove('hidden'))
+    document
+      .querySelectorAll('.color-theme-dark-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-theme-light-icon')
+      .forEach((el) => el.classList.add('hidden'))
+  } else if (theme === 'dark') {
+    document.documentElement.classList.add('dark')
+    document.documentElement.classList.remove('light', 'system')
+    document
+      .querySelectorAll('.color-theme-system-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-theme-dark-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-theme-light-icon')
+      .forEach((el) => el.classList.remove('hidden'))
+  } else {
+    // TODO: add timer to check system theme and apply any changes
+    document.documentElement.classList.add('system')
+    document.documentElement.classList.remove('light')
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    document
+      .querySelectorAll('.color-theme-system-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-theme-dark-icon')
+      .forEach((el) => el.classList.remove('hidden'))
+    document
+      .querySelectorAll('.color-theme-light-icon')
+      .forEach((el) => el.classList.add('hidden'))
+  }
 }
 
-// Set theme to dark
-window.addEventListener('pyro:theme-dark', (e) => {
-  localStorage.theme = 'dark'
-  document.documentElement.classList.add('dark')
-})
-
-// Set theme to light
-window.addEventListener('pyro:theme-light', (e) => {
-  localStorage.theme = 'light'
-  document.documentElement.classList.remove('dark')
-})
-
-// Set theme to system preference
-window.addEventListener('pyro:theme-system', (e) => {
-  localStorage.removeItem('theme')
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.documentElement.classList.add('dark')
+// Toggle theme
+window.toggleTheme = function () {
+  if (document.documentElement.classList.contains('system')) {
+    applyTheme('dark')
+  } else if (document.documentElement.classList.contains('dark')) {
+    applyTheme('light')
   } else {
-    document.documentElement.classList.remove('dark')
+    applyTheme('system')
   }
-  document.documentElement.classList.add('dark')
-})
+}
+
+// Initialize theme
+window.initTheme = function (e) {
+  if (e !== undefined) {
+    e = document.querySelector('.color-theme-switcher')
+  }
+
+  if (e !== undefined) {
+    applyTheme('system')
+  } else {
+    var theme = e.getAttribute('theme')
+    document.documentElement.classList.add(theme)
+    applyTheme(theme)
+  }
+}
+
+try {
+  initTheme()
+} catch (_) {}
 
 // #############################################################################
 // ####    C U S T O M    E V E N T    H A N D L E R S
@@ -88,6 +131,19 @@ export async function sendTimezoneToServer() {
 // #############################################################################
 
 export const hooks = {
+  PyroColorThemeHook: {
+    deadViewCompatible: true,
+    mounted() {
+      this.init()
+    },
+    updated() {
+      this.init()
+    },
+    init() {
+      initTheme(this.el)
+      this.el.addEventListener('click', window.toggleTheme)
+    },
+  },
   PyroFlashComponent: {
     mounted() {
       this.oldMessageHTML = document.querySelector(
