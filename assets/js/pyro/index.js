@@ -49,6 +49,14 @@ window.applyTheme = function (theme) {
   }
 }
 
+window
+  .matchMedia('(prefers-color-scheme: dark)')
+  .addEventListener('change', (_) => {
+    if (document.documentElement.classList.contains('system')) {
+      applyTheme('system')
+    }
+  })
+
 // Toggle theme
 window.toggleTheme = function () {
   if (document.documentElement.classList.contains('system')) {
