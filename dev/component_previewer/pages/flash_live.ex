@@ -27,7 +27,9 @@ defmodule ComponentPreviewer.FlashLive do
             put_flash(
               socket,
               kind,
-              encode_flash(~s[This is a flash of kind "#{kind}"], ttl: Enum.random(10..30) * 1_000)
+              encode_flash(~s[This is a flash of kind "#{kind}"],
+                ttl: Enum.random(10..30) * 1_000
+              )
             )
           end)
           |> put_flash(

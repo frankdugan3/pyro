@@ -33,6 +33,8 @@ defmodule ComponentPreviewer.Router do
       live("/spinner", SpinnerLive)
       live("/tooltip", TooltipLive)
       live("/simple-form", SimpleFormLive)
+      live("/slide-over", SlideOverLive, :index)
+      live("/slide-over/:origin", SlideOverLive, :slide_over)
       live("/smart-form", SmartFormLive)
       live("/table", TableLive)
     end

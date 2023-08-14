@@ -900,6 +900,116 @@ defmodule Pyro.Overrides.Default do
     set :horizontal_offset, "0"
   end
 
+  override Extra, :slide_over do
+    set :class, &__MODULE__.slide_over_class/1
+
+    set :overlay_class,
+        "fixed inset-0 z-50 transition-opacity bg-slate-900 dark:bg-slate-900 bg-opacity-30 dark:bg-opacity-70"
+
+    set :wrapper_class, &__MODULE__.slide_over_wrapper_class/1
+    set :header_class, "px-5 py-3 border-b border-slate-200 dark:border-slate-700"
+    set :header_inner_class, "flex items-center justify-between"
+    set :header_title_class, "font-semibold text-slate-900 dark:text-white"
+
+    set :header_close_button_class,
+        "text-slate-400 hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-400"
+
+    set :content_class, "p-5"
+
+    set :close_icon_class, "w-6 h-6 fill-current"
+    set :close_icon_name, "hero-x-mark-solid"
+
+    set :origin, "left"
+    set :origins, ~w[left right top bottom]
+    set :max_width, "md"
+    set :max_widths, ~w[sm md lg xl 2xl full]
+
+    set :hide_js, &__MODULE__.slide_over_hide_js/5
+  end
+
+  def slide_over_class(passed_assigns) do
+    [
+      "w-full max-h-full overflow-auto",
+      @root_theme,
+      slide_over_width_class(passed_assigns),
+      passed_assigns[:origin] == "left" && "transition translate-x-0",
+      passed_assigns[:origin] == "right" && "transition translate-x-0 absolute right-0 inset-y-0",
+      passed_assigns[:origin] == "top" && "transition translate-y-0 absolute inset-x-0",
+      passed_assigns[:origin] == "bottom" &&
+        "transition translate-y-0 absolute inset-x-0 bottom-0",
+      passed_assigns[:class]
+    ]
+  end
+
+  def slide_over_width_class(%{origin: origin, max_width: max_width}) do
+    case origin do
+      x when x in ["left", "right"] ->
+        case max_width do
+          "sm" -> "max-w-sm"
+          "md" -> "max-w-xl"
+          "lg" -> "max-w-3xl"
+          "xl" -> "max-w-5xl"
+          "2xl" -> "max-w-7xl"
+          "full" -> "max-w-full"
+        end
+
+      x when x in ["top", "bottom"] ->
+        ""
+    end
+  end
+
+  def slide_over_wrapper_class(passed_assigns) do
+    [
+      "fixed inset-0 z-50 flex overflow-hidden transform",
+      passed_assigns[:origin] == "left" && "mr-10",
+      passed_assigns[:origin] == "right" && "ml-10",
+      passed_assigns[:origin] == "top" && "mb-10",
+      passed_assigns[:origin] == "bottom" && "mt-10",
+      passed_assigns[:wrapper_class]
+    ]
+  end
+
+  def slide_over_hide_js(js, id, origin, close_event_name, close_slide_over_target) do
+    origin_class =
+      case origin do
+        x when x in ["left", "right"] -> "translate-x-0"
+        x when x in ["top", "bottom"] -> "translate-y-0"
+      end
+
+    destination_class =
+      case origin do
+        "left" -> "-translate-x-full"
+        "right" -> "translate-x-full"
+        "top" -> "-translate-y-full"
+        "bottom" -> "translate-y-full"
+      end
+
+    js =
+      JS.remove_class("overflow-hidden", to: "body")
+      |> JS.hide(
+        transition: {
+          "ease-in duration-200",
+          "opacity-100",
+          "opacity-0"
+        },
+        to: "##{id}-overlay"
+      )
+      |> JS.hide(
+        transition: {
+          "ease-in duration-200",
+          origin_class,
+          destination_class
+        },
+        to: "##{id}-content"
+      )
+
+    if close_slide_over_target do
+      JS.push(js, close_event_name, close_slide_over_target)
+    else
+      JS.push(js, close_event_name)
+    end
+  end
+
   ##############################################################################
   ####    S M A R T    C O M P O N E N T S
   ##############################################################################

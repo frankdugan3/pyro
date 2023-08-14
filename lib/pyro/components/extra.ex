@@ -54,15 +54,15 @@ defmodule Pyro.Components.Extra do
   attr :replace, :boolean,
     overridable: true,
     required: true,
-    doc: "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
+    doc:
+      "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
 
   attr :class, :tails_classes,
     overridable: true,
     required: true,
     doc: "merge/override default classes of the `code` element"
 
-  attr :rest, :global,
-    doc: "additional HTML attributes added to the `a` tag"
+  attr :rest, :global, doc: "additional HTML attributes added to the `a` tag"
 
   slot :inner_block,
     required: true,
@@ -337,6 +337,100 @@ defmodule Pyro.Components.Extra do
         <% end %>
       </span>
     </span>
+    """
+  end
+
+  @doc """
+  A slide-over component.
+
+  ## Example
+
+      <%= if @slide_over do %>
+        <.slide_over origin={@slide_over} max_width="sm" title="Slide Over">
+          <p>
+            This is a slide over.
+          </p>
+        </.slide_over>
+      <% end %>
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :class, :tails_classes, overridable: true, required: true
+  attr :overlay_class, :tails_classes, overridable: true, required: true
+  attr :wrapper_class, :tails_classes, overridable: true, required: true
+  attr :header_class, :tails_classes, overridable: true, required: true
+  attr :header_inner_class, :tails_classes, overridable: true, required: true
+  attr :header_title_class, :tails_classes, overridable: true, required: true
+  attr :header_close_button_class, :tails_classes, overridable: true, required: true
+  attr :content_class, :tails_classes, overridable: true, required: true
+
+  attr :close_icon_class, :tails_classes, overridable: true, required: false
+  attr :close_icon_name, :string, overridable: true, required: true
+
+  attr :title, :string, doc: "the title of the slide-over"
+
+  attr :id, :string, default: "slide-over"
+  attr :origin, :string, overridable: true, required: true
+  attr :max_width, :string, overridable: true, required: true
+
+  attr :hide_js, :any, overridable: true, required: true
+
+  attr :close_even_name, :string,
+    default: "close_slide_over",
+    doc: "the name of the event to send when the slide-over is closed"
+
+  attr :close_slide_over_target, :string,
+    default: nil,
+    doc:
+      "the specific live component to target for the close event, e.g. close_slide_over_target={@myself}"
+
+  attr :rest, :global
+  slot :inner_block, required: true
+
+  def slide_over(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <div id={@id} {@rest}>
+      <div id={"#{@id}-overlay"} class={@overlay_class} aria-hidden="true"></div>
+
+      <div class={@wrapper_class} role="dialog" aria-modal="true">
+        <div
+          id={"#{@id}-content"}
+          class={@class}
+          phx-click-away={
+            apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
+          }
+          phx-window-keydown={
+            apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
+          }
+          phx-key="escape"
+        >
+          <%!-- Header --%>
+          <div class={@header_class}>
+            <div class={@header_inner_class}>
+              <div class={@header_title_class}>
+                <%= @title %>
+              </div>
+
+              <button
+                phx-click={
+                  apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
+                }
+                class={@header_close_button_class}
+              >
+                <div class="sr-only">Close</div>
+                <Pyro.Components.Core.icon class={@close_icon_class} name={@close_icon_name} />
+              </button>
+            </div>
+          </div>
+          <%!-- Content --%>
+          <div class={@content_class}>
+            <%= render_slot(@inner_block) %>
+          </div>
+        </div>
+      </div>
+    </div>
     """
   end
 end
