@@ -5,8 +5,8 @@
 // Apply theme
 window.applyTheme = function (theme) {
   if (theme === 'light') {
-    document.documentElement.classList.add('light')
-    document.documentElement.classList.remove('dark', 'system')
+    localStorage.theme = 'light'
+    document.documentElement.classList.remove('dark')
     document
       .querySelectorAll('.color-theme-system-icon')
       .forEach((el) => el.classList.remove('hidden'))
@@ -17,8 +17,8 @@ window.applyTheme = function (theme) {
       .querySelectorAll('.color-theme-light-icon')
       .forEach((el) => el.classList.add('hidden'))
   } else if (theme === 'dark') {
+    localStorage.theme = 'dark'
     document.documentElement.classList.add('dark')
-    document.documentElement.classList.remove('light', 'system')
     document
       .querySelectorAll('.color-theme-system-icon')
       .forEach((el) => el.classList.add('hidden'))
@@ -29,9 +29,7 @@ window.applyTheme = function (theme) {
       .querySelectorAll('.color-theme-light-icon')
       .forEach((el) => el.classList.remove('hidden'))
   } else {
-    // TODO: add timer to check system theme and apply any changes
-    document.documentElement.classList.add('system')
-    document.documentElement.classList.remove('light')
+    localStorage.theme = 'system'
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       document.documentElement.classList.add('dark')
     } else {
@@ -49,19 +47,24 @@ window.applyTheme = function (theme) {
   }
 }
 
+// Theme change events
 window
   .matchMedia('(prefers-color-scheme: dark)')
   .addEventListener('change', (_) => {
-    if (document.documentElement.classList.contains('system')) {
+    if (localStorage.theme === 'system') {
       applyTheme('system')
     }
   })
 
+window.onstorage = () => {
+  applyTheme(localStorage.theme)
+}
+
 // Toggle theme
 window.toggleTheme = function () {
-  if (document.documentElement.classList.contains('system')) {
+  if (localStorage.theme === 'system') {
     applyTheme('dark')
-  } else if (document.documentElement.classList.contains('dark')) {
+  } else if (localStorage.theme === 'dark') {
     applyTheme('light')
   } else {
     applyTheme('system')
@@ -69,18 +72,11 @@ window.toggleTheme = function () {
 }
 
 // Initialize theme
-window.initTheme = function (e) {
-  if (e !== undefined) {
-    e = document.querySelector('.color-theme-switcher')
+window.initTheme = function (theme) {
+  if (theme === undefined) {
+    theme = localStorage.theme || 'system'
   }
-
-  if (e !== undefined) {
-    applyTheme('system')
-  } else {
-    var theme = e.getAttribute('theme')
-    document.documentElement.classList.add(theme)
-    applyTheme(theme)
-  }
+  applyTheme(theme)
 }
 
 try {
@@ -142,13 +138,13 @@ export const hooks = {
   PyroColorThemeHook: {
     deadViewCompatible: true,
     mounted() {
-      this.init()
+      this.init(this.el.getAttribute('theme'))
     },
     updated() {
       this.init()
     },
-    init() {
-      initTheme(this.el)
+    init(theme) {
+      initTheme(theme)
       this.el.addEventListener('click', window.toggleTheme)
     },
   },
