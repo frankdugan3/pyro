@@ -57,7 +57,7 @@ defmodule Pyro.Components.Extra do
     doc:
       "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
 
-  attr :class, :tails_classes,
+  attr :class, :css_classes,
     overridable: true,
     required: true,
     doc: "merge/override default classes of the `code` element"
@@ -96,7 +96,7 @@ defmodule Pyro.Components.Extra do
   attr :id, :string, required: true
   attr :copy, :boolean, overridable: true, required: true
   attr :copy_label, :string, overridable: true, required: true
-  attr :copy_class, :tails_classes, overridable: true, required: true
+  attr :copy_class, :css_classes, overridable: true, required: true
   attr :copy_message, :string, overridable: true
 
   attr :language, :string,
@@ -104,7 +104,7 @@ defmodule Pyro.Components.Extra do
     values: ~w[elixir heex html none],
     doc: "language of the code snippet"
 
-  attr :class, :tails_classes,
+  attr :class, :css_classes,
     overridable: true,
     required: true,
     doc: "merge/override default classes of the `code` element"
@@ -151,14 +151,14 @@ defmodule Pyro.Components.Extra do
   attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
   attr :size, :string, overridable: true, required: true, doc: "the size of the button"
   attr :variant, :string, overridable: true, required: true, doc: "style of button"
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
 
   attr :message, :string,
     overridable: true,
     required: true,
     doc: "message to display after copying"
 
-  attr :icon_class, :tails_classes, overridable: true, required: true
+  attr :icon_class, :css_classes, overridable: true, required: true
   attr :rest, :global
 
   def copy_to_clipboard(assigns) do
@@ -202,7 +202,7 @@ defmodule Pyro.Components.Extra do
     required: true,
     doc: "does `:uri` match `:current_uri`?"
 
-  attr :class, :tails_classes,
+  attr :class, :css_classes,
     overridable: true,
     required: true,
     doc: "the class of the navigation link"
@@ -230,7 +230,7 @@ defmodule Pyro.Components.Extra do
   attr :color, :string, overridable: true, required: true, doc: "the color of the progress bar"
   attr :size, :string, overridable: true, required: true, doc: "the size of the progress bar"
 
-  attr :class, :tails_classes,
+  attr :class, :css_classes,
     overridable: true,
     required: true,
     doc: "the class of the progress bar"
@@ -253,7 +253,7 @@ defmodule Pyro.Components.Extra do
   attr :show, :boolean, default: true, doc: "show or hide spinner"
   attr :rest, :global
   attr :size, :string, overridable: true, required: true, doc: "the size of the spinner"
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
 
   def spinner(assigns) do
     assigns = assign_overridables(assigns)
@@ -296,16 +296,16 @@ defmodule Pyro.Components.Extra do
   attr :tooltip, :string, default: nil
   attr :vertical_offset, :string, overridable: true, required: true
   attr :horizontal_offset, :string, overridable: true, required: true
-  attr :tooltip_class, :tails_classes, overridable: true, required: true
-  attr :tooltip_text_class, :tails_classes, overridable: true, required: true
-  attr :icon_class, :tails_classes, overridable: true
+  attr :tooltip_class, :css_classes, overridable: true, required: true
+  attr :tooltip_text_class, :css_classes, overridable: true, required: true
+  attr :icon_class, :css_classes, overridable: true
 
   attr :icon_name, :string,
     overridable: true,
     required: true,
     doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
 
   slot :icon
   slot :inner_block

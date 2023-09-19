@@ -22,6 +22,7 @@ Pyro's documentation is housed on [hexdocs](https://hexdocs.pm/pyro), which incl
 def deps do
   [
     {:pyro, "~> 0.2.0"},
+    {:tails, "~> 0.1.5"}, # Optional: Smart-merge Tailwind component classes
     {:ash_phoenix, "~> 1.2"}, # Optional: Ash integration
     {:ash, "~> 2.8"}, # Optional: Ash integration
   ]

@@ -2,7 +2,7 @@ defmodule Pyro.Component do
   @moduledoc ~S'''
   This is basically the same thing as `Phoenix.Component`, but Pyro extends the `attr/3` macro with:
 
-  * `:tails_classes` type
+  * `:css_classes` type
   * `:overridable` flag
   * `:values` supports an atom value (override key)
 
@@ -18,7 +18,7 @@ defmodule Pyro.Component do
     use Pyro.Component
 
     attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-    attr :class, :tails_classes, overridable: true, required: true
+    attr :class, :css_classes, overridable: true, required: true
     attr :href, :string, required: true
     attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target type]
     slot :inner_block, required: true
@@ -89,9 +89,9 @@ defmodule Pyro.Component do
   @doc """
   There are only a few things added to `Phoenix.Component.attr/3` by Pyro:
 
-  * `:tails_classes` type
-    * merges overridable defaults with passed prop values via `Tails`
-    * prevents weird precedence conflicts
+  * `:css_classes` type
+    * merges overridable defaults with passed prop values via `Pyro.CSS.classes/1`
+    * prevents weird precedence conflicts (via optional `Tails` dependency)
     * less bloated HTML
   * `:overridable` flag (marks attribute to be overridden by `Pyro.Overrides`)
   * `:values` supports an atom value (override key, loaded by `Pyro.Overrides`)
@@ -119,12 +119,12 @@ defmodule Pyro.Component do
         type
       end
 
-    if type == :tails_classes && !opts[:overridable] do
+    if type == :css_classes && !opts[:overridable] do
       invalid_overridable_attr_option!(
         __CALLER__,
         name,
-        ":tails_classes type is only available for overridable props",
-        "attr #{inspect(name)}, :tails_classes, overridable: true"
+        ":css_classes type is only available for overridable props",
+        "attr #{inspect(name)}, :css_classes, overridable: true"
       )
     end
 
@@ -150,7 +150,7 @@ defmodule Pyro.Component do
           :doc,
           [
             opts[:doc],
-            "(#{["overridable", if(type == :tails_classes, do: "`#{inspect(type)}`"), if(opts[:required], do: "required")] |> Enum.filter(& &1) |> Enum.join(", ")})"
+            "(#{["overridable", if(type == :css_classes, do: "`#{inspect(type)}`"), if(opts[:required], do: "required")] |> Enum.filter(& &1) |> Enum.join(", ")})"
           ]
           |> Enum.filter(& &1)
           |> Enum.join(" ")
@@ -175,10 +175,10 @@ defmodule Pyro.Component do
         opts
       end
 
-    # Phoenix doesn't support the `:tails_classes` type natively
+    # Phoenix doesn't support the `:css_classes` type natively
     phoenix_type =
       case type do
-        :tails_classes -> :any
+        :css_classes -> :any
         type -> type
       end
 
@@ -210,7 +210,7 @@ defmodule Pyro.Component do
   end
 
   @doc """
-  This macro automatically assigns all the overridable attrs, and handles merging classes for `:tails_classes` type attrs.
+  This macro automatically assigns all the overridable attrs, and handles merging classes for `:css_classes` type attrs.
 
   It *must* be called once in any component that contains overridable attrs.
 
@@ -319,11 +319,11 @@ defmodule Pyro.Component do
   @doc false
   # Internal tooling to merge classes at runtime
   def maybe_merge_classes(assigns, attr, override, %{class?: true}) do
-    Tails.classes([override, assigns[attr]])
+    Pyro.CSS.classes([override, assigns[attr]])
   end
 
-  def maybe_merge_classes(assigns, attr, override, %{type: :tails_classes}) do
-    Tails.classes([override, assigns[attr]])
+  def maybe_merge_classes(assigns, attr, override, %{type: :css_classes}) do
+    Pyro.CSS.classes([override, assigns[attr]])
   end
 
   def maybe_merge_classes(assigns, attr, override, _opts) do

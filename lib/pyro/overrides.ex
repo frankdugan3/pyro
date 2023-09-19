@@ -252,7 +252,7 @@ defmodule Pyro.Overrides do
     override_docs = """
     - Captured functions with arity 1 and the arg named `passed_assigns` are passed component assigns at runtime, allowing complex conditional logic
     - [`assign_overridables/1`](`Pyro.Component.assign_overridables/1`) preserves the definition order of attrs and assigns them in that order, preserving dependency chains
-    - Attrs with type `:tails_classes` utilize `Tails`, and are merged by the component to prevent weird precedence conflicts and HTML bloat
+    - Attrs with type `:css_classes` utilize the configured CSS merge utility
 
     #{makeup}
     #{global_style}

@@ -10,7 +10,7 @@ defmodule Pyro.Components.Core do
 
   - Maintenance/bugfixes/new features, since it's a library
   - A powerful [override system](#module-overridable-component-attributes) for customization
-  - A special `:tails_classes` type that merges [Tailwind CSS](https://tailwindcss.com) classes via `Tails`
+  - A special `:css_classes` type that utilizes the configured CSS merge utility
   - The button component implements both button and anchor tags (button-styled links!)
   - Inputs
     - `autofocus` prop to enable a hook for reliable focus on mount
@@ -53,7 +53,7 @@ defmodule Pyro.Components.Core do
   attr :on_confirm, JS, default: %JS{}
   attr :show_js, :any, overridable: true, required: true
   attr :hide_js, :any, overridable: true, required: true
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
   slot :inner_block, required: true
   slot :title
   slot :subtitle
@@ -171,14 +171,14 @@ defmodule Pyro.Components.Core do
     overridable: true,
     doc: "used for styling a flash with a different kind"
 
-  attr :class, :tails_classes, overridable: true, required: true
-  attr :control_class, :tails_classes, overridable: true
-  attr :close_button_class, :tails_classes, overridable: true
-  attr :close_icon_class, :tails_classes, overridable: true
-  attr :message_class, :tails_classes, overridable: true, required: true
-  attr :progress_class, :tails_classes, overridable: true, required: true
-  attr :title_class, :tails_classes, overridable: true, required: true
-  attr :title_icon_class, :tails_classes, overridable: true
+  attr :class, :css_classes, overridable: true, required: true
+  attr :control_class, :css_classes, overridable: true
+  attr :close_button_class, :css_classes, overridable: true
+  attr :close_icon_class, :css_classes, overridable: true
+  attr :message_class, :css_classes, overridable: true, required: true
+  attr :progress_class, :css_classes, overridable: true, required: true
+  attr :title_class, :css_classes, overridable: true, required: true
+  attr :title_icon_class, :css_classes, overridable: true
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
 
   slot :inner_block, doc: "the optional inner block to render the flash message"
@@ -244,7 +244,7 @@ defmodule Pyro.Components.Core do
     required: true,
     doc: "the kinds of flashes to display"
 
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash tray"
 
   def flash_group(assigns) do
@@ -323,8 +323,8 @@ defmodule Pyro.Components.Core do
   attr :for, :any, required: true, doc: "the datastructure for the form"
   attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
 
-  attr :class, :tails_classes, overridable: true, required: true
-  attr :actions_class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
+  attr :actions_class, :css_classes, overridable: true, required: true
 
   attr :rest, :global,
     include: ~w(autocomplete name rel action enctype method novalidate target multipart),
@@ -402,9 +402,9 @@ defmodule Pyro.Components.Core do
   attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
   attr :size, :string, overridable: true, required: true, doc: "the size of the button"
   attr :variant, :string, overridable: true, required: true, doc: "style of button"
-  attr :class, :tails_classes, overridable: true, required: true
-  attr :icon_class, :tails_classes, overridable: true, required: true
-  attr :ping_class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
+  attr :icon_class, :css_classes, overridable: true, required: true
+  attr :ping_class, :css_classes, overridable: true, required: true
 
   slot :inner_block, required: true, doc: "the content of the button"
 
@@ -579,22 +579,22 @@ defmodule Pyro.Components.Core do
     required: true,
     doc: "clear input value on pressing Escape"
 
-  attr :class, :tails_classes,
+  attr :class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the field container element"
 
-  attr :input_class, :tails_classes,
+  attr :input_class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the input element"
 
-  attr :input_check_label_class, :tails_classes,
+  attr :input_check_label_class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the label element for a check input"
 
-  attr :description_class, :tails_classes,
+  attr :description_class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the field description"
@@ -740,7 +740,7 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
   attr :for, :string, default: nil
   slot :inner_block, required: true
 
@@ -765,8 +765,8 @@ defmodule Pyro.Components.Core do
     required: true,
     doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
-  attr :icon_class, :tails_classes, overridable: true
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :icon_class, :css_classes, overridable: true
+  attr :class, :css_classes, overridable: true, required: true
 
   slot :inner_block, required: true
 
@@ -786,10 +786,10 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :tails_classes, overridable: true, required: true
-  attr :title_class, :tails_classes, overridable: true, required: true
-  attr :subtitle_class, :tails_classes, overridable: true, required: true
-  attr :actions_class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
+  attr :title_class, :css_classes, overridable: true, required: true
+  attr :subtitle_class, :css_classes, overridable: true, required: true
+  attr :actions_class, :css_classes, overridable: true, required: true
   slot :inner_block, required: true
   slot :subtitle
   slot :actions
@@ -839,16 +839,16 @@ defmodule Pyro.Components.Core do
 
   attr :rows, :list, required: true
 
-  attr :class, :tails_classes, overridable: true, required: true
-  attr :action_class, :tails_classes, overridable: true, required: true
-  attr :action_td_class, :tails_classes, overridable: true, required: true
-  attr :action_wrapper_class, :tails_classes, overridable: true, required: true
-  attr :tbody_class, :tails_classes, overridable: true, required: true
-  attr :td_class, :tails_classes, overridable: true, required: true
-  attr :th_action_class, :tails_classes, overridable: true, required: true
-  attr :th_label_class, :tails_classes, overridable: true, required: true
-  attr :thead_class, :tails_classes, overridable: true, required: true
-  attr :tr_class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
+  attr :action_class, :css_classes, overridable: true, required: true
+  attr :action_td_class, :css_classes, overridable: true, required: true
+  attr :action_wrapper_class, :css_classes, overridable: true, required: true
+  attr :tbody_class, :css_classes, overridable: true, required: true
+  attr :td_class, :css_classes, overridable: true, required: true
+  attr :th_action_class, :css_classes, overridable: true, required: true
+  attr :th_label_class, :css_classes, overridable: true, required: true
+  attr :thead_class, :css_classes, overridable: true, required: true
+  attr :tr_class, :css_classes, overridable: true, required: true
 
   slot :col, required: true do
     attr :label, :string
@@ -906,9 +906,9 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :tails_classes, overridable: true, required: true
-  attr :dd_class, :tails_classes, overridable: true, required: true
-  attr :dt_class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
+  attr :dd_class, :css_classes, overridable: true, required: true
+  attr :dt_class, :css_classes, overridable: true, required: true
 
   slot :item, required: true do
     attr :title, :string, required: true
@@ -945,8 +945,8 @@ defmodule Pyro.Components.Core do
     required: true,
     doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
 
-  attr :class, :tails_classes, overridable: true, required: true
-  attr :icon_class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
+  attr :icon_class, :css_classes, overridable: true, required: true
 
   attr :navigate, :any, required: true
   slot :inner_block, required: true
@@ -1004,7 +1004,7 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
 
   attr :name, :string,
     required: true,
