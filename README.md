@@ -91,12 +91,7 @@ As long as Elixir is already installed:
 git clone git@github.com:frankdugan3/pyro.git
 cd pyro
 mix setup
-iex -S mix phx.server
 ```
-
-You will now have a component previewer running on `http://localhost:9001` (running on that alternate port allows it to run alongside another app running the default Phoenix port). There are links to a component's hexdocs on every page in the component previewer.
-
-> Note: The component previewer is intended exclusively for `Pyro` development, not as a showcase to demo how to use components. So, the previewer is very clunky and has no context as it is simply intended to be a very concise way for me to verify things are working properly. The components are documented on [HexDocs](https://hexdocs.pm/pyro).
 
 If you are working on writing docs, there is a handy watcher script you can run to automatically rebuild/reload the docs locally:
 

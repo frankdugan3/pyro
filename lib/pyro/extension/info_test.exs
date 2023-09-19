@@ -71,7 +71,6 @@ defmodule Pyro.Resource.InfoTest do
 
     pub_sub do
       prefix "user"
-      module ComponentPreviewer.Endpoint
 
       publish_all :create, "created"
       publish_all :update, ["updated", [:id, nil]]

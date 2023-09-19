@@ -122,28 +122,16 @@ defmodule Pyro.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    if Mix.env() == :dev do
-      [
-        mod: {ComponentPreviewer.Application, []},
-        extra_applications: [:logger]
-      ]
-    else
       [
         extra_applications: [:logger]
       ]
     end
-  end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ash_phoenix, "~> 1.2", optional: true},
-      {:ash, "~> 2.4", optional: true},
-      {:bandit, ">= 0.6.4", only: [:dev]},
-      {:credo, ">= 0.0.0", only: [:dev], runtime: false},
-      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
-      {:doctor, ">= 0.0.0", only: [:dev], runtime: false},
-      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
+      # Code quality tooling
+      {:credo, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, "~> 0.15",
        [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
       {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},
@@ -158,10 +146,11 @@ defmodule Pyro.MixProject do
       {:makeup_js, "~> 0.1.0"},
       {:makeup_json, "~> 0.1.0"},
       {:makeup, "~> 1.1"},
-      {:mix_audit, ">= 0.0.0", only: [:dev], runtime: false},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.19"},
       {:phoenix, "~> 1.7"},
+      # These dependencies add optional features if installed
+      {:ash_phoenix, "~> 1.2", optional: true},
+      {:ash, "~> 2.4", optional: true},
       {:tails, "~> 0.1.5", optional: true},
     ]
   end
