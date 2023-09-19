@@ -5,7 +5,7 @@ if Code.ensure_loaded?(Ash) do
     """
     defstruct [:name, :class, :fields]
 
-    @action_types {:one_of, [:create, :update, :destroy]}
+    @action_types {:one_of, [:create, :update]}
 
     @schema [
       name: [

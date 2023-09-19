@@ -20,8 +20,7 @@ if Code.ensure_loaded?(Ash) do
 
       action_type_defaults = %{
         create: merge_action_types(form_entities, :create, dsl),
-        update: merge_action_types(form_entities, :update, dsl),
-        destroy: merge_action_types(form_entities, :destroy, dsl)
+        update: merge_action_types(form_entities, :update, dsl)
       }
 
       action_names =
@@ -110,7 +109,7 @@ if Code.ensure_loaded?(Ash) do
       |> merge_fields(new, dsl)
     end
 
-    defp merge_action_types(_, type, _) when type not in [:create, :update, :destroy],
+    defp merge_action_types(_, type, _) when type not in [:create, :update],
       do: raise("Invalid action_type \"#{type}\"!")
 
     defp merge_action_types(entities, type, dsl) do
