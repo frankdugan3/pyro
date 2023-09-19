@@ -27,7 +27,6 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    ```elixir
    config :pyro, :overrides, [Pyro.Overrides.Default]
-   config :pyro, :css_file, Path.join(File.cwd!(), "assets/css/pyro.css")
    ```
 
 3. Update your `tailwind.config.js`, and add the noted lines:
@@ -54,14 +53,14 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    }
    ```
 
-4. Add `pyro` CSS imports to `assets/css/app.css`:
+4. Add the chosen theme's CSS to `assets/css/app.css`:
 
    ```css
    @import 'tailwindcss/base';
    @import 'tailwindcss/components';
    @import 'tailwindcss/utilities';
 
-   @import './pyro.css';
+   @import '../deps/pyro/priv/static/css/Default.css';
    ```
 
 5. Add the following lines to `assets/js/app.js`:
@@ -75,18 +74,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    })
    ```
 
-6. Update `mix.exs`, adding the `:pyro` compiler to the list of compilers:
-
-   ```elixir
-   def project do
-     [
-       # ...
-       compilers: Mix.compilers() ++ [:pyro]
-     ]
-   end
-   ```
-
-7. Edit your `my_app_web.ex` file, replacing:
+6. Edit your `my_app_web.ex` file, replacing:
 
    - `Phoenix.Component` with `Pyro.Component`
    - `Phoenix.LiveComponent` with `Pyro.LiveComponent`
@@ -94,13 +82,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    **Note:** _Only_ replace those top-level modules, _do not_ replace submodules, e.g. `Phoenix.LiveView.Router`.
 
-8. (Optional) Add the generated files to your `.gitignore` if you don't want them tracked:
-
-   ```
-   /assets/css/pyro.css
-   ```
-
-9. (Optional) Import the Pyro components into your `my_app_web.ex` helpers to make the available in your views/components:
+7. (Optional) Import the Pyro components into your `my_app_web.ex` helpers to make the available in your views/components:
 
    ```elixir
    defp html_helpers do
@@ -111,5 +93,3 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
        # import MyAppWeb.CoreComponents
        # ...
    ```
-
-10. Note: `Tails` may occasionally complain about the `colors_file` being different in runtime than compile time. You simply need to run `mix deps.compile tails --force` to clear it up. If you are using the `Tails` helper functions for custom colors, you will also need to force a recompile if those change. If you are extending the default color theme, you will need to [configure the colors](https://github.com/zachdaniel/tails#colors).

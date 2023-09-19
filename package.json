@@ -2,14 +2,7 @@
   "name": "pyro",
   "description": "Supporting utilities for Pyro components.",
   "license": "MIT",
-  "module": "./priv/static/pyro.mjs",
-  "main": "./priv/static/pyro.cjs.js",
-  "unpkg": "./priv/static/pyro.min.js",
-  "jsdelivr": "./priv/static/pyro.min.js",
-  "exports": {
-    "import": "./priv/static/pyro.mjs",
-    "require": "./priv/static/pyro.cjs.js"
-  },
+  "main": "./priv/static/pyro.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/frankdugan3/pyro.git"
@@ -19,7 +12,6 @@
     "README.md",
     "LICENSE.md",
     "package.json",
-    "priv/static/*",
-    "assets/js/pyro/*"
+    "priv/static/*"
   ]
 }

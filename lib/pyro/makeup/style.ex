@@ -21,12 +21,12 @@ defmodule Pyro.Makeup.Style do
   """
 
   @doc false
-  @spec stylesheet :: binary()
-  def stylesheet do
-    %{light: light, dark: dark} = Pyro.Overrides.makeup_theme()
+  @spec stylesheet(module()) :: binary()
+  def stylesheet(override_module) do
+    light =
+      apply(override_module, :makeup_light, []).() || Makeup.Styles.HTML.DefaultStyle.style()
 
-    light = (light && light.()) || Makeup.Styles.HTML.DefaultStyle.style()
-    dark = (dark && dark.()) || Makeup.Styles.HTML.DefaultStyle.style()
+    dark = apply(override_module, :makeup_dark, []).() || Makeup.Styles.HTML.DefaultStyle.style()
 
     """
     /* ### MAKEUP STYLES ### */
