@@ -18,7 +18,6 @@
     "elixir": "html",
     "phoenix-heex": "html"
   },
-  "tailwindCSS.experimental.configFile": "./assets/tailwind.config.js",
   "elixirLS.fetchDeps": false,
   "todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "LATER"],
   "todo-tree.filtering.excludeGlobs": ["**/node_modules/*/**", "**/deps/*/**"],

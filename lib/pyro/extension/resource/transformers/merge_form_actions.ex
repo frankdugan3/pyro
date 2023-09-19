@@ -141,10 +141,10 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp maybe_override(old, new, :class),
-      do: Map.put(old, :class, Tails.classes([old.class, new.class]))
+      do: Map.put(old, :class, Pyro.CSS.classes([old.class, new.class]))
 
     defp maybe_override(old, new, :input_class),
-      do: Map.put(old, :input_class, Tails.classes([old.class, new.class]))
+      do: Map.put(old, :input_class, Pyro.CSS.classes([old.class, new.class]))
 
     defp maybe_override(%{name: name, label: nil} = old, new, :label),
       do: maybe_override(Map.put(old, :label, default_label(name)), new, :label)

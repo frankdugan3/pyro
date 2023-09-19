@@ -16,8 +16,9 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    def deps do
      [
        {:pyro, "~> 0.2.0"},
-       {:ash_phoenix, "~> 1.2"}, # <-- Optional: Ash integration
-       {:ash, "~> 2.8"}, # <-- Optional: Ash integration
+       {:tails, "~> 0.1.5"}, # <-- Optional: Smart-merge Tailwind component classes
+       {:ash, "~> 2.0"}, # <-- Optional: Ash integration
+       {:ash_phoenix, "~> 1.0"}, # <-- Optional: Ash integration
      ]
    end
    ```

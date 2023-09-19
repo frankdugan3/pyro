@@ -26,8 +26,8 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :resource, :atom, required: true, doc: "the resource of the form"
     attr :actor, :map, default: nil, doc: "the actor to be passed to actions"
     attr :autocomplete, :string, overridable: true, required: true
-    attr :actions_class, :tails_classes, overridable: true, required: true
-    attr :class, :tails_classes, overridable: true, required: true
+    attr :actions_class, :css_classes, overridable: true, required: true
+    attr :class, :css_classes, overridable: true, required: true
     slot :actions, doc: "extra form actions"
 
     attr :rest, :global,
@@ -100,8 +100,8 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :attribute, Ash.Resource.Attribute, default: nil
     attr :argument, Ash.Resource.Actions.Argument, default: nil
     attr :change, :map, default: nil
-    attr :field_group_class, :tails_classes, overridable: true, required: true
-    attr :field_group_label_class, :tails_classes, overridable: true, required: true
+    attr :field_group_class, :css_classes, overridable: true, required: true
+    attr :field_group_label_class, :css_classes, overridable: true, required: true
 
     defp render_field(
            %{

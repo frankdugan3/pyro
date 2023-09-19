@@ -59,24 +59,24 @@ defmodule Pyro.Components.Autocomplete do
     default: false,
     doc: "enable autofocus hook to reliably focus input on mount"
 
-  attr :class, :tails_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true, required: true
 
-  attr :input_class, :tails_classes,
+  attr :input_class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the input element"
 
-  attr :listbox_class, :tails_classes,
+  attr :listbox_class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the listbox element"
 
-  attr :listbox_option_class, :tails_classes,
+  attr :listbox_option_class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the listbox option element"
 
-  attr :description_class, :tails_classes,
+  attr :description_class, :css_classes,
     overridable: true,
     required: true,
     doc: "class of the field description"
