@@ -8,11 +8,10 @@
 
 # Pyro
 
-> ️⚠️ THIS LIBRARY IS HIGHLY EXPERIMENTAL!! ⚠️
->
-> 🔥 THERE WILL BE BREAKING CHANGES!! 🔥
-
 Phoenix components and tooling with (optional) declarative UI for Ash Framework.
+
+**NOTICE:** This library is under heavy development. Expect frequent breaking
+changes until the first stable v1.0 release is out.
 
 Pyro's documentation is housed on [hexdocs](https://hexdocs.pm/pyro), which includes detailed [installation instructions](https://hexdocs.pm/pyro/get-started.html) and other guides.
 
@@ -41,20 +40,7 @@ For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page
 
 ## Roadmap
 
-- [ ] Core components
-  - [x] [`back/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#back/1)
-  - [x] [`button/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#button/1)
-  - [x] [`error/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#error/1)
-  - [x] [`flash/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#flash/1)
-  - [x] [`flash_group/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#flash_group/1)
-  - [x] [`header/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#header/1)
-  - [x] [`icon/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#icon/1)
-  - [x] [`input/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#input/1)
-  - [x] [`label/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#label/1)
-  - [x] [`list/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#list/1)
-  - [x] [`simple_form/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#simple_form/1)
-  - [ ] [`table/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#table/1)
-  - [ ] [`modal/1`](https://hexdocs.pm/pyro/Pyro.Components.Core.html#modal/1)
+- [x] Core components
 - [ ] Extra components
   - [x] [`a/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#a/1)
   - [x] [`code/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#code/1)

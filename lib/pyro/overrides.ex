@@ -297,65 +297,6 @@ defmodule Pyro.Overrides do
     end
   end
 
-  @doc false
-  # Internally used for asset generation.
-  @spec global_style :: binary() | nil
-  def global_style do
-    configured_overrides()
-    |> Enum.reduce_while(nil, fn module, _ ->
-      case Code.ensure_compiled(module) do
-        {:module, _} ->
-          module.global_style()
-          |> case do
-            value when is_binary(value) -> {:halt, value}
-            nil -> {:cont, nil}
-          end
-
-        {:error, _} ->
-          {:cont, nil}
-      end
-    end)
-  end
-
-  @doc false
-  # Internally used for asset generation.
-  @spec makeup_theme :: map()
-  def makeup_theme do
-    light =
-      configured_overrides()
-      |> Enum.reduce_while(nil, fn module, _ ->
-        case Code.ensure_compiled(module) do
-          {:module, _} ->
-            module.makeup_light()
-            |> case do
-              value when is_function(value, 0) -> {:halt, value}
-              nil -> {:cont, nil}
-            end
-
-          {:error, _} ->
-            {:cont, nil}
-        end
-      end)
-
-    dark =
-      configured_overrides()
-      |> Enum.reduce_while(nil, fn module, _ ->
-        case Code.ensure_compiled(module) do
-          {:module, _} ->
-            module.makeup_dark()
-            |> case do
-              value when is_function(value, 0) -> {:halt, value}
-              nil -> {:cont, nil}
-            end
-
-          {:error, _} ->
-            {:cont, nil}
-        end
-      end)
-
-    %{light: light, dark: dark}
-  end
-
   @doc """
   Get an override value for a given component prop.
   """

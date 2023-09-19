@@ -81,12 +81,10 @@ defmodule Pyro.MixProject do
       name: :pyro,
       maintainers: ["Frank Dugan III"],
       licenses: ["MIT"],
-      files: ~w(lib .formatter.exs mix.exs README* LICENSE*
-      CHANGELOG* documentation),
       links: %{GitHub: @source_url},
       files:
-        ~w(assets/js/pyro lib priv) ++
-          ~w(CHANGELOG.md LICENSE mix.exs package.json README.md .formatter.exs)
+        ~w(lib priv documentation) ++
+          ~w(README* CHANGELOG* LICENSE* mix.exs package.json .formatter.exs)
     ]
   end
 
@@ -122,24 +120,27 @@ defmodule Pyro.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-      [
-        extra_applications: [:logger]
-      ]
-    end
+    [
+      extra_applications: [:logger]
+    ]
+  end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       # Code quality tooling
       {:credo, ">= 0.0.0", only: :dev, runtime: false},
+      {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
+      {:doctor, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, "~> 0.15",
        [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
-      {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},
       {:faker, "~> 0.17", only: [:test, :dev]},
-      {:file_system, "~> 0.2.1 or ~> 0.3"},
-      {:finch, "~> 0.14"},
       {:floki, ">= 0.30.0", only: :test},
-      {:git_ops, "~> 2.6", only: [:dev]},
+      {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
+      # Build tooling
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:git_ops, "~> 2.6", only: :dev},
+      # Core dependencies
       {:makeup_eex, "~> 0.1.1"},
       {:makeup_elixir, "~> 0.16"},
       {:makeup_html, "~> 0.1.0"},
@@ -152,6 +153,8 @@ defmodule Pyro.MixProject do
       {:ash_phoenix, "~> 1.2", optional: true},
       {:ash, "~> 2.4", optional: true},
       {:tails, "~> 0.1.5", optional: true},
+      {:timex, "~> 3.0", optional: true},
+      {:tzdata, "~> 1.1.0", optional: true}
     ]
   end
 
@@ -159,17 +162,13 @@ defmodule Pyro.MixProject do
     [
       build: [
         "spark.formatter --extensions Pyro.Resource",
-        "format",
-        "assets.build"
+        "format"
       ],
       setup: [
         "deps.get",
-        "esbuild.install --if-missing",
-        "tailwind.install --if-missing",
         "compile",
         "docs"
-      ],
-      "assets.build": ["esbuild module", "esbuild cdn", "esbuild cdn_min", "esbuild main"]
+      ]
     ]
   end
 end
