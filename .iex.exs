@@ -7,4 +7,3 @@ alias Pyro.Resource.Info, as: UI
 alias Ash.Resource.Info, as: ResourceInfo
 alias Ash.Policy.Info, as: PolicyInfo
 alias Ash.Api.Info, as: ApiInfo
-alias ComponentPreviewer.Ash.User

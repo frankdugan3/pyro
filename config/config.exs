@@ -1,6 +1,8 @@
 import Config
 
-config :pyro, :css_file, Path.join(File.cwd!(), "assets/css/pyro.css")
+config :logger, level: :warning
+
+config :ash, :use_all_identities_in_manage_relationship?, false
 
 config :spark, :formatter,
   remove_parens?: true,
@@ -23,4 +25,26 @@ config :spark, :formatter,
     ]
   ]
 
-import_config "#{config_env()}.exs"
+config :git_ops,
+  mix_project: Mix.Project.get!(),
+  changelog_file: "CHANGELOG.md",
+  repository_url: "https://github.com/frankdugan3/pyro",
+  types: [
+    # Makes an allowed commit type called `tidbit` that is not
+    # shown in the changelog
+    tidbit: [
+      hidden?: true
+    ],
+    # Makes an allowed commit type called `important` that gets
+    # a section in the changelog with the header "Important Changes"
+    important: [
+      header: "Important Changes"
+    ]
+  ],
+  # Instructs the tool to manage your mix version in your `mix.exs` file
+  # See below for more information
+  manage_mix_version?: true,
+  # Instructs the tool to manage the version in your README.md
+  # Pass in `true` to use `"README.md"` or a string to customize
+  manage_readme_version: ["README.md", "documentation/tutorials/get-started.md"],
+  version_tag_prefix: "v"
