@@ -198,9 +198,7 @@ if Code.ensure_loaded?(Ash) do
         end)
 
         # All write actions have forms
-        # TODO: Consider different checks -- do we want forms for destroy? If so, require explicit exclusions.
         write_actions
-        |> Enum.filter(&(&1.type != :destroy))
         |> Enum.each(fn %{name: name} ->
           if MapSet.member?(form_action_names, name) do
             :ok
