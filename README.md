@@ -1,5 +1,3 @@
-![Logo](https://github.com/frankdugan3/pyro/blob/main/logos/logo.png?raw=true)
-
 [![hex.pm](https://img.shields.io/hexpm/l/pyro.svg)](https://hex.pm/packages/pyro)
 [![hex.pm](https://img.shields.io/hexpm/v/pyro.svg)](https://hex.pm/packages/pyro)
 [![Documentation](https://img.shields.io/badge/documentation-gray)](https://hexdocs.pm/pyro)
@@ -88,7 +86,7 @@ If you are working on writing docs, there is a handy watcher script you can run 
 ### Welcome Contributions
 
 - Improvements to default overrides (I am not a designer!)
-- A better logo and banner
+- A logo and banner
 - [Open issues on Github](https://github.com/frankdugan3/pyro/issues)
 - Things marked with `TODO:` in the codebase itself
 - Fixes to obvious bugs/flaws

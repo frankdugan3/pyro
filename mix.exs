@@ -61,7 +61,6 @@ defmodule Pyro.MixProject do
   defp docs do
     [
       main: "about",
-      logo: "logos/logo.png",
       source_ref: "v#{@version}",
       output: "doc",
       source_url: @source_url,

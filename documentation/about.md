@@ -34,3 +34,7 @@ The tricky part is handling all the bespoke features in each app while sharing a
 - Accessible
 - Responsive
 - Built-in `i18n` via `gettext` (internationalization)
+
+> #### Logo {: .info}
+>
+> Pyro needs a good logo; if you're a designer get in touch!
