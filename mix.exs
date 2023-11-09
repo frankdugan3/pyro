@@ -152,7 +152,7 @@ defmodule Pyro.MixProject do
       {:makeup_js, "~> 0.1.0"},
       {:makeup_json, "~> 0.1.0"},
       {:makeup, "~> 1.1"},
-      {:phoenix_live_view, "~> 0.19"},
+      {:phoenix_live_view, "~> 0.20"},
       {:phoenix, "~> 1.7"},
       # These dependencies add optional features if installed
       {:ash_phoenix, "~> 1.2", optional: true},
