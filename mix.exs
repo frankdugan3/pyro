@@ -140,6 +140,12 @@ defmodule Pyro.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
       # Core dependencies
+      {:heroicons,
+       github: "tailwindlabs/heroicons",
+       tag: "v2.0.18",
+       app: false,
+       compile: false,
+       sparse: "optimized"},
       {:makeup_eex, "~> 0.1.1"},
       {:makeup_elixir, "~> 0.16"},
       {:makeup_html, "~> 0.1.0"},

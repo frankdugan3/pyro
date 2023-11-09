@@ -36,19 +36,10 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    module.exports = {
      darkMode: 'class', // <-- Dark theme support
-     content: [
-       // ...
-       '../deps/pyro/lib/pyro/**/*.*ex', // <-- Ensure Pyro components are included
-     ],
      // ...
      plugins: [
        // In addition to the normal `phx` variants, add the following:
-       plugin(({ addVariant }) =>
-         addVariant('aria-selected', '&[aria-selected]'),
-       ),
-       plugin(({ addVariant }) =>
-         addVariant('aria-checked', '&[aria-checked]'),
-       ),
+       require('../deps/pyro/pyro.tailwind.js'),
      ],
    }
    ```
