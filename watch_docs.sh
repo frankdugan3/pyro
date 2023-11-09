@@ -14,6 +14,6 @@ pids=()
 livereload --wait 2 --target ./doc/get-started.html ./doc &
 pids+=($!)
 
-inotifywait --monitor --recursive --event modify ./lib ./documentation | while read; do
+inotifywait --monitor --recursive --event modify ./lib ./documentation mix.exs | while read; do
   mix docs --formatter html
 done
