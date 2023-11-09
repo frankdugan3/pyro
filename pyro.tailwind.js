@@ -4,6 +4,8 @@ const path = require('path')
 
 module.exports = {
   plugins: [
+    // Pyro depends on forms plugin
+    require('@tailwindcss/forms'),
     plugin(function ({ config, addVariant, matchComponents }) {
       // Add Pyro content
       const userContent = config('content', [])
@@ -15,7 +17,22 @@ module.exports = {
         ],
       })
 
-      // Add variants used by Pyro
+      // Add Phoenix variants
+      addVariant('phx-no-feedback', ['.phx-no-feedback&', '.phx-no-feedback &'])
+      addVariant('phx-click-loading', [
+        '.phx-click-loading&',
+        '.phx-click-loading &',
+      ])
+      addVariant('phx-submit-loading', [
+        '.phx-submit-loading&',
+        '.phx-submit-loading &',
+      ])
+      addVariant('phx-change-loading', [
+        '.phx-change-loading&',
+        '.phx-change-loading &',
+      ])
+
+      // Add Pyro variants
       addVariant('aria-selected', '&[aria-selected]')
       addVariant('aria-checked', '&[aria-checked]')
 
@@ -28,7 +45,7 @@ module.exports = {
         ['-mini', '/20/solid'],
       ]
       icons.forEach(([suffix, dir]) => {
-        fs.readdirSync(path.join(iconsDir, dir)).map((file) => {
+        fs.readdirSync(path.join(iconsDir, dir)).forEach((file) => {
           let name = path.basename(file, '.svg') + suffix
           values[name] = { name, fullPath: path.join(iconsDir, dir, file) }
         })
@@ -44,6 +61,7 @@ module.exports = {
               [`--hero-${name}`]: `url('data:image/svg+xml;utf8,${content}')`,
               '-webkit-mask': `var(--hero-${name})`,
               mask: `var(--hero-${name})`,
+              'mask-repeat': 'no-repeat',
               'background-color': 'currentColor',
               'vertical-align': 'middle',
               display: 'inline-block',

@@ -38,7 +38,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
      darkMode: 'class', // <-- Dark theme support
      // ...
      plugins: [
-       // In addition to the normal `phx` variants, add the following:
+       // Replace all the generated Phoenix plugins with the following:
        require('../deps/pyro/pyro.tailwind.js'),
      ],
    }
