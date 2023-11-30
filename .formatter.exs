@@ -16,6 +16,7 @@ spark_locals_without_parens = [
   default_sort: 1,
   default_table_columns: 1,
   description: 1,
+  exclude: 1,
   field: 1,
   field: 2,
   field_group: 1,
