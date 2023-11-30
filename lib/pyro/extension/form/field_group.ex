@@ -17,12 +17,12 @@ if Code.ensure_loaded?(Ash) do
       name: [
         type: :atom,
         required: true,
-        doc: "The name of the field to be modified"
+        doc: "The name of the field group."
       ],
       label: [
         type: :string,
         required: false,
-        doc: "The label for this group."
+        doc: "The label of this group (defaults to capitalized name)."
       ],
       class: [
         type: :string,
@@ -32,7 +32,7 @@ if Code.ensure_loaded?(Ash) do
       path: [
         type: {:list, :atom},
         required: false,
-        doc: "Override the default path (nested paths are appended)."
+        doc: "Append to the root path (nested paths are appended)."
       ]
     ]
 

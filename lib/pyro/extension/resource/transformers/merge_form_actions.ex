@@ -3,6 +3,7 @@ if Code.ensure_loaded?(Ash) do
     @moduledoc false
     use Spark.Dsl.Transformer
     alias Spark.Dsl.Transformer
+    alias Spark.Error.DslError
     alias Pyro.Resource.Form
 
     @ash_resource_transformers Ash.Resource.Dsl.transformers()
@@ -16,207 +17,255 @@ if Code.ensure_loaded?(Ash) do
     def transform(dsl) do
       form_entities = Transformer.get_entities(dsl, [:pyro, :form])
 
-      resource = Transformer.get_persisted(dsl, :module)
+      # convert to a map for fast access later
+      actions =
+        dsl
+        |> Transformer.get_entities([:actions])
+        |> Enum.reduce(%{}, &Map.put(&2, &1.name, &1))
 
-      action_type_defaults = %{
-        create: merge_action_types(form_entities, :create, dsl),
-        update: merge_action_types(form_entities, :update, dsl)
-      }
+      excluded_form_action_names =
+        Transformer.get_option(dsl, [:pyro, :form], :exclude)
 
-      action_names =
-        Enum.reduce(form_entities, [], fn
-          %Form.Action{name: names}, acc when is_list(names) ->
-            acc ++ names
+      # determine the actions that need form definitions
+      expected_action_names =
+        actions
+        |> Map.values()
+        |> Enum.filter(&(!Enum.any?(excluded_form_action_names, &1)))
+        |> Enum.filter(&(&1.type in [:create, :update]))
+        # TODO: Perhaps detect special forms of :destroy types that take arguments?
+        |> Enum.map(& &1.name)
 
-          %Form.Action{name: name}, acc ->
-            [name | acc]
+      %{form_actions: form_actions} =
+        form_entities
+        |> Enum.reduce(
+          %{
+            form_actions: [],
+            form_types: %{},
+            to_find: expected_action_names,
+            exclusions: excluded_form_action_names,
+            actions: actions
+          },
+          fn
+            %Form.ActionType{name: names} = type, acc when is_list(names) ->
+              fields = merge_fields(type.fields)
 
-          _, acc ->
-            acc
+              Enum.reduce(names, acc, fn name, acc ->
+                merge_action_type(
+                  acc,
+                  type
+                  |> Map.put(:name, name)
+                  |> Map.put(:fields, fields)
+                )
+              end)
+
+            %Form.ActionType{} = type, acc ->
+              fields = merge_fields(type.fields)
+              merge_action_type(acc, Map.put(type, :fields, fields))
+
+            %Form.Action{name: names} = action, acc when is_list(names) ->
+              fields = merge_fields(action.fields)
+
+              Enum.reduce(names, acc, fn name, acc ->
+                merge_action(
+                  acc,
+                  action
+                  |> Map.put(:name, name)
+                  |> Map.put(:fields, fields)
+                )
+              end)
+
+            %Form.Action{} = action, acc ->
+              fields = merge_fields(action.fields)
+              merge_action(acc, Map.put(action, :fields, fields))
+
+            _, acc ->
+              acc
+          end
+        )
+        |> merge_defaults_from_types()
+
+      # truncate all Action/ActionType entities because they will be unrolled/defaulted
+      dsl =
+        Transformer.remove_entity(dsl, [:pyro, :form], fn
+          %Form.ActionType{} -> true
+          %Form.Action{} -> true
+          _ -> false
         end)
-        |> Enum.dedup()
-        |> Enum.sort()
 
       dsl =
-        Enum.reduce(form_entities, dsl, fn
-          %Form.ActionType{name: name}, dsl ->
-            Transformer.remove_entity(
-              dsl,
-              [:pyro, :form],
-              &(&1.name == name)
-            )
-
-          %Form.Action{name: name}, dsl ->
-            Transformer.remove_entity(
-              dsl,
-              [:pyro, :form],
-              &(&1.name == name)
-            )
-
-          _, dsl ->
-            dsl
-        end)
-
-      dsl =
-        Enum.reduce(action_names, dsl, fn name, dsl ->
-          action =
-            dsl
-            |> Transformer.get_entities([:actions])
-            |> Enum.find(&(&1.name == name))
-
-          if action == nil,
-            do: raise("Action \"#{name}\" not found for resource #{resource} in UI form config!")
-
-          type_defaults = Map.get(action_type_defaults, action.type)
-
-          form_action =
-            Enum.reduce(
-              form_entities,
-              %Form.Action{
-                name: name,
-                class: type_defaults.class,
-                label: default_label(name),
-                fields: type_defaults.fields
-              },
-              fn
-                %Form.Action{name: names} = action, action_acc
-                when is_list(names) ->
-                  if name in names do
-                    merge_action(action_acc, action, dsl)
-                  else
-                    action_acc
-                  end
-
-                %Form.Action{name: this_name} = action, action_acc
-                when this_name == name ->
-                  merge_action(action_acc, action, dsl)
-
-                _, action_acc ->
-                  action_acc
-              end
-            )
-
-          Transformer.add_entity(dsl, [:pyro, :form], form_action)
+        Enum.reduce(form_actions, dsl, fn form_action, dsl ->
+          Transformer.add_entity(dsl, [:pyro, :form], form_action, prepend: true)
         end)
 
       {:ok, dsl}
     end
 
-    defp merge_action(old, new, dsl) do
-      old
-      |> maybe_override(new, :label)
-      |> maybe_override(new, :class)
-      |> merge_fields(new, dsl)
-    end
-
-    defp merge_action_types(_, type, _) when type not in [:create, :update],
-      do: raise("Invalid action_type \"#{type}\"!")
-
-    defp merge_action_types(entities, type, dsl) do
-      Enum.reduce(
-        entities,
-        %Form.ActionType{name: type, fields: []},
-        fn
-          %Form.ActionType{name: names} = action_type, acc
-          when is_list(names) ->
-            if type in names do
-              acc
-              |> maybe_override(action_type, :class)
-              |> merge_fields(action_type, dsl)
-            else
-              acc
-            end
-
-          %Form.ActionType{name: name} = action_type, acc
-          when name == type ->
-            acc
-            |> maybe_override(action_type, :class)
-            |> merge_fields(action_type, dsl)
-
-          _, acc ->
-            acc
-        end
+    defp merge_action_type(_, %{name: name}) when name not in [:create, :update, :destroy] do
+      raise(
+        DslError.exception(
+          path: [:pyro, :form, :action_type],
+          message: """
+          unsupported action type: #{name}
+          """
+        )
       )
     end
 
-    defp maybe_override(old, new, :class),
-      do: Map.put(old, :class, Pyro.CSS.classes([old.class, new.class]))
-
-    defp maybe_override(old, new, :input_class),
-      do: Map.put(old, :input_class, Pyro.CSS.classes([old.class, new.class]))
-
-    defp maybe_override(%{name: name, label: nil} = old, new, :label),
-      do: maybe_override(Map.put(old, :label, default_label(name)), new, :label)
-
-    defp maybe_override(old, new, key) do
-      case Map.get(new, key) do
-        nil -> old
-        value -> Map.put(old, key, value)
-      end
+    defp merge_action_type(%{form_types: %{create: _}}, %{name: :create}) do
+      raise(
+        DslError.exception(
+          path: [:pyro, :form, :action_type],
+          message: """
+          action type :create has already been defined
+          """
+        )
+      )
     end
 
-    defp merge_fields(old, new, dsl) do
-      {field_keys, field_values} =
-        Enum.concat(old.fields || [], new.fields || [])
-        |> Enum.reduce({[], %{}}, fn
-          %Form.Field{name: name} = field, {keys, field_values} ->
-            key = {Form.Field, name}
-
-            case Map.get(field_values, key) do
-              nil -> {[key | keys], Map.put(field_values, key, merge_field(field, field))}
-              old_field -> {keys, Map.put(field_values, key, merge_field(old_field, field))}
-            end
-
-          %Form.FieldGroup{name: name} = field, {keys, field_values} ->
-            key = {Form.FieldGroup, name}
-
-            case Map.get(field_values, key) do
-              nil ->
-                {[key | keys], Map.put(field_values, key, merge_field_group(field, field, dsl))}
-
-              old_field ->
-                {keys, Map.put(field_values, key, merge_field_group(old_field, field, dsl))}
-            end
-        end)
-
-      fields =
-        field_keys
-        |> Enum.reverse()
-        |> Enum.map(fn
-          key ->
-            field = Map.get(field_values, key)
-            group_path = Map.get(old, :path) || []
-            path = Map.get(field, :path) || []
-            Map.put(field, :path, group_path ++ path)
-        end)
-
-      Map.put(old, :fields, fields)
+    defp merge_action_type(%{form_types: %{update: _}}, %{name: :update}) do
+      raise(
+        DslError.exception(
+          path: [:pyro, :form, :action_type],
+          message: """
+          action type :update has already been defined
+          """
+        )
+      )
     end
 
-    defp merge_field_group(old, new, dsl),
-      do:
-        old
-        |> maybe_override(new, :label)
-        |> maybe_override(new, :class)
-        |> maybe_override(new, :path)
-        |> merge_fields(new, dsl)
+    defp merge_action_type(%{form_types: %{destroy: _}}, %{name: :destroy}) do
+      raise(
+        DslError.exception(
+          path: [:pyro, :form, :action_type],
+          message: """
+          action type :destroy has already been defined
+          """
+        )
+      )
+    end
 
-    defp merge_field(old, new),
-      do:
-        old
-        |> maybe_override(new, :type)
-        |> maybe_override(new, :options)
-        |> maybe_override(new, :label)
-        |> maybe_override(new, :description)
-        |> maybe_override(new, :path)
-        |> maybe_override(new, :class)
-        |> maybe_override(new, :autofocus)
-        |> maybe_override(new, :input_class)
-        |> maybe_override(new, :prompt)
-        |> maybe_override(new, :autocomplete_search_action)
-        |> maybe_override(new, :autocomplete_search_arg)
-        |> maybe_override(new, :autocomplete_option_label_key)
-        |> maybe_override(new, :autocomplete_option_value_keu)
+    defp merge_action_type(%{form_types: types} = acc, %{name: name} = type) do
+      types = Map.put(types, name, type)
+      Map.put(acc, :form_types, types)
+    end
+
+    defp merge_action(acc, %{name: name} = form_action) do
+      action =
+        acc.actions
+        |> validate_action(name)
+        |> validate_action_type()
+
+      if name in acc.exclusions,
+        do:
+          raise(
+            DslError.exception(
+              path: [:pyro, :form, :action],
+              message: """
+              action #{name} is listed in `exclude`
+              """
+            )
+          )
+
+      form_action =
+        form_action
+        |> Map.put(:label, form_action.label || default_label(name))
+        |> Map.put(:description, form_action.description || Map.get(action, :description))
+
+      form_actions = [form_action | acc.form_actions]
+      to_find = Enum.filter(acc.to_find, &(&1 == name))
+
+      acc
+      |> Map.put(:form_actions, form_actions)
+      |> Map.put(:to_find, to_find)
+    end
+
+    defp validate_action(actions, name) do
+      action = Map.get(actions, name)
+
+      if action == nil,
+        do:
+          raise(
+            DslError.exception(
+              path: [:pyro, :form, :action],
+              message: """
+              action #{name} not found in resource
+              """
+            )
+          )
+
+      action
+    end
+
+    defp validate_action_type(%{name: name, type: type})
+         when type not in [:create, :update, :destroy] do
+      raise(
+        DslError.exception(
+          path: [:pyro, :form, :action],
+          message: """
+          action #{name} is an unsupported type: #{type}
+          """
+        )
+      )
+    end
+
+    defp validate_action_type(action), do: action
+
+    defp merge_defaults_from_types(%{to_find: []} = acc), do: acc
+
+    defp merge_defaults_from_types(acc) do
+      Enum.reduce(acc.to_find, acc, fn name, acc ->
+        action =
+          acc.actions
+          |> validate_action(name)
+          |> validate_action_type()
+
+        type_default = Map.get(acc.form_types, action.type)
+
+        if type_default == nil,
+          do:
+            raise(
+              DslError.exception(
+                path: [:pyro, :form],
+                message: """
+
+                Problem: Neither action #{name} nor defaults for type #{action.type} are defined.
+
+                Solutions:
+                  1. Add the action #{name} to the `exclude` list if a form is unneeded
+                  2. Define the action #{name}
+                  3. Define an action type default for type #{action.type}
+                """
+              )
+            )
+
+        merge_action(acc, %Form.Action{
+          name: name,
+          class: type_default.class,
+          fields: type_default.fields
+        })
+      end)
+    end
+
+    defp merge_fields(fields, path \\ []) do
+      Enum.map(fields, fn
+        %Form.Field{} = field ->
+          field
+          |> Map.put(:label, field.label || default_label(field))
+          |> Map.put(:path, maybe_append_path(path, field.path))
+
+        %Form.FieldGroup{name: name} = group ->
+          path = maybe_append_path(path, group.path)
+
+          group
+          |> Map.put(:label, group.label || default_label(group))
+          |> Map.put(:path, path)
+          |> Map.put(:fields, merge_fields(group.fields, path ++ [name]))
+      end)
+    end
+
+    defp maybe_append_path(root, nil), do: root
+    defp maybe_append_path(root, []), do: root
+    defp maybe_append_path(root, path), do: root ++ List.wrap(path)
 
     defp default_label(%{name: name}), do: default_label(name)
 

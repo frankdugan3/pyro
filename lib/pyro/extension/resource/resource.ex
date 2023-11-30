@@ -1,6 +1,6 @@
 if Code.ensure_loaded?(Ash) do
   defmodule Pyro.Resource do
-    @field %Spark.Dsl.Entity{
+    @form_field %Spark.Dsl.Entity{
       describe:
         "Declare non-default behavior for a specific form field in the `Pyro.Resource` extension.",
       name: :field,
@@ -9,7 +9,7 @@ if Code.ensure_loaded?(Ash) do
       args: [:name]
     }
 
-    @field_group %Spark.Dsl.Entity{
+    @form_field_group %Spark.Dsl.Entity{
       describe: "Configure the appearance of form field groups in the `Pyro.Resource` extension.",
       name: :field_group,
       schema: Pyro.Resource.Form.FieldGroup.schema(),
@@ -17,38 +17,47 @@ if Code.ensure_loaded?(Ash) do
       recursive_as: :fields,
       args: [:name],
       entities: [
-        fields: [@field]
+        fields: [@form_field]
       ]
     }
 
-    @action %Spark.Dsl.Entity{
-      describe: "",
+    @form_action %Spark.Dsl.Entity{
+      describe: "Configure the appearance forms forms for specific action(s).",
       name: :action,
       schema: Pyro.Resource.Form.Action.schema(),
       target: Pyro.Resource.Form.Action,
       args: [:name],
       entities: [
-        fields: [@field, @field_group]
+        fields: [@form_field, @form_field_group]
       ]
     }
 
-    @action_type %Spark.Dsl.Entity{
-      describe: "",
+    @form_action_type %Spark.Dsl.Entity{
+      describe:
+        "Configure default form appearance for actions of type(s). Will be ignored by actions configured explicitly.",
       name: :action_type,
       schema: Pyro.Resource.Form.ActionType.schema(),
       target: Pyro.Resource.Form.ActionType,
       args: [:name],
       entities: [
-        fields: [@field, @field_group]
+        fields: [@form_field, @form_field_group]
       ]
     }
 
     @form %Spark.Dsl.Section{
       describe: "Configure the appearance of forms in the `Pyro.Resource` extension.",
       name: :form,
+      schema: [
+        exclude: [
+          required: false,
+          type: {:list, :atom},
+          doc: "The actions to exclude from forms.",
+          default: []
+        ]
+      ],
       entities: [
-        @action,
-        @action_type
+        @form_action,
+        @form_action_type
       ]
     }
 
