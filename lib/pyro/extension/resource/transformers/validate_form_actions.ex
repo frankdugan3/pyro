@@ -123,48 +123,48 @@ if Code.ensure_loaded?(Ash) do
             end)
 
             all_fields
-            |> Enum.each(fn %{name: field_name, path: []} ->
-              matching_argument = Enum.find(action.arguments, &(&1.name == field_name))
+            |> Enum.each(fn
+              %{name: field_name, path: []} ->
+                matching_argument = Enum.find(action.arguments, &(&1.name == field_name))
 
-              cond do
-                field_name not in action.accept && !matching_argument ->
-                  raise DslError,
-                    path: [:pyro, :form, :action, action_name],
-                    message: "#{field_name} is not an accepted attribute or argument"
+                cond do
+                  field_name not in action.accept && !matching_argument ->
+                    raise DslError,
+                      path: [:pyro, :form, :action, action_name],
+                      message: "#{field_name} is not an accepted attribute or argument"
 
-                MapSet.member?(writable_attribute_names, field_name) ->
-                  :ok
+                  MapSet.member?(writable_attribute_names, field_name) ->
+                    :ok
 
-                # TODO: Validate arguments
-                !!matching_argument ->
-                  :ok
+                  # TODO: Validate arguments
+                  !!matching_argument ->
+                    :ok
 
-                # Check these after argument validation, or will get false positives on private attributes
-                MapSet.member?(private_attribute_names, field_name) ->
-                  raise DslError,
-                    path: [:pyro, :form, :action, action_name],
-                    message: "#{field_name} is a private attribute"
+                  # Check these after argument validation, or will get false positives on private attributes
+                  MapSet.member?(private_attribute_names, field_name) ->
+                    raise DslError,
+                      path: [:pyro, :form, :action, action_name],
+                      message: "#{field_name} is a private attribute"
 
-                MapSet.member?(unwritable_attribute_names, field_name) ->
-                  raise DslError,
-                    path: [:pyro, :form, :action, action_name],
-                    message: "#{field_name} is an unwritable attribute"
+                  MapSet.member?(unwritable_attribute_names, field_name) ->
+                    raise DslError,
+                      path: [:pyro, :form, :action, action_name],
+                      message: "#{field_name} is an unwritable attribute"
 
-                true ->
-                  raise DslError,
-                    path: [:pyro, :form, :action, action_name],
-                    message: "#{field_name} is not an attribute"
-              end
+                  true ->
+                    raise DslError,
+                      path: [:pyro, :form, :action, action_name],
+                      message: "#{field_name} is not an attribute"
+                end
+
+              _ ->
+                :noop
             end)
 
             :ok
         end
       )
 
-      form_action_names = MapSet.new(form_actions, & &1.name)
-
-      # Only validate if form is configured
-      # TODO: Require form to be disabled by option, use that instead of length (because we want to explicitly disable forms rather than implicitly)
       unless Enum.empty?(form_actions) do
         # No duplicate actions
         form_actions
@@ -182,6 +182,7 @@ if Code.ensure_loaded?(Ash) do
           end
         end)
 
+        # No duplicate action labels
         form_actions
         |> Enum.group_by(& &1.label)
         |> Enum.each(fn {label, groups} ->
@@ -194,18 +195,6 @@ if Code.ensure_loaded?(Ash) do
                     There are #{label_count} actions that share the label `#{label}`. This will make it impossible for an end-user to distinguish the actions for this resource.
                     """
                   )
-          end
-        end)
-
-        # All write actions have forms
-        write_actions
-        |> Enum.each(fn %{name: name} ->
-          if MapSet.member?(form_action_names, name) do
-            :ok
-          else
-            raise DslError,
-              path: [:pyro, :form, :action, name],
-              message: "form not defined for action `#{name}`"
           end
         end)
       end

@@ -14,17 +14,17 @@ if Code.ensure_loaded?(Ash) do
       label: [
         type: :string,
         required: false,
-        doc: "The label for this form."
+        doc: "The label for this form (defaults to capitalized name)."
       ],
       description: [
         type: :string,
         required: false,
-        doc: "The description for this form."
+        doc: "The description for this form (defaults to action's description)."
       ],
       class: [
         type: :string,
         required: false,
-        doc: "Merge/override the default class."
+        doc: "Merge/override the default form classes."
       ]
     ]
 

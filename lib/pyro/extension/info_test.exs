@@ -64,18 +64,16 @@ defmodule Pyro.Resource.InfoTest do
             input_class "min-h-[10rem]"
           end
         end
-
-        action [:create, :update]
       end
     end
 
-    pub_sub do
-      prefix "user"
+    # pub_sub do
+    #   prefix "user"
 
-      publish_all :create, "created"
-      publish_all :update, ["updated", [:id, nil]]
-      publish_all :destroy, ["destroyed", [:id, nil]]
-    end
+    #   publish_all :create, "created"
+    #   publish_all :update, ["updated", [:id, nil]]
+    #   publish_all :destroy, ["destroyed", [:id, nil]]
+    # end
 
     attributes do
       uuid_primary_key :id
@@ -105,7 +103,7 @@ defmodule Pyro.Resource.InfoTest do
 
     calculations do
       calculate :name_email, :ci_string do
-        expr(name <> " (" <> email <> ")")
+        calculation expr(name <> " (" <> email <> ")")
       end
     end
 

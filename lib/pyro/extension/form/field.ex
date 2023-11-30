@@ -61,7 +61,7 @@ if Code.ensure_loaded?(Ash) do
       label: [
         type: :string,
         required: false,
-        doc: "Override the default extracted label."
+        doc: "The label of the field (defaults to capitalized name)."
       ],
       description: [
         type: :string,
@@ -92,7 +92,7 @@ if Code.ensure_loaded?(Ash) do
       path: [
         type: {:list, :atom},
         required: false,
-        doc: "Override the default path (nested paths are appended)."
+        doc: "Append to the root path (nested paths are appended)."
       ],
       autocomplete_search_action: [
         type: :atom,
