@@ -91,15 +91,15 @@ defmodule Pyro.MixProject do
     [
       Core: [
         Pyro,
-        Pyro.Components,
-        Pyro.Resource,
-        Pyro.Resource.Info
+        Pyro.Components
       ],
       Overrides: [
         Pyro.Overrides,
         ~r/\.Overrides\./
       ],
-      "Resource Extension": [
+      "Ash Resource Extension": [
+        Pyro.Resource,
+        Pyro.Resource.Info,
         Pyro.Resource.Form.Action,
         Pyro.Resource.Form.ActionType,
         Pyro.Resource.Form.Field,
@@ -108,6 +108,7 @@ defmodule Pyro.MixProject do
       Components: [~r/\.Components\./],
       "Component Tooling": [
         Pyro.Component,
+        Pyro.Component.CSS,
         Pyro.LiveComponent,
         Pyro.LiveView,
         Pyro.Component.Overridable,
