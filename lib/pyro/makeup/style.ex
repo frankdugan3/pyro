@@ -24,9 +24,10 @@ defmodule Pyro.Makeup.Style do
   @spec stylesheet(module()) :: binary()
   def stylesheet(override_module) do
     light =
-      apply(override_module, :makeup_light, []).() || Makeup.Styles.HTML.DefaultStyle.style()
+      apply(override_module, :makeup_light, []).() || Makeup.Styles.HTML.StyleMap.default_style()
 
-    dark = apply(override_module, :makeup_dark, []).() || Makeup.Styles.HTML.DefaultStyle.style()
+    dark =
+      apply(override_module, :makeup_dark, []).() || Makeup.Styles.HTML.StyleMap.default_style()
 
     """
     /* ### MAKEUP STYLES ### */
