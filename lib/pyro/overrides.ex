@@ -42,11 +42,7 @@ defmodule Pyro.Overrides do
 
   @doc false
   @spec __using__(any) :: Macro.t()
-  defmacro __using__(env) do
-    global_style = env[:global_style]
-    makeup_light = env[:makeup_light]
-    makeup_dark = env[:makeup_dark]
-
+  defmacro __using__(_env) do
     quote do
       require unquote(__MODULE__)
       import unquote(__MODULE__), only: :macros
@@ -55,7 +51,6 @@ defmodule Pyro.Overrides do
       alias Pyro.Components.{
         Autocomplete,
         Core,
-        Extra,
         SmartDataTable,
         SmartForm
       }
@@ -65,9 +60,6 @@ defmodule Pyro.Overrides do
 
       Module.register_attribute(__MODULE__, :override, accumulate: true)
       @component nil
-      @global_style unquote(global_style)
-      @makeup_light unquote(makeup_light)
-      @makeup_dark unquote(makeup_dark)
       @__pass_assigns_to__ %{}
 
       @on_definition unquote(__MODULE__)
@@ -77,21 +69,6 @@ defmodule Pyro.Overrides do
       # Internally used for validation.
       @spec __pass_assigns_to__ :: map()
       def __pass_assigns_to__(), do: @__pass_assigns_to__
-
-      @doc false
-      # Internally used for asset generation.
-      @spec global_style :: binary() | nil
-      def global_style(), do: @global_style
-
-      @doc false
-      # Internally used for asset generation.
-      @spec makeup_light :: any()
-      def makeup_light(), do: @makeup_light
-
-      @doc false
-      # Internally used for asset generation.
-      @spec makeup_dark :: any()
-      def makeup_dark(), do: @makeup_dark
     end
   end
 
@@ -205,57 +182,10 @@ defmodule Pyro.Overrides do
     overrides =
       Map.new(overrides, fn {component, selector, value} -> {{component, selector}, value} end)
 
-    makeup =
-      if Module.get_attribute(env.module, :makeup_light) ||
-           Module.get_attribute(env.module, :makeup_dark) do
-        """
-        ## Makeup
-
-        """ <>
-          case Module.get_attribute(env.module, :makeup_light) do
-            style when is_function(style, 0) ->
-              module = Function.info(style)[:module]
-              name = Function.info(style)[:name]
-              "* `makeup_light`: [`#{name}/0`](`#{module}.#{name}/0`)\n"
-
-            _ ->
-              ""
-          end <>
-          case Module.get_attribute(env.module, :makeup_dark) do
-            style when is_function(style, 0) ->
-              module = Function.info(style)[:module]
-              name = Function.info(style)[:name]
-              "* `makeup_dark`: [`#{name}/0`](`#{module}.#{name}/0`)\n"
-
-            _ ->
-              ""
-          end
-      else
-        ""
-      end
-
-    global_style =
-      case Module.get_attribute(env.module, :global_style) do
-        style when is_binary(style) ->
-          """
-          ## Global Style
-
-          ```css
-          #{style}
-          ```
-          """
-
-        _ ->
-          ""
-      end
-
     override_docs = """
     - Captured functions with arity 1 and the arg named `passed_assigns` are passed component assigns at runtime, allowing complex conditional logic
     - [`assign_overridables/1`](`Pyro.Component.assign_overridables/1`) preserves the definition order of attrs and assigns them in that order, preserving dependency chains
     - Attrs with type `:css_classes` utilize the configured CSS merge utility
-
-    #{makeup}
-    #{global_style}
 
     ## Overrides
 

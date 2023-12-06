@@ -3,6 +3,336 @@ defmodule Pyro.Components.Core do
 
   import Pyro.Gettext
 
+  @doc """
+  Renders a link. This basically wraps `Phoenix.Component.link/1` with some overridable attributes, in particular `class` for consistent, DRY link default styling.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+
+  attr :navigate, :string,
+    default: nil,
+    doc: """
+    Navigates from a LiveView to a new LiveView.
+    The browser page is kept, but a new LiveView process is mounted and its content on the page
+    is reloaded. It is only possible to navigate between LiveViews declared under the same router
+    `Phoenix.LiveView.Router.live_session/3`. Otherwise, a full browser redirect is used.
+    """
+
+  attr :patch, :string,
+    default: nil,
+    doc: """
+    Patches the current LiveView.
+    The `handle_params` callback of the current LiveView will be invoked and the minimum content
+    will be sent over the wire, as any other LiveView diff.
+    """
+
+  attr :href, :any,
+    default: nil,
+    doc: """
+    Uses traditional browser navigation to the new location.
+    This means the whole page is reloaded on the browser.
+    """
+
+  attr :method, :string,
+    default: "get",
+    doc: """
+    The HTTP method to use with the link. This is intended for usage outside of LiveView
+    and therefore only works with the `href={...}` attribute. It has no effect on `patch`
+    and `navigate` instructions.
+    In case the method is not `get`, the link is generated inside the form which sets the proper
+    information. In order to submit the form, JavaScript must be enabled in the browser.
+    """
+
+  attr :csrf_token, :any,
+    default: true,
+    doc: "a boolean or custom token to use for links with an HTTP method other than `get`"
+
+  attr :replace, :boolean,
+    overridable: true,
+    required: true,
+    doc:
+      "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
+
+  attr :class, :css_classes,
+    overridable: true,
+    required: true,
+    doc: "merge/override default classes of the `code` element"
+
+  attr :rest, :global, doc: "additional HTML attributes added to the `a` tag"
+
+  slot :inner_block,
+    required: true,
+    doc: "the content rendered inside of the `a` tag"
+
+  def a(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <.link
+      class={@class}
+      navigate={@navigate}
+      patch={@patch}
+      href={@href}
+      replace={@replace}
+      method={@method}
+      csrf_token={@csrf_token}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </.link>
+    """
+  end
+
+  @doc """
+  Renders a code block.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :source, :string, required: true, doc: "the code snippet"
+  attr :id, :string, required: true
+  attr :copy, :boolean, overridable: true, required: true
+  attr :copy_label, :string, overridable: true, required: true
+  attr :copy_class, :css_classes, overridable: true, required: true
+  attr :copy_message, :string, overridable: true
+
+  attr :language, :string,
+    default: "elixir",
+    values: ~w[elixir heex html none],
+    doc: "language of the code snippet"
+
+  attr :class, :css_classes,
+    overridable: true,
+    required: true,
+    doc: "merge/override default classes of the `code` element"
+
+  def code(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <code class={@class} phx-no-format><.copy_to_clipboard :if={@copy} id={@id <> "-copy-btn"} value={@source} message={@copy_message} label={@copy_label} icon_name="hero-code-bracket" class={@copy_class} /><%= format_code(@source, @language) %></code>
+    """
+  end
+
+  if Code.ensure_loaded?(Makeup) do
+    defp format_code(source, language) do
+      case language do
+        "none" -> source
+        lexer -> Makeup.highlight_inner_html(source, lexer: lexer)
+      end
+      |> Phoenix.HTML.raw()
+    end
+  else
+    defp format_code(source, _), do: source
+  end
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :id, :string, required: true
+  attr :value, :string, required: true, doc: "text to copy"
+  attr :label, :string, default: nil, doc: "button label, defaults to value"
+  attr :disabled, :boolean, default: false
+
+  attr :icon_name, :string,
+    default: nil,
+    doc: "the name of the icon to display (nil for none); see [`icon/1`](`.icon/1`) for details"
+
+  attr :ttl, :integer,
+    overridable: true,
+    required: true,
+    doc: "how long to show the flash message after copying"
+
+  attr :case, :string,
+    overridable: true,
+    required: true,
+    values: ~w[uppercase normal-case lowercase capitalize],
+    doc: "the case of the text"
+
+  attr :color, :string, overridable: true, required: true, doc: "the color of the button"
+  attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the button"
+  attr :variant, :string, overridable: true, required: true, doc: "style of button"
+  attr :class, :css_classes, overridable: true, required: true
+
+  attr :message, :string,
+    overridable: true,
+    required: true,
+    doc: "message to display after copying"
+
+  attr :icon_class, :css_classes, overridable: true, required: true
+  attr :rest, :global
+
+  def copy_to_clipboard(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <button
+      id={@id}
+      type="button"
+      class={@class}
+      disabled={@disabled}
+      phx-hook="PyroCopyToClipboard"
+      data-value={@value}
+      data-message={@message}
+      data-ttl={@ttl}
+      title="Copy to clipboard"
+      {@rest}
+    >
+      <.icon :if={@icon_name} overrides={@overrides} name={@icon_name} class={@icon_class} />
+      <%= @label || @value %>
+    </button>
+    """
+  end
+
+  @doc """
+  Renders a navigation link, taking into account whether the URI is the current page.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :label, :string, required: true, doc: "the label of of the link"
+  attr :uri, :string, required: true, doc: "the URI of the link"
+  attr :current_uri, :string, required: true, doc: "the current URI of the page"
+
+  attr :is_current, :boolean,
+    overridable: true,
+    required: true,
+    doc: "does `:uri` match `:current_uri`?"
+
+  attr :class, :css_classes,
+    overridable: true,
+    required: true,
+    doc: "the class of the navigation link"
+
+  def nav_link(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <.link :if={!@is_current} class={@class} navigate={@uri}>
+      <%= @label %>
+    </.link>
+    <span :if={@is_current} class={@class}>
+      <%= @label %>
+    </span>
+    """
+  end
+
+  @doc """
+  A progress element. Styling the progress element is tricky, so this wraps it with some nice conveniences.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :max, :integer, default: 100
+  attr :value, :integer, default: 0
+  attr :color, :string, overridable: true, required: true, doc: "the color of the progress bar"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the progress bar"
+
+  attr :class, :css_classes,
+    overridable: true,
+    required: true,
+    doc: "the class of the progress bar"
+
+  attr :rest, :global
+
+  def progress(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <progress value={@value} max={@max} class={@class} {@rest} />
+    """
+  end
+
+  @doc """
+  A simple spinner component.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :show, :boolean, default: true, doc: "show or hide spinner"
+  attr :rest, :global
+  attr :size, :string, overridable: true, required: true, doc: "the size of the spinner"
+  attr :class, :css_classes, overridable: true, required: true
+
+  def spinner(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <svg {@rest} class={@class} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+      <path
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+    """
+  end
+
+  @doc """
+  A tooltip component.
+
+  - JS hook that "nudges" tooltip into view
+  - Simple props for tooltip text and custom icon
+  - Optional slots for icon and/or tooltip content
+
+  ## Examples
+
+      <.tooltip id="tooltip-1" tooltip="A default tooltip!" />
+      <.tooltip id="tooltip-2"
+                icon_name="hero-light-bulb-solid"
+                tooltip="Custom icon." />
+      <.tooltip id="tooltip-3">
+        <:icon>?</:icon>
+        <div class="bg-red-500 text-white p-4 w-48 shadow-lg rounded">
+          Custom tooltip slot and custom icon slot.
+        </div>
+      </.tooltip>
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :id, :string, required: true
+  attr :tooltip, :string, default: nil
+  attr :vertical_offset, :string, overridable: true, required: true
+  attr :horizontal_offset, :string, overridable: true, required: true
+  attr :tooltip_class, :css_classes, overridable: true, required: true
+  attr :tooltip_text_class, :css_classes, overridable: true, required: true
+  attr :icon_class, :css_classes, overridable: true
+
+  attr :icon_name, :string,
+    overridable: true,
+    required: true,
+    doc: "the name of the icon; see [`icon/1`](`.icon/1`) for details"
+
+  attr :class, :css_classes, overridable: true, required: true
+
+  slot :icon
+  slot :inner_block
+
+  def tooltip(assigns) do
+    assigns = assign_overridables(assigns)
+
+    assigns[:tooltip] || assigns[:inner_block] ||
+      raise ArgumentError, "missing :tooltip assign or :inner_block slot"
+
+    ~H"""
+    <span id={@id} class={@class}>
+      <%= if assigns[:icon] !== [] do %>
+        <%= render_slot(@icon) %>
+      <% else %>
+        <.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
+      <% end %>
+      <span
+        id={@id <> "-tooltip"}
+        class={@tooltip_class}
+        data-vertical-offset={@vertical_offset}
+        data-horizontal-offset={@horizontal_offset}
+        phx-hook="PyroNudgeIntoView"
+      >
+        <%= if assigns[:inner_block] !== [] do %>
+          <%= render_slot(@inner_block) %>
+        <% else %>
+          <span class={@tooltip_text_class} phx-no-format><%= @tooltip %></span>
+        <% end %>
+      </span>
+    </span>
+    """
+  end
+
   @moduledoc """
   Drop-in (prop/API compatible) replacement (and enhancement) of `core_components.ex` as generated by `Phoenix`, providing core UI components.
 
@@ -68,6 +398,7 @@ defmodule Pyro.Components.Core do
       id={@id}
       phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
       phx-remove={apply(@hide_js, [%JS{}, @id])}
+      data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class={@class}
     >
       <div id={"#{@id}-bg"} class="fixed inset-0 bg-zinc-50/90 transition-opacity" aria-hidden="true" />
@@ -83,20 +414,19 @@ defmodule Pyro.Components.Core do
           <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
             <.focus_wrap
               id={"#{@id}-container"}
-              phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
-              phx-window-keydown={apply(@hide_js, [@on_cancel, @id])}
+              phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
-              phx-click-away={apply(@hide_js, [@on_cancel, @id])}
-              class="hidden relative rounded-2xl bg-white p-14 shadow-lg shadow-zinc-700/10 ring-1 ring-zinc-700/10 transition"
+              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
+              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
             >
               <div class="absolute top-6 right-5">
                 <button
-                  phx-click={apply(@hide_js, [@on_cancel, @id])}
+                  phx-click={JS.exec("data-cancel", to: "##{@id}")}
                   type="button"
                   class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
                   aria-label={gettext("close")}
                 >
-                  <.icon name="hero-x-mark-solid" class="h-5 w-5 stroke-current" />
+                  <.icon name="hero-x-mark-solid" class="h-5 w-5" />
                 </button>
               </div>
               <div id={"#{@id}-content"}>
@@ -206,7 +536,7 @@ defmodule Pyro.Components.Core do
       {@rest}
     >
       <section :if={@ttl > 0 || @close} class={@control_class}>
-        <Pyro.Components.Extra.progress
+        <.progress
           :if={@ttl > 0}
           overrides={@overrides}
           value={@ttl}
@@ -376,8 +706,7 @@ defmodule Pyro.Components.Core do
 
   attr :icon_name, :string,
     default: nil,
-    doc:
-      "the name of the icon to display (nil for none); see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+    doc: "the name of the icon to display (nil for none); see `icon/1` for details"
 
   attr :loading, :boolean, default: false, doc: "display a loading spinner"
   attr :method, :string, default: "get"
@@ -426,7 +755,7 @@ defmodule Pyro.Components.Core do
       class={@class}
       {@rest}
     >
-      <Pyro.Components.Extra.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
       <.icon
         :if={!@loading && @icon_name}
         overrides={@overrides}
@@ -452,7 +781,7 @@ defmodule Pyro.Components.Core do
       class={@class}
       {@rest}
     >
-      <Pyro.Components.Extra.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
       <.icon
         :if={!@loading && @icon_name}
         overrides={@overrides}
@@ -478,7 +807,7 @@ defmodule Pyro.Components.Core do
       class={@class}
       {@rest}
     >
-      <Pyro.Components.Extra.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
       <.icon
         :if={!@loading && @icon_name}
         overrides={@overrides}
@@ -504,7 +833,7 @@ defmodule Pyro.Components.Core do
       class={@class}
       {@rest}
     >
-      <Pyro.Components.Extra.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
       <.icon
         :if={!@loading && @icon_name}
         overrides={@overrides}
@@ -599,8 +928,10 @@ defmodule Pyro.Components.Core do
     required: true,
     doc: "class of the field description"
 
-  attr :rest, :global, include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
+  attr :rest, :global,
+    include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                                    pattern placeholder readonly required rows size step)
+
   slot :inner_block
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
@@ -761,7 +1092,7 @@ defmodule Pyro.Components.Core do
   attr :icon_name, :string,
     overridable: true,
     required: true,
-    doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+    doc: "the name of the icon; see `icon/1` for details"
 
   attr :icon_class, :css_classes, overridable: true
   attr :class, :css_classes, overridable: true, required: true
@@ -941,7 +1272,7 @@ defmodule Pyro.Components.Core do
   attr :icon_name, :string,
     overridable: true,
     required: true,
-    doc: "the name of the icon; see [`icon/1`](`Pyro.Components.Core.icon/1`) for details"
+    doc: "the name of the icon; see `icon/1` for details"
 
   attr :class, :css_classes, overridable: true, required: true
   attr :icon_class, :css_classes, overridable: true, required: true
@@ -959,32 +1290,6 @@ defmodule Pyro.Components.Core do
     </.link>
     """
   end
-
-  @icons_dir Path.join(File.cwd!(), "deps/heroicons/optimized")
-
-  @outline [@icons_dir, "24/outline"]
-           |> Path.join()
-           |> File.ls!()
-           |> Enum.map(fn name ->
-             "hero-#{Path.basename(name, ".svg")}"
-           end)
-
-  @solid [@icons_dir, "24/solid"]
-         |> Path.join()
-         |> File.ls!()
-         |> Enum.map(fn name ->
-           "hero-#{Path.basename(name, ".svg")}-solid"
-         end)
-
-  @mini [@icons_dir, "20/solid"]
-        |> Path.join()
-        |> File.ls!()
-        |> Enum.map(fn name ->
-          "hero-#{Path.basename(name, ".svg")}-mini"
-        end)
-
-  @icon_name_options Enum.zip([@outline, @solid, @mini])
-                     |> Enum.flat_map(fn {o, s, m} -> [o, s, m] end)
 
   @doc """
   Renders an icon.
@@ -1006,7 +1311,6 @@ defmodule Pyro.Components.Core do
 
   attr :name, :string,
     required: true,
-    values: @icon_name_options,
     doc: "the icon name"
 
   attr :rest, :global,

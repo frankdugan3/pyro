@@ -19,9 +19,17 @@ Pyro's documentation is housed on [hexdocs](https://hexdocs.pm/pyro), which incl
 def deps do
   [
     {:pyro, "~> 0.2.0"},
-    {:tails, "~> 0.1.5"}, # Optional: Smart-merge Tailwind component classes
     {:ash_phoenix, "~> 1.2"}, # Optional: Ash integration
-    {:ash, "~> 2.8"}, # Optional: Ash integration
+    {:ash, "~> 2.4"}, # Optional: Ash integration
+    {:makeup_eex, "~> 0.1.1"}, # Optional: Code highlighting components
+    {:makeup_elixir, "~> 0.16"}, # Optional: Code highlighting components
+    {:makeup_html, "~> 0.1.0"}, # Optional: Code highlighting components
+    {:makeup_js, "~> 0.1.0"}, # Optional: Code highlighting components
+    {:makeup_json, "~> 0.1.0"}, # Optional: Code highlighting components
+    {:makeup, "~> 1.1"}, # Optional: Code highlighting components
+    {:tails, "~> 0.1.5"}, # Optional: Smart-merge Tailwind classes
+    {:timex, "~> 3.0"}, # Optional: Date/Time/Zone components & tooling
+    {:tzdata, "~> 1.1.0"}, # Optional: Date/Time/Zone components & tooling
   ]
 end
 ```
@@ -29,8 +37,8 @@ end
 ## What is Pyro?
 
 1. [Component tooling](https://hexdocs.pm/pyro/Pyro.Component.html) for Phoenix LiveView
-2. A library of pre-built components that are [api-compatible replacements](https://hexdocs.pm/pyro/Pyro.Components.Core.html) of `core_components.ex` plus [additional components](https://hexdocs.pm/pyro/Pyro.Components.Extra.html) to cover most common UI requirements
-3. An [Ash extension](https://hexdocs.pm/pyro/Pyro.Components.Extra.html) providing a declarative UI DSL
+2. A library of [pre-built components](https://hexdocs.pm/pyro/Pyro.Components.Core.html) to cover most common UI requirements
+3. An [Ash extension](https://hexdocs.pm/pyro/Pyro.Resource.html) providing a declarative UI DSL
 4. A library of (optional) "smart components" that leverage 1-3 to automatically render [forms](https://hexdocs.pm/pyro/Pyro.Components.SmartForm.html)/[data tables](https://hexdocs.pm/pyro/Pyro.Components.SmartDataTable.html)/etc. for Ash resources
 5. A set of [default](https://hexdocs.pm/pyro/Pyro.Overrides.Default.html), [customizable](https://hexdocs.pm/pyro/Pyro.Overrides.html) themes for all the above
 
@@ -38,31 +46,17 @@ For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page
 
 ## Roadmap
 
-- [x] Core components
-- [ ] Extra components
-  - [x] [`a/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#a/1)
-  - [x] [`code/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#code/1)
-  - [x] [`copy_to_clipboard/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#copy_to_clipboard/1)
-  - [x] [`nav_link/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#nav_link/1)
-  - [x] [`progress/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#progress/1)
-  - [x] [`spinner/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#spinner/1)
-  - [x] [`tooltip/1`](https://hexdocs.pm/pyro/Pyro.Components.Extra.html#tooltip/1)
+- [ ] Function Components
   - [ ] Navbar/NavItem [#5](https://github.com/frankdugan3/pyro/issues/5)
   - [ ] SlideOver [#4](https://github.com/frankdugan3/pyro/issues/4)
   - [ ] Tabs [#13](https://github.com/frankdugan3/pyro/issues/13)
   - [ ] Breadcrumbs [#11](https://github.com/frankdugan3/pyro/issues/11)
   - [ ] Dark/Light theme selector [#3](https://github.com/frankdugan3/pyro/issues/3)
-- [ ] Live Components
-  - [x] [`Pyro.Components.Autocomplete`](https://hexdocs.pm/pyro/Pyro.Components.Autocomplete.html)
 - [ ] Smart Components
-  - [x] [`Pyro.Components.SmartForm`](https://hexdocs.pm/pyro/Pyro.Components.SmartForm.html)
   - [ ] `Pyro.Components.SmartDataTable` [#16](https://github.com/frankdugan3/pyro/issues/16)
   - [ ] `Pyro.Components.SmartCardGrid` [#10](https://github.com/frankdugan3/pyro/issues/10)
   - [ ] Extensible AshAuthentication support [#15](https://github.com/frankdugan3/pyro/issues/15)
 - [ ] DX
-  - [ ] Simplified setup [#2](https://github.com/frankdugan3/pyro/issues/2)
-    - [ ] Create a Tailwind plugin
-    - [ ] Figure out a better way to avoid needing to include `:reloadable_compilers` and `mix.exs` compilers config
   - [ ] Strong test suite
   - [ ] More override presets
   - [ ] Code patching tools [#1](https://github.com/frankdugan3/pyro/issues/1)

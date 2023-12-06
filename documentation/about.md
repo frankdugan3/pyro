@@ -18,6 +18,8 @@ The tricky part is handling all the bespoke features in each app while sharing a
 
 ## General Principles
 
+There are some under-developed components that don't adhere to all these principles, but eventually these principles should prevail.
+
 - Maximal flexibility
   - Application defaults through presets & custom overrides
   - Bespoke configuration (via DSL in resources)

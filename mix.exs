@@ -22,7 +22,7 @@ defmodule Pyro.MixProject do
       source_url: @source_url,
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
-      compilers: Mix.compilers() ++ [:pyro],
+      compilers: Mix.compilers(),
       dialyzer: [plt_add_apps: [:ash, :ash_phoenix, :spark, :ecto, :mix]]
     ]
   end
@@ -112,8 +112,7 @@ defmodule Pyro.MixProject do
         Pyro.LiveComponent,
         Pyro.LiveView,
         Pyro.Component.Overridable,
-        Pyro.Component.Helpers,
-        Pyro.Makeup.Style
+        Pyro.Component.Helpers
       ]
     ]
   end
@@ -141,23 +140,17 @@ defmodule Pyro.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
       # Core dependencies
-      {:heroicons,
-       github: "tailwindlabs/heroicons",
-       tag: "v2.0.18",
-       app: false,
-       compile: false,
-       sparse: "optimized"},
-      {:makeup_eex, "~> 0.1.1"},
-      {:makeup_elixir, "~> 0.16"},
-      {:makeup_html, "~> 0.1.0"},
-      {:makeup_js, "~> 0.1.0"},
-      {:makeup_json, "~> 0.1.0"},
-      {:makeup, "~> 1.1"},
       {:phoenix_live_view, "~> 0.20"},
       {:phoenix, "~> 1.7"},
       # These dependencies add optional features if installed
       {:ash_phoenix, "~> 1.2", optional: true},
       {:ash, "~> 2.4", optional: true},
+      {:makeup_eex, "~> 0.1.1", optional: true},
+      {:makeup_elixir, "~> 0.16", optional: true},
+      {:makeup_html, "~> 0.1.0", optional: true},
+      {:makeup_js, "~> 0.1.0", optional: true},
+      {:makeup_json, "~> 0.1.0", optional: true},
+      {:makeup, "~> 1.1", optional: true},
       {:tails, "~> 0.1.5", optional: true},
       {:timex, "~> 3.0", optional: true},
       {:tzdata, "~> 1.1.0", optional: true}

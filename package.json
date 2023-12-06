@@ -2,7 +2,10 @@
   "name": "pyro",
   "description": "Supporting utilities for Pyro components.",
   "license": "MIT",
-  "main": "./priv/static/pyro.js",
+  "exports": {
+    ".": "./priv/static/pyro.js",
+    "./tailwind-plugin": "./priv/static/tailwind-plugin.js"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/frankdugan3/pyro.git"
