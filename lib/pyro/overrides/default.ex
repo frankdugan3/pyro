@@ -229,6 +229,7 @@ defmodule Pyro.Overrides.Default do
     set :class, "pyro-input"
     set :input_class, &__MODULE__.input_class/1
     set :input_check_label_class, "pyro-input__input_check_label"
+    set :input_datetime_zoned_wrapper_class, "pyro-input__input_datetime_zoned_wrapper"
     set :description_class, "pyro-input__description"
     set :clear_on_escape, true
   end

@@ -29,6 +29,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :actions_class, :css_classes, overridable: true, required: true
     attr :class, :css_classes, overridable: true, required: true
     slot :actions, doc: "extra form actions"
+    attr :tz, :string, default: "Etc/UTC", doc: "timezone"
 
     attr :rest, :global,
       include: ~w(name rel action enctype method novalidate target),
@@ -68,6 +69,7 @@ if Code.ensure_loaded?(AshPhoenix) do
 
         <%= for field <- @pyro_form.fields do %>
           <.render_field
+            tz={@tz}
             overrides={@overrides}
             actor={@actor}
             resource={@resource}
@@ -110,6 +112,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :change, :map, default: nil
     attr :field_group_class, :css_classes, overridable: true, required: true
     attr :field_group_label_class, :css_classes, overridable: true, required: true
+    attr :tz, :string, required: true, doc: "timezone"
 
     defp render_field(
            %{
@@ -163,10 +166,33 @@ if Code.ensure_loaded?(AshPhoenix) do
             actor={@actor}
             field={child_field}
             form={@form}
+            tz={@tz}
           />
         <% end %>
       </fieldset>
       """
+    end
+
+    if Code.ensure_loaded?(Timex) && Code.ensure_loaded?(Tzdata) do
+      defp render_field(
+             %{field: %Pyro.Resource.Form.Field{type: :default}, attribute: %{type: type}} =
+               assigns
+           )
+           when type == Pyro.Ash.Type.ZonedDateTime do
+        ~H"""
+        <.input
+          overrides={@overrides}
+          field={@form[@field.name]}
+          type="datetime-zoned"
+          class={@field.class}
+          input_class={@field.input_class}
+          label={@field.label}
+          autofocus={@field.autofocus}
+          description={@field.description || @attribute.description}
+          tz={@tz}
+        />
+        """
+      end
     end
 
     defp render_field(%{field: %Pyro.Resource.Form.Field{type: :select}} = assigns) do
@@ -344,10 +370,9 @@ if Code.ensure_loaded?(AshPhoenix) do
             @change.relationship.destination
             |> Ash.Query.for_read(
               @field.autocomplete_search_action,
-              Map.new([{@field.autocomplete_search_arg, search}]),
-              actor: @actor
+              Map.new([{@field.autocomplete_search_arg, search}])
             )
-            |> @change.relationship.api.read!()
+            |> @change.relationship.api.read!(actor: @actor)
           end
         }
         lookup_fn={
@@ -355,13 +380,10 @@ if Code.ensure_loaded?(AshPhoenix) do
 
           fn value ->
             @change.relationship.destination
-            |> Ash.Query.for_read(
-              lookup_action,
-              actor: @actor
-            )
+            |> Ash.Query.for_read(lookup_action)
             |> Ash.Query.filter([{@field.autocomplete_option_value_key, value}])
             |> Ash.Query.load([@field.autocomplete_option_label_key])
-            |> @change.relationship.api.read_one!()
+            |> @change.relationship.api.read_one!(actor: @actor)
           end
         }
       />
