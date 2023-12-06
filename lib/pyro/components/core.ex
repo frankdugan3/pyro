@@ -133,7 +133,7 @@ defmodule Pyro.Components.Core do
 
   attr :icon_name, :string,
     default: nil,
-    doc: "the name of the icon to display (nil for none); see [`icon/1`](`.icon/1`) for details"
+    doc: "the name of the icon to display (nil for none); see `icon/1` for details"
 
   attr :ttl, :integer,
     overridable: true,
@@ -296,7 +296,7 @@ defmodule Pyro.Components.Core do
   attr :icon_name, :string,
     overridable: true,
     required: true,
-    doc: "the name of the icon; see [`icon/1`](`.icon/1`) for details"
+    doc: "the name of the icon; see `icon/1` for details"
 
   attr :class, :css_classes, overridable: true, required: true
 
