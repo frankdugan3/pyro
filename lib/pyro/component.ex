@@ -354,7 +354,11 @@ defmodule Pyro.Component do
       first_attr = List.first(attrs)
 
       # Automatically mark the doc type as a component
-      Module.put_attribute(env.module, :doc, {first_attr.line - 1, type: :component})
+      Module.put_attribute(
+        env.module,
+        :doc,
+        {Module.get_attribute(env.module, :__components__)[name].line - 1, type: :component}
+      )
 
       unless Enum.empty?(overrides) do
         case first_attr do
