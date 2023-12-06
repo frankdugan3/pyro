@@ -41,8 +41,16 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     def smart_form(%{pyro_form: :unassigned, for: %{action: action}} = assigns) do
+      pyro_form = UI.form_for(assigns[:resource], action)
+
+      if pyro_form == nil,
+        do:
+          raise("""
+          Resource #{assigns[:resource]} does not have a pyro form defined for the action #{action}!
+          """)
+
       assigns
-      |> assign(:pyro_form, UI.form_for(assigns[:resource], action))
+      |> assign(:pyro_form, pyro_form)
       |> smart_form()
     end
 
