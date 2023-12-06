@@ -94,7 +94,7 @@ defmodule Pyro.Components.Autocomplete do
       phx-target={@myself}
     >
       <input type="hidden" id={@input_id || @name} name={@name} value={@value} />
-      <.label for={@id} overrides={@overrides}><%= @label %></.label>
+      <.label for={@id <> "-search"} overrides={@overrides}><%= @label %></.label>
       <input
         id={@id <> "-search"}
         type="text"

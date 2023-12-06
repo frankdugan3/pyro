@@ -15,10 +15,18 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    ```elixir
    def deps do
      [
-       {:pyro, "~> 0.2.0"},
-       {:tails, "~> 0.1.5"}, # <-- Optional: Smart-merge Tailwind component classes
-       {:ash, "~> 2.0"}, # <-- Optional: Ash integration
-       {:ash_phoenix, "~> 1.0"}, # <-- Optional: Ash integration
+    {:pyro, "~> 0.2.0"},
+    {:ash_phoenix, "~> 1.2"}, # Optional: Ash integration
+    {:ash, "~> 2.4"}, # Optional: Ash integration
+    {:makeup_eex, "~> 0.1.1"}, # Optional: Code highlighting components
+    {:makeup_elixir, "~> 0.16"}, # Optional: Code highlighting components
+    {:makeup_html, "~> 0.1.0"}, # Optional: Code highlighting components
+    {:makeup_js, "~> 0.1.0"}, # Optional: Code highlighting components
+    {:makeup_json, "~> 0.1.0"}, # Optional: Code highlighting components
+    {:makeup, "~> 1.1"}, # Optional: Code highlighting components
+    {:tails, "~> 0.1.5"}, # Optional: Smart-merge Tailwind classes
+    {:timex, "~> 3.0"}, # Optional: Date/Time/Zone components & tooling
+    {:tzdata, "~> 1.1.0"}, # Optional: Date/Time/Zone components & tooling
      ]
    end
    ```
@@ -38,23 +46,13 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
      darkMode: 'class', // <-- Dark theme support
      // ...
      plugins: [
-       // Replace all the generated Phoenix plugins with the following:
-       require('../deps/pyro/pyro.tailwind.js'),
+       require('../deps/pyro/priv/static/pyro.tailwind.js'), // <-- Add Pyro's plugin
+       // ... Leave Phoenix's generated stuff, Pyro expects it!
      ],
    }
    ```
 
-4. Add the chosen theme's CSS to `assets/css/app.css`:
-
-   ```css
-   @import 'tailwindcss/base';
-   @import 'tailwindcss/components';
-   @import 'tailwindcss/utilities';
-
-   @import '../deps/pyro/priv/static/css/Default.css';
-   ```
-
-5. Add the following lines to `assets/js/app.js`:
+4. Add the following lines to `assets/js/app.js`:
 
    ```js
    import { hooks, getTimezone } from 'pyro'
@@ -65,7 +63,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    })
    ```
 
-6. Edit your `my_app_web.ex` file, replacing:
+5. Edit your `my_app_web.ex` file, replacing:
 
    - `Phoenix.Component` with `Pyro.Component`
    - `Phoenix.LiveComponent` with `Pyro.LiveComponent`
@@ -73,7 +71,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    **Note:** _Only_ replace those top-level modules, _do not_ replace submodules, e.g. `Phoenix.LiveView.Router`.
 
-7. (Optional) Import the Pyro components into your `my_app_web.ex` helpers to make the available in your views/components:
+6. (Optional) Import the Pyro components into your `my_app_web.ex` helpers to make the available in your views/components:
 
    ```elixir
    defp html_helpers do
@@ -84,3 +82,5 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
        # import MyAppWeb.CoreComponents
        # ...
    ```
+
+   At this point, you probably want to delete the old `core_components.ex` file, since Pyro will replace that functionality (mostly API-compatible).
