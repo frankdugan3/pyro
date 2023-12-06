@@ -24,182 +24,239 @@ if Code.ensure_loaded?(Ash) do
       unwritable_attribute_names = MapSet.new(unwritable_attributes, & &1.name)
 
       form_actions = Transformer.get_entities(dsl_state, [:pyro, :form])
+      actions = Transformer.get_entities(dsl_state, [:actions])
 
-      write_actions =
-        Transformer.get_entities(dsl_state, [:actions]) |> Enum.filter(&(&1.type != :read))
+      errors =
+        Enum.reduce(
+          form_actions,
+          [],
+          fn
+            %Form.Action{name: action_name, fields: fields}, errors ->
+              all = flatten_fields(fields)
 
-      Enum.each(
-        form_actions,
-        fn
-          %Form.Action{name: action_name, fields: fields} ->
-            all = flatten_fields(fields)
+              # No duplicate path-names
+              errors =
+                Enum.group_by(all, fn %{path: path, name: name} ->
+                  path
+                  |> Kernel.++([name])
+                  |> Enum.join(".")
+                end)
+                |> Enum.reduce(errors, fn {name, groups}, errors ->
+                  name_count = Enum.count(groups)
 
-            # No duplicate path-names
-            Enum.group_by(all, fn %{path: path, name: name} ->
-              path
-              |> Kernel.++([name])
-              |> Enum.join(".")
-            end)
-            |> Enum.each(fn {name, groups} ->
-              name_count = Enum.count(groups)
-
-              unless name_count == 1 do
-                raise DslError.exception(
+                  if name_count == 1 do
+                    errors
+                  else
+                    [
+                      DslError.exception(
                         path: [:pyro, :form, :action, action_name, name],
-                        message: """
-                        There are #{name_count} field/field_groups that share the path/name `#{name}`. A given path/name should only be defined once per action. Ensure you are not duplicating fields and that you are not using field_group names that match a field name.
-                        """
+                        message:
+                          "#{name_count} field/field_groups duplicate the path/name #{name}"
                       )
-              end
-            end)
+                      | errors
+                    ]
+                  end
+                end)
 
-            # No duplicate path/labels
-            Enum.group_by(all, fn %{path: path, label: label} ->
-              path
-              |> Kernel.++([label])
-              |> Enum.join(".")
-            end)
-            |> Enum.each(fn {label, groups} ->
-              label_count = Enum.count(groups)
+              errors =
+                Enum.group_by(all, fn %{path: path, label: label} ->
+                  path
+                  |> Kernel.++([label])
+                  |> Enum.join(".")
+                end)
+                |> Enum.reduce(errors, fn {label, groups}, errors ->
+                  label_count = Enum.count(groups)
 
-              unless label_count == 1 do
-                raise DslError.exception(
+                  if label_count == 1 do
+                    errors
+                  else
+                    [
+                      DslError.exception(
                         path: [:pyro, :form, :action, action_name, label],
-                        message: """
-                        There are #{label_count} field/field_groups that share the path/label `#{label}`. This will make it impossible for an end-user to distinguish the field/groups for this action. A given path/label should only be defined once per action. Ensure you are not duplicating fields and that you are not using field_group labels that match a field label.
-                        """
+                        message:
+                          "#{label_count} field/field_groups duplicate the path/label #{label}"
                       )
-              end
-            end)
+                      | errors
+                    ]
+                  end
+                end)
 
-            action = Enum.find(write_actions, &(&1.name == action_name))
-
-            # Action exists
-            unless action do
-              raise DslError.exception(
+              case Enum.find(actions, &(&1.name == action_name)) do
+                nil ->
+                  [
+                    DslError.exception(
                       path: [:pyro, :form, :action, action_name],
-                      message: """
-                      The `pyro` form is referring to action `#{action_name}`, but it does not exist on this resource.
-                      """
+                      message: "action #{action_name} does not exist on this resource"
                     )
-            end
+                    | errors
+                  ]
 
-            all_fields = Enum.filter(all, &(&1.__struct__ == Form.Field))
+                %{type: type} when type not in [:create, :update, :delete] ->
+                  [
+                    DslError.exception(
+                      path: [:pyro, :form, :action, action_name],
+                      message: "action #{action_name} is an unsupported type: #{type}"
+                    )
+                    | errors
+                  ]
 
-            # Autofocus properly specified
-            case Enum.count(all_fields, &(&1.autofocus == true)) do
-              0 ->
-                raise DslError.exception(
-                        path: [:pyro, :form, :action, action_name],
-                        message: """
-                        There are no fields that have `autofocus true`. The form won't know what field to focus on mount.
-                        """
-                      )
+                action ->
+                  all_fields = Enum.filter(all, &(&1.__struct__ == Form.Field))
 
-              1 ->
-                :ok
+                  errors =
+                    case Enum.count(all_fields, &(&1.autofocus == true)) do
+                      0 ->
+                        [
+                          DslError.exception(
+                            path: [:pyro, :form, :action, action_name],
+                            message: "exactly one field must have autofocus"
+                          )
+                          | errors
+                        ]
 
-              count ->
-                raise DslError.exception(
-                        path: [:pyro, :form, :action, action_name],
-                        message: """
-                        There are #{count} fields that have `autofocus true`. Only one field can be auto-focused.
-                        """
-                      )
-            end
+                      1 ->
+                        errors
 
-            # All writable accepted attributes are in form.
-            action.accept
-            |> Enum.filter(&(&1 in writable_attribute_names))
-            |> Enum.each(fn name ->
-              unless Enum.find(all_fields, &(&1.path == [] && &1.name == name)) do
-                raise DslError.exception(
-                        path: [:pyro, :form, :action, action_name],
-                        message: """
-                        The action `#{action_name}` has the attribute `#{name}` accepted and writable, but no matching field entry exists in the form definition.
-                        """
-                      )
+                      count ->
+                        [
+                          DslError.exception(
+                            path: [:pyro, :form, :action, action_name],
+                            message:
+                              "#{count} autofocus fields; exactly one field must have autofocus"
+                          )
+                          | errors
+                        ]
+                    end
+
+                  errors =
+                    action.accept
+                    |> Enum.filter(&(&1 in writable_attribute_names))
+                    |> Enum.reduce(errors, fn name, errors ->
+                      if Enum.find(all_fields, &(&1.path == [] && &1.name == name)) do
+                        errors
+                      else
+                        dbg(all_fields)
+                        dbg(name)
+
+                        [
+                          DslError.exception(
+                            path: [:pyro, :form, :action, action_name],
+                            message: "action #{action_name}: attribute #{name} not in form fields"
+                          )
+                          | errors
+                        ]
+                      end
+                    end)
+
+                  Enum.reduce(all_fields, errors, fn
+                    %{name: field_name, path: []}, errors ->
+                      matching_argument =
+                        Enum.find(action.arguments, &(&1.name == field_name))
+
+                      cond do
+                        field_name not in action.accept && !matching_argument ->
+                          [
+                            DslError.exception(
+                              path: [:pyro, :form, :action, action_name],
+                              message:
+                                "action #{action_name}: #{field_name} is not an accepted attribute or argument"
+                            )
+                            | errors
+                          ]
+
+                        MapSet.member?(writable_attribute_names, field_name) ->
+                          errors
+
+                        # TODO: Validate arguments
+                        !!matching_argument ->
+                          errors
+
+                        # Check these after argument validation, or will get false positives on private attributes
+                        MapSet.member?(private_attribute_names, field_name) ->
+                          [
+                            DslError.exception(
+                              path: [:pyro, :form, :action, action_name],
+                              message:
+                                "action #{action_name}: #{field_name} is a private attribute"
+                            )
+                            | errors
+                          ]
+
+                        MapSet.member?(unwritable_attribute_names, field_name) ->
+                          [
+                            DslError.exception(
+                              path: [:pyro, :form, :action, action_name],
+                              message:
+                                "action #{action_name}: #{field_name} is an unwritable attribute"
+                            )
+                            | errors
+                          ]
+
+                        true ->
+                          [
+                            DslError.exception(
+                              path: [:pyro, :form, :action, action_name],
+                              message: "action #{action_name}: #{field_name} is not an attribute"
+                            )
+                            | errors
+                          ]
+                      end
+
+                    _, errors ->
+                      errors
+                  end)
               end
-            end)
+          end
+        )
 
-            all_fields
-            |> Enum.each(fn
-              %{name: field_name, path: []} ->
-                matching_argument = Enum.find(action.arguments, &(&1.name == field_name))
+      errors =
+        if Enum.empty?(form_actions) do
+          errors
+        else
+          form_actions
+          |> Enum.group_by(& &1.label)
+          |> Enum.reduce(errors, fn {label, groups}, acc ->
+            label_count = Enum.count(groups)
 
-                cond do
-                  field_name not in action.accept && !matching_argument ->
-                    raise DslError,
-                      path: [:pyro, :form, :action, action_name],
-                      message: "#{field_name} is not an accepted attribute or argument"
-
-                  MapSet.member?(writable_attribute_names, field_name) ->
-                    :ok
-
-                  # TODO: Validate arguments
-                  !!matching_argument ->
-                    :ok
-
-                  # Check these after argument validation, or will get false positives on private attributes
-                  MapSet.member?(private_attribute_names, field_name) ->
-                    raise DslError,
-                      path: [:pyro, :form, :action, action_name],
-                      message: "#{field_name} is a private attribute"
-
-                  MapSet.member?(unwritable_attribute_names, field_name) ->
-                    raise DslError,
-                      path: [:pyro, :form, :action, action_name],
-                      message: "#{field_name} is an unwritable attribute"
-
-                  true ->
-                    raise DslError,
-                      path: [:pyro, :form, :action, action_name],
-                      message: "#{field_name} is not an attribute"
-                end
-
-              _ ->
-                :noop
-            end)
-
-            :ok
+            if label_count == 1 do
+              acc
+            else
+              [
+                DslError.exception(
+                  path: [:pyro, :form, :action],
+                  message: "#{label_count} actions share the label #{label}"
+                )
+                | errors
+              ]
+            end
+          end)
         end
-      )
 
-      unless Enum.empty?(form_actions) do
-        # No duplicate actions
-        form_actions
-        |> Enum.group_by(& &1.name)
-        |> Enum.each(fn {name, groups} ->
-          name_count = Enum.count(groups)
+      case errors do
+        [] ->
+          :ok
 
-          unless name_count == 1 do
-            raise DslError.exception(
-                    path: [:pyro, :form, :action],
-                    message: """
-                    There are #{name_count} actions that share the name `#{name}`. This is likely a `pyro` extension bug since action config should be merged.
-                    """
-                  )
-          end
-        end)
+        [error] ->
+          raise(error)
 
-        # No duplicate action labels
-        form_actions
-        |> Enum.group_by(& &1.label)
-        |> Enum.each(fn {label, groups} ->
-          label_count = Enum.count(groups)
+        errors ->
+          list =
+            errors
+            |> Enum.reverse()
+            |> Enum.map(&("   - " <> &1.message))
+            |> Enum.dedup()
+            |> Enum.join("\n")
 
-          unless label_count == 1 do
-            raise DslError.exception(
-                    path: [:pyro, :form, :action],
-                    message: """
-                    There are #{label_count} actions that share the label `#{label}`. This will make it impossible for an end-user to distinguish the actions for this resource.
-                    """
-                  )
-          end
-        end)
+          raise(
+            DslError.exception(
+              path: [:pyro, :form],
+              message: """
+              There are multiple errors with the form:
+              #{list}
+              """
+            )
+          )
       end
-
-      :ok
     end
 
     defp flatten_fields(fields),

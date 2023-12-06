@@ -30,12 +30,14 @@ if Code.ensure_loaded?(Ash) do
       expected_action_names =
         actions
         |> Map.values()
-        |> Enum.filter(&(!Enum.any?(excluded_form_action_names, &1)))
+        |> Enum.filter(fn action ->
+          !Enum.any?(excluded_form_action_names, &(&1 == action.name))
+        end)
         |> Enum.filter(&(&1.type in [:create, :update]))
         # TODO: Perhaps detect special forms of :destroy types that take arguments?
         |> Enum.map(& &1.name)
 
-      %{form_actions: form_actions} =
+      %{form_actions: form_actions, errors: errors} =
         form_entities
         |> Enum.reduce(
           %{
@@ -43,7 +45,8 @@ if Code.ensure_loaded?(Ash) do
             form_types: %{},
             to_find: expected_action_names,
             exclusions: excluded_form_action_names,
-            actions: actions
+            actions: actions,
+            errors: []
           },
           fn
             %Form.ActionType{name: names} = type, acc when is_list(names) ->
@@ -84,6 +87,30 @@ if Code.ensure_loaded?(Ash) do
         )
         |> merge_defaults_from_types()
 
+      case errors do
+        [] ->
+          :noop
+
+        [error] ->
+          raise(error)
+
+        errors ->
+          list =
+            errors
+            |> Enum.reverse()
+            |> Enum.map_join("\n", &("   - " <> &1.message))
+
+          raise(
+            DslError.exception(
+              path: [:pyro, :form],
+              message: """
+              There are multiple errors with the form:
+              #{list}
+              """
+            )
+          )
+      end
+
       # truncate all Action/ActionType entities because they will be unrolled/defaulted
       dsl =
         Transformer.remove_entity(dsl, [:pyro, :form], fn
@@ -100,48 +127,61 @@ if Code.ensure_loaded?(Ash) do
       {:ok, dsl}
     end
 
-    defp merge_action_type(_, %{name: name}) when name not in [:create, :update, :destroy] do
-      raise(
+    defp merge_action_type(%{errors: errors} = acc, %{name: name})
+         when name not in [:create, :update, :destroy] do
+      errors = [
         DslError.exception(
           path: [:pyro, :form, :action_type],
           message: """
           unsupported action type: #{name}
           """
         )
-      )
+        | errors
+      ]
+
+      Map.put(acc, :errors, errors)
     end
 
-    defp merge_action_type(%{form_types: %{create: _}}, %{name: :create}) do
-      raise(
+    defp merge_action_type(%{form_types: %{create: _}, errors: errors} = acc, %{name: :create}) do
+      errors = [
         DslError.exception(
           path: [:pyro, :form, :action_type],
           message: """
           action type :create has already been defined
           """
         )
-      )
+        | errors
+      ]
+
+      Map.put(acc, :errors, errors)
     end
 
-    defp merge_action_type(%{form_types: %{update: _}}, %{name: :update}) do
-      raise(
+    defp merge_action_type(%{form_types: %{update: _}, errors: errors} = acc, %{name: :update}) do
+      errors = [
         DslError.exception(
           path: [:pyro, :form, :action_type],
           message: """
           action type :update has already been defined
           """
         )
-      )
+        | errors
+      ]
+
+      Map.put(acc, :errors, errors)
     end
 
-    defp merge_action_type(%{form_types: %{destroy: _}}, %{name: :destroy}) do
-      raise(
+    defp merge_action_type(%{form_types: %{destroy: _}, errors: errors} = acc, %{name: :destroy}) do
+      errors = [
         DslError.exception(
           path: [:pyro, :form, :action_type],
           message: """
           action type :destroy has already been defined
           """
         )
-      )
+        | errors
+      ]
+
+      Map.put(acc, :errors, errors)
     end
 
     defp merge_action_type(%{form_types: types} = acc, %{name: name} = type) do
@@ -149,100 +189,100 @@ if Code.ensure_loaded?(Ash) do
       Map.put(acc, :form_types, types)
     end
 
-    defp merge_action(acc, %{name: name} = form_action) do
-      action =
-        acc.actions
-        |> validate_action(name)
-        |> validate_action_type()
+    defp merge_action(%{errors: errors} = acc, %{name: name} = form_action) do
+      case validate_action_and_type(acc.actions, name) do
+        {:error, error} ->
+          errors = [error | errors]
+          Map.put(acc, :errors, errors)
 
-      if name in acc.exclusions,
-        do:
-          raise(
-            DslError.exception(
-              path: [:pyro, :form, :action],
-              message: """
-              action #{name} is listed in `exclude`
-              """
-            )
-          )
+        {:ok, action} ->
+          if name in acc.exclusions do
+            errors = [
+              DslError.exception(
+                path: [:pyro, :form, :action],
+                message: """
+                action #{name} is listed in `exclude`
+                """
+              )
+              | errors
+            ]
 
-      form_action =
-        form_action
-        |> Map.put(:label, form_action.label || default_label(name))
-        |> Map.put(:description, form_action.description || Map.get(action, :description))
+            Map.put(acc, :errors, errors)
+          else
+            form_action =
+              form_action
+              |> Map.put(:label, form_action.label || default_label(name))
+              |> Map.put(:description, form_action.description || Map.get(action, :description))
 
-      form_actions = [form_action | acc.form_actions]
-      to_find = Enum.filter(acc.to_find, &(&1 == name))
+            form_actions = [form_action | acc.form_actions]
+            to_find = Enum.filter(acc.to_find, &(&1 == name))
 
-      acc
-      |> Map.put(:form_actions, form_actions)
-      |> Map.put(:to_find, to_find)
+            acc
+            |> Map.put(:form_actions, form_actions)
+            |> Map.put(:to_find, to_find)
+          end
+      end
     end
 
-    defp validate_action(actions, name) do
+    defp validate_action_and_type(actions, name) do
       action = Map.get(actions, name)
 
-      if action == nil,
-        do:
-          raise(
-            DslError.exception(
-              path: [:pyro, :form, :action],
-              message: """
-              action #{name} not found in resource
-              """
-            )
-          )
+      case action do
+        nil ->
+          {:error,
+           DslError.exception(
+             path: [:pyro, :form, :action],
+             message: """
+             action #{name} not found in resource
+             """
+           )}
 
-      action
+        %{type: type} when type not in [:create, :update, :destroy] ->
+          {:error,
+           DslError.exception(
+             path: [:pyro, :form, :action],
+             message: """
+             action #{name} is an unsupported type: #{type}
+             """
+           )}
+
+        action ->
+          {:ok, action}
+      end
     end
-
-    defp validate_action_type(%{name: name, type: type})
-         when type not in [:create, :update, :destroy] do
-      raise(
-        DslError.exception(
-          path: [:pyro, :form, :action],
-          message: """
-          action #{name} is an unsupported type: #{type}
-          """
-        )
-      )
-    end
-
-    defp validate_action_type(action), do: action
 
     defp merge_defaults_from_types(%{to_find: []} = acc), do: acc
 
     defp merge_defaults_from_types(acc) do
       Enum.reduce(acc.to_find, acc, fn name, acc ->
-        action =
-          acc.actions
-          |> validate_action(name)
-          |> validate_action_type()
+        case validate_action_and_type(acc.actions, name) do
+          {:error, error} ->
+            errors = [error | acc.errors]
+            Map.put(acc, :errors, errors)
 
-        type_default = Map.get(acc.form_types, action.type)
+          {:ok, action} ->
+            type_default = Map.get(acc.form_types, action.type)
 
-        if type_default == nil,
-          do:
-            raise(
-              DslError.exception(
-                path: [:pyro, :form],
-                message: """
+            if type_default == nil do
+              errors = [
+                DslError.exception(
+                  path: [:pyro, :form],
+                  message: """
+                  form for action #{name} is not defined, has no type defaults, and is not excluded
+                  """
+                )
+                | acc.errors
+              ]
 
-                Problem: Neither action #{name} nor defaults for type #{action.type} are defined.
-
-                Solutions:
-                  1. Add the action #{name} to the `exclude` list if a form is unneeded
-                  2. Define the action #{name}
-                  3. Define an action type default for type #{action.type}
-                """
-              )
-            )
-
-        merge_action(acc, %Form.Action{
-          name: name,
-          class: type_default.class,
-          fields: type_default.fields
-        })
+              Map.put(acc, :errors, errors)
+            else
+              merge_action(acc, %Form.Action{
+                name: name,
+                class: type_default.class,
+                fields: type_default.fields
+              })
+            end
+        end
       end)
     end
 
@@ -253,13 +293,13 @@ if Code.ensure_loaded?(Ash) do
           |> Map.put(:label, field.label || default_label(field))
           |> Map.put(:path, maybe_append_path(path, field.path))
 
-        %Form.FieldGroup{name: name} = group ->
+        %Form.FieldGroup{} = group ->
           path = maybe_append_path(path, group.path)
 
           group
           |> Map.put(:label, group.label || default_label(group))
           |> Map.put(:path, path)
-          |> Map.put(:fields, merge_fields(group.fields, path ++ [name]))
+          |> Map.put(:fields, merge_fields(group.fields, path))
       end)
     end
 
