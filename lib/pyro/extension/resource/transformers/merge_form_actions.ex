@@ -31,9 +31,9 @@ if Code.ensure_loaded?(Ash) do
         actions
         |> Map.values()
         |> Enum.filter(fn action ->
-          !Enum.any?(excluded_form_action_names, &(&1 == action.name))
+          action.name not in excluded_form_action_names &&
+            action.type in [:create, :update]
         end)
-        |> Enum.filter(&(&1.type in [:create, :update]))
         # TODO: Perhaps detect special forms of :destroy types that take arguments?
         |> Enum.map(& &1.name)
 

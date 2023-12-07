@@ -189,7 +189,7 @@ defmodule Pyro.Overrides do
 
     ## Overrides
 
-    #{overrides |> Enum.group_by(fn {{component, _}, _} -> component end) |> Enum.map(fn {{module, component}, overrides} ->
+    #{overrides |> Enum.group_by(fn {{component, _}, _} -> component end) |> Enum.map_join("\n", fn {{module, component}, overrides} ->
       label = case module.__info__(:functions) |> Enum.find(&(&1 == {component, 1})) do
         nil -> "#{module}.#{component}/1 (private)"
         _ -> "`#{module}.#{component}/1`"
@@ -205,7 +205,7 @@ defmodule Pyro.Overrides do
         "  - `:#{selector}` `#{value}`"
       end)}
       """
-    end) |> Enum.join("\n")}
+    end)}
     """
 
     quote do
