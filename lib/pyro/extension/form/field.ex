@@ -118,6 +118,7 @@ if Code.ensure_loaded?(Ash) do
       ]
     ]
 
+    @doc false
     def schema, do: @schema
   end
 end

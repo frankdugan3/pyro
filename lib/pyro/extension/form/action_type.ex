@@ -3,6 +3,7 @@ if Code.ensure_loaded?(Ash) do
     @moduledoc """
     A group of form for action(s) in the `Pyro.Resource` extension.
     """
+    @type t :: %__MODULE__{}
     defstruct [:name, :class, :fields]
 
     @action_types {:one_of, [:create, :update]}
@@ -20,6 +21,7 @@ if Code.ensure_loaded?(Ash) do
       ]
     ]
 
+    @doc false
     def schema, do: @schema
   end
 end
