@@ -1392,15 +1392,6 @@ defmodule Pyro.Components.Core do
       ]
     end
 
-    defp format_time(nil), do: nil
-    defp format_time(""), do: ""
-    defp format_time(value) when is_binary(value), do: value
-
-    defp format_time(time) do
-      time
-      |> Timex.Format.DateTime.Formatters.Default.format!("{ISOdate}T{h24}:{m}:{s}")
-    end
-
     defp assign_date_time_timezone_value(assigns) do
       tz = assigns[:tz]
 
@@ -1422,7 +1413,16 @@ defmodule Pyro.Components.Core do
               :date_time_value,
               value
               |> Timex.Timezone.convert(tz)
-              |> format_time
+              |> case do
+                {:error, _} ->
+                  ""
+
+                time ->
+                  Timex.Format.DateTime.Formatters.Default.format!(
+                    time,
+                    "{ISOdate}T{h24}:{m}:{s}"
+                  )
+              end
             )
             |> assign(:timezone_value, tz)
           else

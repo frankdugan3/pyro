@@ -12,9 +12,11 @@ if Code.ensure_loaded?(Ash) do
         iex> form_for(Pyro.Resource.InfoTest.User, :create) |> Map.get(:fields) |> Enum.map(& &1.name)
         [:primary, :authorization, :friendships, :notes]
     """
-    @spec form_for(Ash.Resource.t(), atom()) :: [
-            Pyro.Resource.Form.Field.t() | Pyro.Resource.Form.FieldGroup.t()
-          ]
+    @spec form_for(Ash.Resource.t(), atom()) ::
+            [
+              Pyro.Resource.Form.Field.t() | Pyro.Resource.Form.FieldGroup.t()
+            ]
+            | nil
     def form_for(resource, action_name) do
       resource
       |> Spark.Dsl.Extension.get_entities([:pyro, :form])

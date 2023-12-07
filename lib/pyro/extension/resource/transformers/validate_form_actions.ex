@@ -135,9 +135,6 @@ if Code.ensure_loaded?(Ash) do
                       if Enum.find(all_fields, &(&1.path == [] && &1.name == name)) do
                         errors
                       else
-                        dbg(all_fields)
-                        dbg(name)
-
                         [
                           DslError.exception(
                             path: [:pyro, :form, :action, action_name],

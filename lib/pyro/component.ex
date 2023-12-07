@@ -360,7 +360,9 @@ defmodule Pyro.Component do
         {Module.get_attribute(env.module, :__components__)[name].line - 1, type: :component}
       )
 
-      unless Enum.empty?(overrides) do
+      if Enum.empty?(overrides) do
+        :ok
+      else
         case first_attr do
           %{name: :overrides, type: :list, opts: [default: nil, doc: _]} ->
             :ok
@@ -399,8 +401,6 @@ defmodule Pyro.Component do
           :__overridable_components__,
           Map.put(components, name, %{kind: kind, overridable_attrs: overrides})
         )
-      else
-        :ok
       end
 
       :ok
@@ -446,10 +446,10 @@ defmodule Pyro.Component do
 
         The components in this module support the following overridable attributes:
 
-        #{overridable_components |> Enum.map(fn {component, %{overridable_attrs: attrs}} -> """
+        #{overridable_components |> Enum.map_join("\n", fn {component, %{overridable_attrs: attrs}} -> """
           - `#{component}/1`
           #{Enum.map_join(attrs, "\n", fn %{name: name, type: type, required: required} -> "  - `#{inspect(name)}` `#{inspect(type)}`" <> if required, do: " (required)", else: "" end)}
-          """ end) |> Enum.join("\n")}
+          """ end)}
         """
       else
         ""
