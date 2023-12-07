@@ -145,11 +145,6 @@ defmodule Pyro.MixProject do
       # These dependencies add optional features if installed
       {:ash_phoenix, "~> 1.2", optional: true},
       {:ash, "~> 2.4", optional: true},
-      {:makeup_eex, "~> 0.1.1", optional: true},
-      {:makeup_elixir, "~> 0.16", optional: true},
-      {:makeup_html, "~> 0.1.0", optional: true},
-      {:makeup_js, "~> 0.1.0", optional: true},
-      {:makeup_json, "~> 0.1.0", optional: true},
       {:makeup, "~> 1.1", optional: true},
       {:tails, "~> 0.1.5", optional: true},
       {:timex, "~> 3.0", optional: true},
