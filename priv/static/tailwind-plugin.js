@@ -378,10 +378,10 @@ module.exports = plugin(function ({
         '@apply mt-2 flex items-center justify-between gap-6': {},
       },
       '&__render_field__group': {
-        '@apply grid col-span-full text-center gap-2 p-2 border border-solid rounded-lg border-slate-300 dark:border-slate-700':
+        '@apply grid col-span-full gap-2 p-2 border border-solid rounded-lg border-slate-300 dark:border-slate-700':
           {},
         '&_label': {
-          '@apply font-black col-span-full': {},
+          '@apply font-black text-center col-span-full': {},
         },
       },
     },
