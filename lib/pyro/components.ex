@@ -18,8 +18,10 @@ defmodule Pyro.Components do
   defmacro __using__(_) do
     quote do
       import Pyro.Components.Core
+      import Pyro.Components.DataTable
+      import Pyro.Components.SmartPage
+      import Pyro.Components.SmartDataTable
       import Pyro.Components.SmartForm
-      alias Pyro.Components.SmartDataTable
       alias Pyro.Components.Autocomplete
     end
   end

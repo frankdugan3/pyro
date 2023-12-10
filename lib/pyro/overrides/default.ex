@@ -424,6 +424,32 @@ defmodule Pyro.Overrides.Default do
   end
 
   ##############################################################################
+  ####    D A T A    T A B L E    C O M P O N E N T
+  ##############################################################################
+
+  override Pyro.Components.DataTable, :data_table do
+    set :class, "pyro-data_table"
+    # grid overflow-auto content-start relative gap-px px-2 pb-16
+  end
+
+  # override Pyro.Components.DataTable, :sort do
+  #   set :class, nil
+
+  # border-b border-slate-50/25 border-solid hover:bg-slate-500/25 backdrop-blur z-10 sticky top-0 px-2 py-1 text-center font-black
+  # border-b border-slate-50/25 border-solid backdrop-blur z-10 sticky top-0 px-2 py-1 text-center font-black
+  # end
+
+  # override Pyro.Components.DataTable, :cell do
+  #   set :class, nil
+  # "px-2 py-0 whitespace-nowrap",
+  #     [
+  #       "group-odd:bg-slate-50 dark:group-odd:bg-slate-950 group-even:bg-slate-100 dark:group-even:bg-slate-900 group-hover:bg-slate-300 dark:group-hover:bg-slate-700":
+  #         !@highlighted
+  #     ],
+  #     ["text-black group-odd:bg-yellow-500 group-even:bg-yellow-600": @highlighted],
+  # end
+
+  ##############################################################################
   ####    L I V E    C O M P O N E N T S
   ##############################################################################
 
@@ -466,12 +492,19 @@ defmodule Pyro.Overrides.Default do
     ["pyro-smart_form__render_field__group", get_nested(passed_assigns, [:field, :class])]
   end
 
-  # override SmartDataTable, :render do
-  #   set :class, "grid"
-  #   set :pyro_table, &__MODULE__.smart_data_table_pyro_table/1
-  # end
+  override SmartDataTable, :smart_data_table do
+    set :class, &__MODULE__.smart_data_table_class/1
+  end
 
-  # def smart_data_table_pyro_table(passed_assigns) do
-  #   UI.table_for(passed_assigns[:resource])
-  # end
+  def smart_data_table_class(passed_assigns) do
+    ["pyro-smart_data_table", get_nested(passed_assigns, [:pyro_data_table, :class])]
+  end
+
+  override SmartPage, :smart_page do
+    set :class, &__MODULE__.smart_page_class/1
+  end
+
+  def smart_page_class(passed_assigns) do
+    ["pyro-smart_page", get_nested(passed_assigns, [:pyro_page, :class])]
+  end
 end
