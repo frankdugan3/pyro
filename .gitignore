@@ -28,9 +28,6 @@ pyro-*.tar
 /.elixir_ls/
 
 # Generated files
-/assets/tailwind.pyro.colors.json
-/assets/css/pyro.css
-/priv/static/assets
 *.env
 
 # EXAMPLE PROJECT
