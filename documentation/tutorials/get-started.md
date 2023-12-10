@@ -4,11 +4,11 @@ This guide steps through the installation process for `Pyro`.
 
 ## Installation
 
-The installation process is currently pretty involved, and may be omitting some required steps. This will [improve over time](https://github.com/frankdugan3/pyro/issues/2), pinky-promise!
+The installation process is pretty straightforward, and many of the steps can be customized depending on how you want to use `Pyro`.
 
 ### Steps
 
-These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as generated from the `v1.7.2+` `phx.new`.
+These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as generated from the `v1.7.10+` `phx.new`.
 
 1. Add `:pyro` to your dependencies:
 
@@ -16,6 +16,12 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    def deps do
      [
     {:pyro, "~> 0.2.0"},
+    {:heroicons,
+      github: "tailwindlabs/heroicons",
+      tag: "v2.0.18",
+      app: false,
+      compile: false,
+      sparse: "optimized"}, # Heroicon support in components
     {:ash_phoenix, "~> 1.2"}, # Optional: Ash integration
     {:ash, "~> 2.4"}, # Optional: Ash integration
     {:makeup_eex, "~> 0.1.1"}, # Optional: Code highlighting components
@@ -37,17 +43,29 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    config :pyro, :overrides, [Pyro.Overrides.Default]
    ```
 
-3. Update your `tailwind.config.js`, and add the noted lines:
+3. Update your `tailwind.config.js`, this is a working example configuration:
 
    ```js
-   let plugin = require('tailwindcss/plugin')
+   const path = require('path')
 
    module.exports = {
      darkMode: 'class', // <-- Dark theme support
-     // ...
+     content: [
+       './js/**/*.js',
+       '../lib/my_app_web.ex',
+       '../lib/my_app_web/**/*.*ex',
+       '../deps/pyro/lib/pyro/**/*.*ex', // <-- Add Pyro's component and overrides files
+     ],
      plugins: [
-       require('../deps/pyro/priv/static/pyro.tailwind.js'), // <-- Add Pyro's plugin
-       // ... Leave Phoenix's generated stuff, Pyro expects it!
+       require('@tailwindcss/forms'), // <-- Pyro expects this
+       // Add Pyro's Tailwind plugin
+       require(path.join(
+         __dirname,
+         '../deps/pyro/assets/js/tailwind-plugin.js',
+       ))({
+         heroIconsPath: path.join(__dirname, '../deps/heroicons/optimized'),
+       }),
+       // ... Pyro replaces Phoenix's generated plugin stuff, you can delete it!
      ],
    }
    ```
@@ -84,3 +102,14 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    ```
 
    At this point, you probably want to delete the old `core_components.ex` file, since Pyro will replace that functionality (mostly API-compatible).
+
+7. (Optional) If you are using Ash, you'll want to add `:pyro` to your `.formatter.exs`:
+
+   ```elixir
+   [
+     import_deps: [:ash, :ash_postgres, :ecto, :ecto_sql, :phoenix, :pyro],
+     subdirectories: ["priv/*/migrations"],
+     plugins: [Spark.Formatter, Phoenix.LiveView.HTMLFormatter],
+     inputs: ["*.{heex,ex,exs}", "{config,lib,test}/**/*.{heex,ex,exs}", "priv/*/seeds.exs"]
+   ]
+   ```

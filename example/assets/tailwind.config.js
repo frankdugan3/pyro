@@ -20,7 +20,7 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/forms'),
-    require(path.join(__dirname, '../../priv/static/tailwind-plugin.js'))({
+    require(path.join(__dirname, '../../assets/js/tailwind-plugin.js'))({
       heroIconsPath: path.join(__dirname, '../deps/heroicons/optimized'),
       addBase: true,
     }),

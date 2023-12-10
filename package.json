@@ -3,8 +3,8 @@
   "description": "Supporting utilities for Pyro components.",
   "license": "MIT",
   "exports": {
-    ".": "./priv/static/pyro.js",
-    "./tailwind-plugin": "./priv/static/tailwind-plugin.js"
+    ".": "./assets/js/pyro.js",
+    "./tailwind-plugin": "./assets/js/tailwind-plugin.js"
   },
   "repository": {
     "type": "git",
@@ -15,6 +15,6 @@
     "README.md",
     "LICENSE.md",
     "package.json",
-    "priv/static/*"
+    "assets/*"
   ]
 }
