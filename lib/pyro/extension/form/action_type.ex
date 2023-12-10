@@ -1,7 +1,7 @@
 if Code.ensure_loaded?(Ash) do
   defmodule Pyro.Resource.Form.ActionType do
     @moduledoc """
-    A group of form for action(s) in the `Pyro.Resource` extension.
+    A form for action(s) of a given type in the `Pyro.Resource` extension.
     """
     @type t :: %__MODULE__{}
     defstruct [:name, :class, :fields]

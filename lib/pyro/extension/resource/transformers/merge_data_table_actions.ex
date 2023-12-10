@@ -1,10 +1,10 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.Transformers.MergeFormActions do
+  defmodule Pyro.Resource.Transformers.MergeDataTableActions do
     @moduledoc false
     use Spark.Dsl.Transformer
     alias Spark.Dsl.Transformer
     alias Spark.Error.DslError
-    alias Pyro.Resource.Form
+    alias Pyro.Resource.DataTable
 
     @ash_resource_transformers Ash.Resource.Dsl.transformers()
 
@@ -15,74 +15,73 @@ if Code.ensure_loaded?(Ash) do
 
     @impl true
     def transform(dsl) do
-      case Transformer.get_entities(dsl, [:pyro, :form]) do
+      case Transformer.get_entities(dsl, [:pyro, :data_table]) do
         [] ->
           {:ok, dsl}
 
-        form_entities ->
+        data_table_entities ->
           # convert to a map for fast access later
           actions =
             dsl
             |> Transformer.get_entities([:actions])
             |> Enum.reduce(%{}, &Map.put(&2, &1.name, &1))
 
-          excluded_form_action_names =
-            Transformer.get_option(dsl, [:pyro, :form], :exclude, [])
+          excluded_data_table_action_names =
+            Transformer.get_option(dsl, [:pyro, :data_table], :exclude, [])
 
-          # determine the actions that need form definitions
+          # determine the actions that need data table definitions
           expected_action_names =
             actions
             |> Map.values()
             |> Enum.filter(fn action ->
-              action.name not in excluded_form_action_names &&
-                action.type in [:create, :update]
+              action.name not in excluded_data_table_action_names &&
+                action.type in [:read]
             end)
-            # TODO: Perhaps detect special forms of :destroy types that take arguments?
             |> Enum.map(& &1.name)
 
-          %{form_actions: form_actions, errors: errors} =
-            form_entities
+          %{data_table_actions: data_table_actions, errors: errors} =
+            data_table_entities
             |> Enum.reduce(
               %{
-                form_actions: [],
-                form_types: %{},
+                data_table_actions: [],
+                data_table_types: %{},
                 to_find: expected_action_names,
-                exclusions: excluded_form_action_names,
+                exclusions: excluded_data_table_action_names,
                 actions: actions,
                 errors: []
               },
               fn
-                %Form.ActionType{name: names} = type, acc when is_list(names) ->
-                  fields = merge_fields(type.fields)
+                %DataTable.ActionType{name: names} = type, acc when is_list(names) ->
+                  columns = merge_columns(type.columns)
 
                   Enum.reduce(names, acc, fn name, acc ->
                     merge_action_type(
                       acc,
                       type
                       |> Map.put(:name, name)
-                      |> Map.put(:fields, fields)
+                      |> Map.put(:columns, columns)
                     )
                   end)
 
-                %Form.ActionType{} = type, acc ->
-                  fields = merge_fields(type.fields)
-                  merge_action_type(acc, Map.put(type, :fields, fields))
+                %DataTable.ActionType{} = type, acc ->
+                  columns = merge_columns(type.columns)
+                  merge_action_type(acc, Map.put(type, :columns, columns))
 
-                %Form.Action{name: names} = action, acc when is_list(names) ->
-                  fields = merge_fields(action.fields)
+                %DataTable.Action{name: names} = action, acc when is_list(names) ->
+                  columns = merge_columns(action.columns)
 
                   Enum.reduce(names, acc, fn name, acc ->
                     merge_action(
                       acc,
                       action
                       |> Map.put(:name, name)
-                      |> Map.put(:fields, fields)
+                      |> Map.put(:columns, columns)
                     )
                   end)
 
-                %Form.Action{} = action, acc ->
-                  fields = merge_fields(action.fields)
-                  merge_action(acc, Map.put(action, :fields, fields))
+                %DataTable.Action{} = action, acc ->
+                  columns = merge_columns(action.columns)
+                  merge_action(acc, Map.put(action, :columns, columns))
 
                 _, acc ->
                   acc
@@ -105,9 +104,9 @@ if Code.ensure_loaded?(Ash) do
 
               raise(
                 DslError.exception(
-                  path: [:pyro, :form],
+                  path: [:pyro, :data_table],
                   message: """
-                  There are multiple errors with the form:
+                  There are multiple errors with the data table:
                   #{list}
                   """
                 )
@@ -116,15 +115,15 @@ if Code.ensure_loaded?(Ash) do
 
           # truncate all Action/ActionType entities because they will be unrolled/defaulted
           dsl =
-            Transformer.remove_entity(dsl, [:pyro, :form], fn
-              %Form.ActionType{} -> true
-              %Form.Action{} -> true
+            Transformer.remove_entity(dsl, [:pyro, :data_table], fn
+              %DataTable.ActionType{} -> true
+              %DataTable.Action{} -> true
               _ -> false
             end)
 
           dsl =
-            Enum.reduce(form_actions, dsl, fn form_action, dsl ->
-              Transformer.add_entity(dsl, [:pyro, :form], form_action, prepend: true)
+            Enum.reduce(data_table_actions, dsl, fn data_table_action, dsl ->
+              Transformer.add_entity(dsl, [:pyro, :data_table], data_table_action, prepend: true)
             end)
 
           {:ok, dsl}
@@ -132,10 +131,10 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp merge_action_type(%{errors: errors} = acc, %{name: name})
-         when name not in [:create, :update, :destroy] do
+         when name not in [:read] do
       errors = [
         DslError.exception(
-          path: [:pyro, :form, :action_type],
+          path: [:pyro, :data_table, :action_type],
           message: """
           unsupported action type: #{name}
           """
@@ -146,12 +145,14 @@ if Code.ensure_loaded?(Ash) do
       Map.put(acc, :errors, errors)
     end
 
-    defp merge_action_type(%{form_types: %{create: _}, errors: errors} = acc, %{name: :create}) do
+    defp merge_action_type(%{data_table_types: %{read: _}, errors: errors} = acc, %{
+           name: :read
+         }) do
       errors = [
         DslError.exception(
-          path: [:pyro, :form, :action_type],
+          path: [:pyro, :data_table, :action_type],
           message: """
-          action type :create has already been defined
+          action type :read has already been defined
           """
         )
         | errors
@@ -160,40 +161,12 @@ if Code.ensure_loaded?(Ash) do
       Map.put(acc, :errors, errors)
     end
 
-    defp merge_action_type(%{form_types: %{update: _}, errors: errors} = acc, %{name: :update}) do
-      errors = [
-        DslError.exception(
-          path: [:pyro, :form, :action_type],
-          message: """
-          action type :update has already been defined
-          """
-        )
-        | errors
-      ]
-
-      Map.put(acc, :errors, errors)
-    end
-
-    defp merge_action_type(%{form_types: %{destroy: _}, errors: errors} = acc, %{name: :destroy}) do
-      errors = [
-        DslError.exception(
-          path: [:pyro, :form, :action_type],
-          message: """
-          action type :destroy has already been defined
-          """
-        )
-        | errors
-      ]
-
-      Map.put(acc, :errors, errors)
-    end
-
-    defp merge_action_type(%{form_types: types} = acc, %{name: name} = type) do
+    defp merge_action_type(%{data_table_types: types} = acc, %{name: name} = type) do
       types = Map.put(types, name, type)
-      Map.put(acc, :form_types, types)
+      Map.put(acc, :data_table_types, types)
     end
 
-    defp merge_action(%{errors: errors} = acc, %{name: name} = form_action) do
+    defp merge_action(%{errors: errors} = acc, %{name: name} = data_table_action) do
       case validate_action_and_type(acc.actions, name) do
         {:error, error} ->
           errors = [error | errors]
@@ -203,7 +176,7 @@ if Code.ensure_loaded?(Ash) do
           if name in acc.exclusions do
             errors = [
               DslError.exception(
-                path: [:pyro, :form, :action],
+                path: [:pyro, :data_table, :action],
                 message: """
                 action #{name} is listed in `exclude`
                 """
@@ -213,16 +186,19 @@ if Code.ensure_loaded?(Ash) do
 
             Map.put(acc, :errors, errors)
           else
-            form_action =
-              form_action
-              |> Map.put(:label, form_action.label || default_label(name))
-              |> Map.put(:description, form_action.description || Map.get(action, :description))
+            data_table_action =
+              data_table_action
+              |> Map.put(:label, data_table_action.label || default_label(name))
+              |> Map.put(
+                :description,
+                data_table_action.description || Map.get(action, :description)
+              )
 
-            form_actions = [form_action | acc.form_actions]
+            data_table_actions = [data_table_action | acc.data_table_actions]
             to_find = Enum.filter(acc.to_find, &(&1 == name))
 
             acc
-            |> Map.put(:form_actions, form_actions)
+            |> Map.put(:data_table_actions, data_table_actions)
             |> Map.put(:to_find, to_find)
           end
       end
@@ -235,16 +211,16 @@ if Code.ensure_loaded?(Ash) do
         nil ->
           {:error,
            DslError.exception(
-             path: [:pyro, :form, :action],
+             path: [:pyro, :data_table, :action],
              message: """
-             action #{name} not found in resource
+             action #{name} does not exist on this resource
              """
            )}
 
-        %{type: type} when type not in [:create, :update, :destroy] ->
+        %{type: type} when type not in [:read] ->
           {:error,
            DslError.exception(
-             path: [:pyro, :form, :action],
+             path: [:pyro, :data_table, :action],
              message: """
              action #{name} is an unsupported type: #{type}
              """
@@ -265,14 +241,14 @@ if Code.ensure_loaded?(Ash) do
             Map.put(acc, :errors, errors)
 
           {:ok, action} ->
-            type_default = Map.get(acc.form_types, action.type)
+            type_default = Map.get(acc.data_table_types, action.type)
 
             if type_default == nil do
               errors = [
                 DslError.exception(
-                  path: [:pyro, :form],
+                  path: [:pyro, :data_table],
                   message: """
-                  form for action #{name} is not defined, has no type defaults, and is not excluded
+                  data table for action #{name} is not defined, has no type defaults, and is not excluded
                   """
                 )
                 | acc.errors
@@ -282,7 +258,7 @@ if Code.ensure_loaded?(Ash) do
             else
               merge_action(
                 acc,
-                %Form.Action{name: name}
+                %DataTable.Action{name: name}
                 |> Map.merge(Map.drop(type_default, [:__struct__, :name]))
               )
             end
@@ -290,20 +266,12 @@ if Code.ensure_loaded?(Ash) do
       end)
     end
 
-    defp merge_fields(fields, path \\ []) do
-      Enum.map(fields, fn
-        %Form.Field{} = field ->
-          field
-          |> Map.put(:label, field.label || default_label(field))
-          |> Map.put(:path, maybe_append_path(path, field.path))
-
-        %Form.FieldGroup{} = group ->
-          path = maybe_append_path(path, group.path)
-
-          group
-          |> Map.put(:label, group.label || default_label(group))
-          |> Map.put(:path, path)
-          |> Map.put(:fields, merge_fields(group.fields, path))
+    defp merge_columns(columns, path \\ []) do
+      Enum.map(columns, fn
+        %DataTable.Column{} = column ->
+          column
+          |> Map.put(:label, column.label || default_label(column))
+          |> Map.put(:path, maybe_append_path(path, column.path))
       end)
     end
 

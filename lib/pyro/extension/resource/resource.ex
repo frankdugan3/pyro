@@ -61,30 +61,77 @@ if Code.ensure_loaded?(Ash) do
       ]
     }
 
-    @page %Spark.Dsl.Section{
-      describe: "Configure this resource as a page.",
-      name: :page,
-      schema: [
-        module: [
-          required: false,
-          type: :atom,
-          doc:
-            "The live_view module to use for the page (defaults to an automatically generated page)."
-        ],
-        route_path: [
-          required: true,
-          type: :string,
-          doc: "The route path for the page"
-        ]
+    @data_table_column %Spark.Dsl.Entity{
+      describe:
+        "Declare non-default behavior for a specific data table column in the `Pyro.Resource` extension.",
+      name: :column,
+      schema: Pyro.Resource.DataTable.Column.schema(),
+      target: Pyro.Resource.DataTable.Column,
+      args: [:name]
+    }
+
+    @data_table_action %Spark.Dsl.Entity{
+      describe: "Configure the appearance of the data table for specific action(s).",
+      name: :action,
+      schema: Pyro.Resource.DataTable.Action.schema(),
+      target: Pyro.Resource.DataTable.Action,
+      args: [:name],
+      entities: [
+        columns: [@data_table_column]
       ]
+    }
+
+    @data_table_action_type %Spark.Dsl.Entity{
+      describe:
+        "Configure the default data table appearance for actions of type(s). Will be ignored by actions configured explicitly.",
+      name: :action_type,
+      schema: Pyro.Resource.DataTable.ActionType.schema(),
+      target: Pyro.Resource.DataTable.ActionType,
+      args: [:name],
+      entities: [
+        columns: [@data_table_column]
+      ]
+    }
+
+    @data_table %Spark.Dsl.Section{
+      describe: "Configure the appearance of data tables in the `Pyro.Resource` extension.",
+      name: :data_table,
+      schema: [
+        exclude: [
+          required: false,
+          type: {:list, :atom},
+          doc: "The actions to exclude from data tables.",
+          default: []
+        ]
+      ],
+      entities: [
+        @data_table_action,
+        @data_table_action_type
+      ]
+    }
+
+    @live_view_page %Spark.Dsl.Entity{
+      describe: "Configure a page for this resource.",
+      name: :page,
+      schema: Pyro.Resource.Page.schema(),
+      target: Pyro.Resource.Page,
+      args: [:name]
+    }
+
+    @live_view %Spark.Dsl.Section{
+      describe: "Configure LiveViews in the `Pyro.Resource` extension.",
+      name: :live_view,
+      schema: [],
+      entities: [@live_view_page]
     }
 
     @pyro %Spark.Dsl.Section{
       describe: "Configure the pyro dashboard for a given resource",
       name: :pyro,
       sections: [
+        @data_table,
         @form,
-        @page
+        @live_view
       ],
       schema: [
         resource_label: [
@@ -119,9 +166,12 @@ if Code.ensure_loaded?(Ash) do
     }
 
     @transformers [
+      Pyro.Resource.Transformers.MergeDataTableActions,
+      Pyro.Resource.Transformers.ValidateDataTableActions,
       Pyro.Resource.Transformers.MergeFormActions,
       Pyro.Resource.Transformers.ValidateFormActions
     ]
+
     @sections [@pyro]
 
     @moduledoc """
