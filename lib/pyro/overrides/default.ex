@@ -477,7 +477,6 @@ defmodule Pyro.Overrides.Default do
   def slide_over_class(passed_assigns) do
     [
       "w-full max-h-full overflow-auto",
-      @root_theme,
       slide_over_width_class(passed_assigns),
       passed_assigns[:origin] == "left" && "transition translate-x-0",
       passed_assigns[:origin] == "right" && "transition translate-x-0 absolute right-0 inset-y-0",
@@ -532,7 +531,8 @@ defmodule Pyro.Overrides.Default do
       end
 
     js =
-      JS.remove_class("overflow-hidden", to: "body")
+      js
+      |> JS.remove_class("overflow-hidden", to: "body")
       |> JS.hide(
         transition: {
           "ease-in duration-200",
