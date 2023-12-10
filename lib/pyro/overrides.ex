@@ -52,7 +52,8 @@ defmodule Pyro.Overrides do
         Autocomplete,
         Core,
         SmartDataTable,
-        SmartForm
+        SmartForm,
+        SmartPage
       }
 
       alias Pyro.Resource.Info, as: UI
