@@ -16,6 +16,7 @@ defmodule Pyro.Overrides.Default do
   @flash_kinds ~w[info error warning success] ++ @variant_colors
 
   use Pyro.Overrides
+  import Pyro.Component.Helpers, only: [get_nested: 2]
 
   defp color_class(color) do
     case color do
@@ -462,7 +463,7 @@ defmodule Pyro.Overrides.Default do
   end
 
   def smart_form_field_group_class(passed_assigns) do
-    ["pyro-smart_form__render_field__group", passed_assigns.field.class || nil]
+    ["pyro-smart_form__render_field__group", get_nested(passed_assigns, [:field, :class])]
   end
 
   # override SmartDataTable, :render do
