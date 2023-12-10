@@ -71,4 +71,41 @@ defmodule Pyro.Component.Helpers do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc """
+  Safely get nested values from maps or keyword lists that may be `nil` or an otherwise non-map value at any point. Great for accessing nested assigns in a template.
+
+  ## Examples
+
+      iex> get_nested(nil, [:one, :two, :three])
+      nil
+
+      iex> get_nested(%{one: nil}, [:one, :two, :three])
+      nil
+
+      iex> get_nested(%{one: %{two: %{three: 3}}}, [:one, :two, :three])
+      3
+
+      iex> get_nested(%{one: %{two: [three: 3]}}, [:one, :two, :three])
+      3
+
+      iex> get_nested([one: :nope], [:one, :two, :three])
+      nil
+
+      iex> get_nested([one: :nope], [:one, :two, :three], :default)
+      :default
+  """
+  def get_nested(value, keys, default \\ nil)
+  def get_nested(value, [], _), do: value
+  def get_nested(%{} = map, [key], default), do: Map.get(map, key, default)
+
+  def get_nested(%{} = map, [key | keys], default),
+    do: get_nested(Map.get(map, key), keys, default)
+
+  def get_nested([_ | _] = keyword, [key], default), do: Keyword.get(keyword, key, default)
+
+  def get_nested([_ | _] = keyword, [key | keys], default),
+    do: get_nested(Keyword.get(keyword, key), keys, default)
+
+  def get_nested(_, _, default), do: default
 end
