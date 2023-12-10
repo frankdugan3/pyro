@@ -145,6 +145,8 @@ defmodule Pyro.MixProject do
       # These dependencies add optional features if installed
       {:ash_phoenix, "~> 1.2", optional: true},
       {:ash, "~> 2.4", optional: true},
+      {:ash_authentication, "~> 3.12", optional: true},
+      {:ash_authentication_phoenix, "~> 1.9", optional: true},
       {:makeup, "~> 1.1", optional: true},
       {:tails, "~> 0.1.5", optional: true},
       {:timex, "~> 3.0", optional: true},

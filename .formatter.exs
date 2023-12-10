@@ -4,12 +4,15 @@ spark_locals_without_parens = [
   action: 2,
   action_type: 1,
   action_type: 2,
+  actions: 1,
   autocomplete_option_label_key: 1,
   autocomplete_option_value_key: 1,
   autocomplete_search_action: 1,
   autocomplete_search_arg: 1,
   autofocus: 1,
   class: 1,
+  column: 1,
+  column: 2,
   default_card_fields: 1,
   default_display_mode: 1,
   default_foreign_label: 1,
@@ -23,8 +26,9 @@ spark_locals_without_parens = [
   field_group: 2,
   input_class: 1,
   label: 1,
-  module: 1,
   options: 1,
+  page: 1,
+  page: 2,
   path: 1,
   prompt: 1,
   resource_label: 1,
@@ -39,9 +43,9 @@ pyro_locals_without_parens = [
 [
   import_deps: [
     :phoenix,
-    :ash
-    # :ash_authentication,
-    # :ash_authentication_phoenix
+    :ash,
+    :ash_authentication,
+    :ash_authentication_phoenix
   ],
   subdirectories: ["priv/*/migrations"],
   locals_without_parens: spark_locals_without_parens ++ pyro_locals_without_parens,
