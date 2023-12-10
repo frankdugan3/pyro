@@ -341,6 +341,13 @@ defmodule Pyro.Components.Core do
   - Optionally override the default labels for each scheme with `label_system`, `label_dark`, and `label_light`
   - Optionally override the default icons for each scheme with `icon_system`, `icon_dark`, and `icon_light`
 
+  > #### Note: {: .info}
+  >
+  > This requires several things to work:
+  >   - `darkMode: 'class'` in your Tailwind config
+  >   - `color_scheme_switcher_js/1` added to the page's `<head>` before `app.js`
+  >   - Pyro's `PyroColorSchemeHook` hook added to your hooks in `app.js`
+
   ## Examples
 
       <.color_scheme_switcher />
@@ -421,6 +428,22 @@ defmodule Pyro.Components.Core do
     """
   end
 
+  @doc """
+  Javascript to manage switching color schemes with `color_scheme_switcher/1`.
+
+  > #### Note: {: .info}
+  >
+  > This needs to be added in the page's head before `app.js` to prevent FOUC:
+
+  ```heex
+  <head>
+    <.color_scheme_switcher_js />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+  </head>
+  ```
+
+  """
+  @doc type: :component
   def color_scheme_switcher_js(assigns) do
     ~H"""
     <script>

@@ -70,6 +70,10 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    }
    ```
 
+   > #### Note: {: .warning}
+   >
+   > Using `path.join(.__dirname, '...')` is important; Tailwind CLI will get confused without it!
+
 4. Add the following lines to `assets/js/app.js`:
 
    ```js
@@ -89,9 +93,9 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    **Note:** _Only_ replace those top-level modules, _do not_ replace submodules, e.g. `Phoenix.LiveView.Router`.
 
-6. Add the color scheme JS to your `root.html.heex` template (prevents FLOUC):
+6. Add the color scheme JS to your `root.html.heex` template (prevents FOUC):
 
-   ```elixir
+   ```heex
    <head>
      <!-- ... -->
      <.color_scheme_switcher_js />
