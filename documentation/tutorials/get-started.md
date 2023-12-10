@@ -89,7 +89,17 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    **Note:** _Only_ replace those top-level modules, _do not_ replace submodules, e.g. `Phoenix.LiveView.Router`.
 
-6. (Optional) Import the Pyro components into your `my_app_web.ex` helpers to make the available in your views/components:
+6. Add the color scheme JS to your `root.html.heex` template (prevents FLOUC):
+
+   ```elixir
+   <head>
+     <!-- ... -->
+     <.color_scheme_switcher_js />
+     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+   </head>
+   ```
+
+7. (Optional) Import the Pyro components into your `my_app_web.ex` helpers to make the available in your views/components:
 
    ```elixir
    defp html_helpers do
@@ -103,7 +113,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    At this point, you probably want to delete the old `core_components.ex` file, since Pyro will replace that functionality (mostly API-compatible).
 
-7. (Optional) If you are using Ash, you'll want to add `:pyro` to your `.formatter.exs`:
+8. (Optional) If you are using Ash, you'll want to add `:pyro` to your `.formatter.exs`:
 
    ```elixir
    [

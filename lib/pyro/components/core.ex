@@ -421,6 +421,92 @@ defmodule Pyro.Components.Core do
     """
   end
 
+  def color_scheme_switcher_js(assigns) do
+    ~H"""
+    <script>
+      window.applyScheme = function (scheme) {
+      if (scheme === 'light') {
+      localStorage.scheme = 'light'
+      document.documentElement.classList.remove('dark')
+      document
+        .querySelectorAll('.color-scheme-system-icon')
+        .forEach((el) => el.classList.remove('hidden'))
+      document
+        .querySelectorAll('.color-scheme-dark-icon')
+        .forEach((el) => el.classList.add('hidden'))
+      document
+        .querySelectorAll('.color-scheme-light-icon')
+        .forEach((el) => el.classList.add('hidden'))
+      } else if (scheme === 'dark') {
+      localStorage.scheme = 'dark'
+      document.documentElement.classList.add('dark')
+      document
+        .querySelectorAll('.color-scheme-system-icon')
+        .forEach((el) => el.classList.add('hidden'))
+      document
+        .querySelectorAll('.color-scheme-dark-icon')
+        .forEach((el) => el.classList.add('hidden'))
+      document
+        .querySelectorAll('.color-scheme-light-icon')
+        .forEach((el) => el.classList.remove('hidden'))
+      } else {
+      localStorage.scheme = 'system'
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+      document
+        .querySelectorAll('.color-scheme-system-icon')
+        .forEach((el) => el.classList.add('hidden'))
+      document
+        .querySelectorAll('.color-scheme-dark-icon')
+        .forEach((el) => el.classList.remove('hidden'))
+      document
+        .querySelectorAll('.color-scheme-light-icon')
+        .forEach((el) => el.classList.add('hidden'))
+      }
+      }
+
+      // Scheme change events
+      window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (_) => {
+      if (localStorage.scheme === 'system') {
+        applyScheme('system')
+      }
+      })
+
+      window.onstorage = () => {
+      applyScheme(localStorage.scheme)
+      }
+
+      // Toggle scheme
+      window.toggleScheme = function () {
+      if (localStorage.scheme === 'system') {
+      applyScheme('dark')
+      } else if (localStorage.scheme === 'dark') {
+      applyScheme('light')
+      } else {
+      applyScheme('system')
+      }
+      }
+
+      // Initialize scheme
+      window.initScheme = function (scheme) {
+      if (scheme === undefined) {
+      scheme = localStorage.scheme || 'system'
+      }
+      applyScheme(scheme)
+      }
+
+      try {
+      initScheme()
+      } catch (_) {}
+    </script>
+    """
+  end
+
   @doc """
   A slide-over component.
 
