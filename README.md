@@ -51,7 +51,6 @@ For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page
   - [ ] SlideOver [#4](https://github.com/frankdugan3/pyro/issues/4)
   - [ ] Tabs [#13](https://github.com/frankdugan3/pyro/issues/13)
   - [ ] Breadcrumbs [#11](https://github.com/frankdugan3/pyro/issues/11)
-  - [ ] Dark/Light theme selector [#3](https://github.com/frankdugan3/pyro/issues/3)
 - [ ] Smart Components
   - [ ] `Pyro.Components.SmartDataTable` [#16](https://github.com/frankdugan3/pyro/issues/16)
   - [ ] `Pyro.Components.SmartCardGrid` [#10](https://github.com/frankdugan3/pyro/issues/10)

@@ -402,6 +402,25 @@ defmodule Pyro.Overrides.Default do
     set :horizontal_offset, "0"
   end
 
+  override Core, :color_scheme_switcher do
+    set :class, &__MODULE__.color_scheme_switcher_class/1
+    set :scheme, &__MODULE__.color_scheme_switcher_scheme/1
+    set :label_system, "System"
+    set :label_light, "Light"
+    set :label_dark, "Dark"
+    set :icon_system, "hero-computer-desktop-mini"
+    set :icon_light, "hero-sun-solid"
+    set :icon_dark, "hero-moon-solid"
+  end
+
+  def color_scheme_switcher_class(passed_assigns) do
+    ["whitespace-nowrap", passed_assigns[:class], "color-scheme-switcher"]
+  end
+
+  def color_scheme_switcher_scheme(passed_assigns) do
+    passed_assigns[:scheme] || :system
+  end
+
   ##############################################################################
   ####    D A T A    T A B L E    C O M P O N E N T
   ##############################################################################

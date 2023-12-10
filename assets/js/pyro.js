@@ -2,39 +2,86 @@
 // ####    T H E M E    M A N A G E M E N T
 // #############################################################################
 
-// Load user or system preference for dark or light theme
-if (
-  localStorage.theme === 'dark' ||
-  (!('theme' in localStorage) &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches)
-) {
-  document.documentElement.classList.add('dark')
-} else {
-  document.documentElement.classList.remove('dark')
+// Apply scheme
+window.applyScheme = function (scheme) {
+  if (scheme === 'light') {
+    localStorage.scheme = 'light'
+    document.documentElement.classList.remove('dark')
+    document
+      .querySelectorAll('.color-scheme-system-icon')
+      .forEach((el) => el.classList.remove('hidden'))
+    document
+      .querySelectorAll('.color-scheme-dark-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-scheme-light-icon')
+      .forEach((el) => el.classList.add('hidden'))
+  } else if (scheme === 'dark') {
+    localStorage.scheme = 'dark'
+    document.documentElement.classList.add('dark')
+    document
+      .querySelectorAll('.color-scheme-system-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-scheme-dark-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-scheme-light-icon')
+      .forEach((el) => el.classList.remove('hidden'))
+  } else {
+    localStorage.scheme = 'system'
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    document
+      .querySelectorAll('.color-scheme-system-icon')
+      .forEach((el) => el.classList.add('hidden'))
+    document
+      .querySelectorAll('.color-scheme-dark-icon')
+      .forEach((el) => el.classList.remove('hidden'))
+    document
+      .querySelectorAll('.color-scheme-light-icon')
+      .forEach((el) => el.classList.add('hidden'))
+  }
 }
 
-// Set theme to dark
-window.addEventListener('pyro:theme-dark', (e) => {
-  localStorage.theme = 'dark'
-  document.documentElement.classList.add('dark')
-})
+// Scheme change events
+window
+  .matchMedia('(prefers-color-scheme: dark)')
+  .addEventListener('change', (_) => {
+    if (localStorage.scheme === 'system') {
+      applyScheme('system')
+    }
+  })
 
-// Set theme to light
-window.addEventListener('pyro:theme-light', (e) => {
-  localStorage.theme = 'light'
-  document.documentElement.classList.remove('dark')
-})
+window.onstorage = () => {
+  applyScheme(localStorage.scheme)
+}
 
-// Set theme to system preference
-window.addEventListener('pyro:theme-system', (e) => {
-  localStorage.removeItem('theme')
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.documentElement.classList.add('dark')
+// Toggle scheme
+window.toggleScheme = function () {
+  if (localStorage.scheme === 'system') {
+    applyScheme('dark')
+  } else if (localStorage.scheme === 'dark') {
+    applyScheme('light')
   } else {
-    document.documentElement.classList.remove('dark')
+    applyScheme('system')
   }
-  document.documentElement.classList.add('dark')
-})
+}
+
+// Initialize scheme
+window.initScheme = function (scheme) {
+  if (scheme === undefined) {
+    scheme = localStorage.scheme || 'system'
+  }
+  applyScheme(scheme)
+}
+
+try {
+  initScheme()
+} catch (_) {}
 
 // #############################################################################
 // ####    C U S T O M    E V E N T    H A N D L E R S
@@ -88,6 +135,19 @@ export async function sendTimezoneToServer() {
 // #############################################################################
 
 export const hooks = {
+  PyroColorSchemeHook: {
+    deadViewCompatible: true,
+    mounted() {
+      this.init(this.el.getAttribute('data-scheme'))
+    },
+    updated() {
+      this.init()
+    },
+    init(scheme) {
+      initScheme(scheme)
+      this.el.addEventListener('click', window.toggleScheme)
+    },
+  },
   PyroFlashComponent: {
     mounted() {
       this.oldMessageHTML = document.querySelector(
