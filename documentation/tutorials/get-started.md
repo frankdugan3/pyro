@@ -30,7 +30,6 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
     {:makeup_js, "~> 0.1.0"}, # Optional: Code highlighting components
     {:makeup_json, "~> 0.1.0"}, # Optional: Code highlighting components
     {:makeup, "~> 1.1"}, # Optional: Code highlighting components
-    {:tails, "~> 0.1.5"}, # Optional: Smart-merge Tailwind classes
     {:timex, "~> 3.0"}, # Optional: Date/Time/Zone components & tooling
     {:tzdata, "~> 1.1.0"}, # Optional: Date/Time/Zone components & tooling
      ]

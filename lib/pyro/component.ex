@@ -90,8 +90,7 @@ defmodule Pyro.Component do
   There are only a few things added to `Phoenix.Component.attr/3` by Pyro:
 
   * `:css_classes` type
-    * merges overridable defaults with passed prop values via `Pyro.Component.CSS.classes/1`
-    * prevents weird precedence conflicts (via optional `Tails` dependency)
+    * merges overridable defaults with passed prop values via `Pyro.Component.CSS.classes/1` (or bring your own merge function)
     * less bloated HTML
   * `:overridable` flag (marks attribute to be overridden by `Pyro.Overrides`)
   * `:values` supports an atom value (override key, loaded by `Pyro.Overrides`)
