@@ -98,12 +98,7 @@ defmodule Pyro.MixProject do
         ~r/\.Overrides\./
       ],
       "Ash Resource Extension": [
-        Pyro.Resource,
-        Pyro.Resource.Info,
-        Pyro.Resource.Form.Action,
-        Pyro.Resource.Form.ActionType,
-        Pyro.Resource.Form.Field,
-        Pyro.Resource.Form.FieldGroup
+        ~r/Pyro.Resource/
       ],
       Components: [~r/\.Components\./],
       "Component Tooling": [
@@ -148,7 +143,6 @@ defmodule Pyro.MixProject do
       {:ash_authentication, "~> 3.12", optional: true},
       {:ash_authentication_phoenix, "~> 1.9", optional: true},
       {:makeup, "~> 1.1", optional: true},
-      {:tails, "~> 0.1.5", optional: true},
       {:timex, "~> 3.0", optional: true},
       {:tzdata, "~> 1.1.0", optional: true}
     ]
