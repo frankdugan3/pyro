@@ -17,7 +17,7 @@ if Code.ensure_loaded?(Ash) do
       class: [
         type: :string,
         required: false,
-        doc: "Merge/override the default data table classes."
+        doc: "Customize data table classes."
       ],
       exclude: [
         required: false,

@@ -71,12 +71,12 @@ if Code.ensure_loaded?(Ash) do
       class: [
         type: :string,
         required: false,
-        doc: "Merge/override the default class."
+        doc: "Customize class."
       ],
       input_class: [
         type: :string,
         required: false,
-        doc: "Merge/override the default input class."
+        doc: "Customize input class."
       ],
       autofocus: [
         type: :boolean,

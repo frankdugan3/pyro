@@ -27,7 +27,7 @@ if Code.ensure_loaded?(Ash) do
       class: [
         type: :string,
         required: false,
-        doc: "Merge/override the default class."
+        doc: "Customize class."
       ],
       path: [
         type: {:list, :atom},

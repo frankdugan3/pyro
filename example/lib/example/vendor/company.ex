@@ -7,9 +7,10 @@ defmodule Example.Vendor.Company do
 
   pyro do
     live_view do
-      page :list do
-        actions([:read])
-        route_path "/"
+      page :companies do
+        list :index, :read
+        create :new, :create
+        update :edit, :update
       end
     end
 
@@ -17,6 +18,14 @@ defmodule Example.Vendor.Company do
       action_type :read do
         exclude [:id]
         column :name
+      end
+    end
+
+    form do
+      action_type [:create, :update] do
+        field :name do
+          autofocus true
+        end
       end
     end
   end

@@ -110,12 +110,47 @@ if Code.ensure_loaded?(Ash) do
       ]
     }
 
+    @live_view_list %Spark.Dsl.Entity{
+      describe: "Configure a list action for this resource.",
+      name: :list,
+      schema: Pyro.Resource.LiveView.Page.List.schema(),
+      target: Pyro.Resource.LiveView.Page.List,
+      args: [:live_action, :action]
+    }
+
+    @live_view_show %Spark.Dsl.Entity{
+      describe: "Configure a show action for this resource.",
+      name: :show,
+      schema: Pyro.Resource.LiveView.Page.Show.schema(),
+      target: Pyro.Resource.LiveView.Page.Show,
+      args: [:live_action, :action]
+    }
+
+    @live_view_create %Spark.Dsl.Entity{
+      describe: "Configure a create action for this resource.",
+      name: :create,
+      schema: Pyro.Resource.LiveView.Page.Create.schema(),
+      target: Pyro.Resource.LiveView.Page.Create,
+      args: [:live_action, :action]
+    }
+
+    @live_view_update %Spark.Dsl.Entity{
+      describe: "Configure a update action for this resource.",
+      name: :update,
+      schema: Pyro.Resource.LiveView.Page.Update.schema(),
+      target: Pyro.Resource.LiveView.Page.Update,
+      args: [:live_action, :action]
+    }
+
     @live_view_page %Spark.Dsl.Entity{
       describe: "Configure a page for this resource.",
       name: :page,
-      schema: Pyro.Resource.Page.schema(),
-      target: Pyro.Resource.Page,
-      args: [:name]
+      schema: Pyro.Resource.LiveView.Page.schema(),
+      target: Pyro.Resource.LiveView.Page,
+      args: [:name],
+      entities: [
+        live_actions: [@live_view_list, @live_view_show, @live_view_create, @live_view_update]
+      ]
     }
 
     @live_view %Spark.Dsl.Section{

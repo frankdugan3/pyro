@@ -33,7 +33,7 @@ if Code.ensure_loaded?(Ash) do
         iex> page_for(Pyro.Resource.InfoTest.User, :list) |> Enum.map(& &1.name)
         :list
     """
-    @spec page_for(Ash.Resource.t(), atom()) :: Pyro.Resource.Page | nil
+    @spec page_for(Ash.Resource.t(), atom()) :: Pyro.Resource.LiveView.Page | nil
     def page_for(resource, page_name) do
       resource
       |> Spark.Dsl.Extension.get_entities([:pyro, :live_view])
@@ -57,7 +57,7 @@ if Code.ensure_loaded?(Ash) do
             | nil
     def data_table_for(resource, action_name) do
       resource
-      |> Spark.Dsl.Extension.get_entities([:pyro, :data_tables])
+      |> Spark.Dsl.Extension.get_entities([:pyro, :data_table])
       |> Enum.find(fn action ->
         action.name == action_name
       end)
