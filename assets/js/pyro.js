@@ -51,7 +51,6 @@ export async function sendTimezoneToServer() {
 
 export const hooks = {
   PyroColorSchemeHook: {
-    deadViewCompatible: true,
     mounted() {
       this.init(this.el.getAttribute('data-scheme'))
     },
