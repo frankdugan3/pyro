@@ -194,7 +194,7 @@ if Code.ensure_loaded?(Ash) do
               |> Map.put(:description, form_action.description || Map.get(action, :description))
 
             form_actions = [form_action | acc.form_actions]
-            to_find = Enum.filter(acc.to_find, &(&1 == name))
+            to_find = Enum.reject(acc.to_find, &(&1 == name))
 
             acc
             |> Map.put(:form_actions, form_actions)

@@ -19,74 +19,8 @@ if Code.ensure_loaded?(Ash) do
           {:ok, dsl}
 
         data_table_entities ->
-          # convert to a map for fast access later
-          actions =
-            dsl
-            |> Transformer.get_entities([:actions])
-            |> Enum.reduce(%{}, &Map.put(&2, &1.name, &1))
-
           excluded_data_table_action_names =
             Transformer.get_option(dsl, [:pyro, :data_table], :exclude, [])
-
-          # determine the actions that need data table definitions
-          expected_action_names =
-            actions
-            |> Map.values()
-            |> Enum.filter(fn action ->
-              action.name not in excluded_data_table_action_names &&
-                action.type in [:read]
-            end)
-            |> Enum.map(& &1.name)
-
-          %{data_table_actions: data_table_actions, errors: errors} =
-            data_table_entities
-            |> Enum.reduce(
-              %{
-                data_table_actions: [],
-                data_table_types: %{},
-                to_find: expected_action_names,
-                exclusions: excluded_data_table_action_names,
-                actions: actions,
-                errors: []
-              },
-              fn
-                %DataTable.ActionType{name: names} = type, acc when is_list(names) ->
-                  columns = merge_columns(type.columns)
-
-                  Enum.reduce(names, acc, fn name, acc ->
-                    merge_action_type(
-                      acc,
-                      type
-                      |> Map.put(:name, name)
-                      |> Map.put(:columns, columns)
-                    )
-                  end)
-
-                %DataTable.ActionType{} = type, acc ->
-                  columns = merge_columns(type.columns)
-                  merge_action_type(acc, Map.put(type, :columns, columns))
-
-                %DataTable.Action{name: names} = action, acc when is_list(names) ->
-                  columns = merge_columns(action.columns)
-
-                  Enum.reduce(names, acc, fn name, acc ->
-                    merge_action(
-                      acc,
-                      action
-                      |> Map.put(:name, name)
-                      |> Map.put(:columns, columns)
-                    )
-                  end)
-
-                %DataTable.Action{} = action, acc ->
-                  columns = merge_columns(action.columns)
-                  merge_action(acc, Map.put(action, :columns, columns))
-
-                _, acc ->
-                  acc
-              end
-            )
-            |> merge_defaults_from_types()
 
           # truncate all Action/ActionType entities because they will be unrolled/defaulted
           dsl =
@@ -96,6 +30,29 @@ if Code.ensure_loaded?(Ash) do
               _ -> false
             end)
 
+          # determine the actions that need data table definitions
+          expected_action_names =
+            filter_actions(dsl, fn action ->
+              action.name not in excluded_data_table_action_names &&
+                action.type in [:read]
+            end)
+            |> Enum.map(& &1.name)
+
+          %{data_table_actions: data_table_actions, errors: errors} =
+            data_table_entities
+            |> Enum.reduce(
+              %{
+                dsl: dsl,
+                data_table_actions: [],
+                data_table_types: %{},
+                to_find: expected_action_names,
+                exclusions: excluded_data_table_action_names,
+                errors: []
+              },
+              &reduce_data_table_entities/2
+            )
+            |> merge_defaults_from_types()
+
           dsl =
             Enum.reduce(data_table_actions, dsl, fn data_table_action, dsl ->
               Transformer.add_entity(dsl, [:pyro, :data_table], data_table_action, prepend: true)
@@ -103,6 +60,48 @@ if Code.ensure_loaded?(Ash) do
 
           handle_errors(errors, "data table", dsl)
       end
+    end
+
+    defp reduce_data_table_entities(%DataTable.ActionType{name: names} = type, acc)
+         when is_list(names) do
+      columns = merge_columns(type.columns)
+
+      Enum.reduce(names, acc, fn name, acc ->
+        merge_action_type(
+          acc,
+          type
+          |> Map.put(:name, name)
+          |> Map.put(:columns, columns)
+        )
+      end)
+    end
+
+    defp reduce_data_table_entities(%DataTable.ActionType{} = type, acc) do
+      columns = merge_columns(type.columns)
+      merge_action_type(acc, Map.put(type, :columns, columns))
+    end
+
+    defp reduce_data_table_entities(%DataTable.Action{name: names} = action, acc)
+         when is_list(names) do
+      columns = merge_columns(action.columns)
+
+      Enum.reduce(names, acc, fn name, acc ->
+        merge_action(
+          acc,
+          action
+          |> Map.put(:name, name)
+          |> Map.put(:columns, columns)
+        )
+      end)
+    end
+
+    defp reduce_data_table_entities(%DataTable.Action{} = action, acc) do
+      columns = merge_columns(action.columns)
+      merge_action(acc, Map.put(action, :columns, columns))
+    end
+
+    defp reduce_data_table_entities(_, acc) do
+      acc
     end
 
     defp merge_action_type(%{errors: errors} = acc, %{name: name})
@@ -142,7 +141,7 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp merge_action(%{errors: errors} = acc, %{name: name} = data_table_action) do
-      case validate_action_and_type(acc.actions, name) do
+      case validate_action_and_type(acc.dsl, name) do
         {:error, error} ->
           errors = [error | errors]
           Map.put(acc, :errors, errors)
@@ -170,7 +169,7 @@ if Code.ensure_loaded?(Ash) do
               )
 
             data_table_actions = [data_table_action | acc.data_table_actions]
-            to_find = Enum.filter(acc.to_find, &(&1 == name))
+            to_find = Enum.reject(acc.to_find, &(&1 == name))
 
             acc
             |> Map.put(:data_table_actions, data_table_actions)
@@ -179,8 +178,8 @@ if Code.ensure_loaded?(Ash) do
       end
     end
 
-    defp validate_action_and_type(actions, name) do
-      action = Map.get(actions, name)
+    defp validate_action_and_type(dsl, name) do
+      action = get_action(dsl, name)
 
       case action do
         nil ->
@@ -210,7 +209,7 @@ if Code.ensure_loaded?(Ash) do
 
     defp merge_defaults_from_types(acc) do
       Enum.reduce(acc.to_find, acc, fn name, acc ->
-        case validate_action_and_type(acc.actions, name) do
+        case validate_action_and_type(acc.dsl, name) do
           {:error, error} ->
             errors = [error | acc.errors]
             Map.put(acc, :errors, errors)
