@@ -12,8 +12,8 @@ spark_locals_without_parens = [
   class: 1,
   column: 1,
   column: 2,
-  create: 2,
   create: 3,
+  create: 4,
   default_card_fields: 1,
   default_display_mode: 1,
   default_foreign_label: 1,
@@ -29,25 +29,25 @@ spark_locals_without_parens = [
   identity: 1,
   input_class: 1,
   label: 1,
-  list: 2,
   list: 3,
+  list: 4,
   options: 1,
-  page: 1,
   page: 2,
+  page: 3,
   path: 1,
-  path_key: 1,
   prompt: 1,
   resource_label: 1,
-  show: 2,
   show: 3,
+  show: 4,
   type: 1,
-  update: 2,
   update: 3,
+  update: 4,
   view_as: 1
 ]
 
 pyro_locals_without_parens = [
-  set: 2
+  set: 2,
+  live_routes_for: 3
 ]
 
 [

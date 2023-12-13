@@ -1,8 +1,11 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.Form.ActionType do
+  defmodule Pyro.Ash.Extensions.Resource.Form.ActionType do
     @moduledoc """
-    A form for action(s) of a given type in the `Pyro.Resource` extension.
+    A form for action(s) of a given type in the `Pyro.Ash.Extensions.Resource` extension.
     """
+
+    use Pyro.Ash.Extensions.Resource.Schema
+
     @type t :: %__MODULE__{}
     defstruct [:name, :class, :fields]
 
@@ -15,7 +18,7 @@ if Code.ensure_loaded?(Ash) do
         doc: "The action type(s) for this form."
       ],
       class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize form classes."
       ]

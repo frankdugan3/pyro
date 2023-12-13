@@ -1,8 +1,10 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.DataTable.ActionType do
+  defmodule Pyro.Ash.Extensions.Resource.DataTable.ActionType do
     @moduledoc """
-    A data table for action(s) of a given type in the `Pyro.Resource` extension.
+    A data table for action(s) of a given type in the `Pyro.Ash.Extensions.Resource` extension.
     """
+    use Pyro.Ash.Extensions.Resource.Schema
+
     @type t :: %__MODULE__{}
     defstruct [:name, :class, :exclude, :columns]
 
@@ -15,7 +17,7 @@ if Code.ensure_loaded?(Ash) do
         doc: "The action type(s) for this data table."
       ],
       class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize data table classes."
       ],

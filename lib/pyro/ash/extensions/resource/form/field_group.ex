@@ -1,8 +1,11 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.Form.FieldGroup do
+  defmodule Pyro.Ash.Extensions.Resource.Form.FieldGroup do
     @moduledoc """
-    A group of form fields in the `Pyro.Resource` extension.
+    A group of form fields in the `Pyro.Ash.Extensions.Resource` extension.
     """
+
+    use Pyro.Ash.Extensions.Resource.Schema
+
     defstruct [:name, :label, :class, :path, :fields]
 
     @type t :: %__MODULE__{
@@ -10,7 +13,7 @@ if Code.ensure_loaded?(Ash) do
             label: String.t(),
             class: String.t(),
             path: [atom()],
-            fields: [Pyro.Resource.Form.Field.t()]
+            fields: [Pyro.Ash.Extensions.Resource.Form.Field.t()]
           }
 
     @schema [
@@ -25,7 +28,7 @@ if Code.ensure_loaded?(Ash) do
         doc: "The label of this group (defaults to capitalized name)."
       ],
       class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize class."
       ],

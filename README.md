@@ -37,7 +37,7 @@ end
 
 1. [Component tooling](https://hexdocs.pm/pyro/Pyro.Component.html) for Phoenix LiveView
 2. A library of [pre-built components](https://hexdocs.pm/pyro/Pyro.Components.Core.html) to cover most common UI requirements
-3. An [Ash extension](https://hexdocs.pm/pyro/Pyro.Resource.html) providing a declarative UI DSL
+3. An [Ash extension](https://hexdocs.pm/pyro/Pyro.Ash.Extensions.Resource.html) providing a declarative UI DSL
 4. A library of (optional) "smart components" that leverage 1-3 to automatically render [forms](https://hexdocs.pm/pyro/Pyro.Components.SmartForm.html)/[data tables](https://hexdocs.pm/pyro/Pyro.Components.SmartDataTable.html)/etc. for Ash resources
 5. A set of [default](https://hexdocs.pm/pyro/Pyro.Overrides.Default.html), [customizable](https://hexdocs.pm/pyro/Pyro.Overrides.html) themes for all the above
 

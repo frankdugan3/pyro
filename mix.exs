@@ -98,7 +98,7 @@ defmodule Pyro.MixProject do
         ~r/\.Overrides\./
       ],
       "Ash Resource Extension": [
-        ~r/Pyro.Resource/
+        ~r/Pyro.Ash.Extensions.Resource/
       ],
       Components: [~r/\.Components\./],
       "Component Tooling": [
@@ -151,7 +151,7 @@ defmodule Pyro.MixProject do
   defp aliases do
     [
       build: [
-        "spark.formatter --extensions Pyro.Resource",
+        "spark.formatter --extensions Pyro.Ash.Extensions.Resource",
         "format"
       ],
       setup: [

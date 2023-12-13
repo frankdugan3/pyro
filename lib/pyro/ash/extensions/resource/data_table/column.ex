@@ -1,8 +1,11 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.DataTable.Column do
+  defmodule Pyro.Ash.Extensions.Resource.DataTable.Column do
     @moduledoc """
-    The configuration of a data table column in the `Pyro.Resource` extension.
+    The configuration of a data table column in the `Pyro.Ash.Extensions.Resource` extension.
     """
+
+    use Pyro.Ash.Extensions.Resource.Schema
+
     defstruct [
       :name,
       :type,
@@ -36,7 +39,7 @@ if Code.ensure_loaded?(Ash) do
         doc: "Override the default extracted description."
       ],
       class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize class."
       ],

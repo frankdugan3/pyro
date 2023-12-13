@@ -1,27 +1,44 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.LiveView.Page.List do
+  defmodule Pyro.Ash.Extensions.Resource.LiveView.Page.Create do
     @moduledoc """
     A LiveView page.
     """
+
+    use Pyro.Ash.Extensions.Resource.Schema
+
     @type t :: %__MODULE__{}
-    defstruct [:live_action, :display_as, :action, :label, :description, :class, :path_key]
+    defstruct [
+      :path,
+      :live_action,
+      :action,
+      :display_as,
+      :label,
+      :description,
+      :class,
+      :identity
+    ]
 
     @schema [
+      path: [
+        required: true,
+        type: :string,
+        doc: "The route path for this action."
+      ],
       live_action: [
         type: :atom,
         required: true,
         doc: "The live action for this action."
       ],
-      display_as: [
-        type: {:one_of, [:data_table, :card_grid]},
-        required: false,
-        default: :data_table,
-        doc: "How to display the action."
-      ],
       action: [
         type: :atom,
         required: true,
-        doc: "The action to use to load list of data."
+        doc: "The action to use to create the record."
+      ],
+      display_as: [
+        type: {:one_of, [:form]},
+        required: false,
+        default: :form,
+        doc: "How to display the action."
       ],
       label: [
         type: :string,
@@ -34,14 +51,15 @@ if Code.ensure_loaded?(Ash) do
         doc: "The description for this action."
       ],
       class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize action classes."
       ],
-      path_key: [
+      identity: [
         required: false,
-        type: :string,
-        doc: "The route path key for this action (no slashes)."
+        type: {:or, [:atom, {:list, :atom}]},
+        default: :id,
+        doc: "The identity used to load the record."
       ]
     ]
 

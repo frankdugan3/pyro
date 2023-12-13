@@ -1,8 +1,11 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.Form.Field do
+  defmodule Pyro.Ash.Extensions.Resource.Form.Field do
     @moduledoc """
-    The configuration of a form field in the `Pyro.Resource` extension.
+    The configuration of a form field in the `Pyro.Ash.Extensions.Resource` extension.
     """
+
+    use Pyro.Ash.Extensions.Resource.Schema
+
     defstruct [
       :name,
       :type,
@@ -69,12 +72,12 @@ if Code.ensure_loaded?(Ash) do
         doc: "Override the default extracted description."
       ],
       class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize class."
       ],
       input_class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize input class."
       ],

@@ -1,10 +1,9 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.Transformers.MergeDataTableActions do
+  defmodule Pyro.Ash.Extensions.Resource.Transformers.MergeDataTableActions do
     @moduledoc false
-    use Spark.Dsl.Transformer
-    alias Spark.Dsl.Transformer
-    alias Spark.Error.DslError
-    alias Pyro.Resource.DataTable
+
+    use Pyro.Ash.Extensions.Resource.Transformers
+    alias Pyro.Ash.Extensions.Resource.DataTable
 
     @ash_resource_transformers Ash.Resource.Dsl.transformers()
 
@@ -89,30 +88,6 @@ if Code.ensure_loaded?(Ash) do
             )
             |> merge_defaults_from_types()
 
-          case errors do
-            [] ->
-              :noop
-
-            [error] ->
-              raise(error)
-
-            errors ->
-              list =
-                errors
-                |> Enum.reverse()
-                |> Enum.map_join("\n", &("   - " <> &1.message))
-
-              raise(
-                DslError.exception(
-                  path: [:pyro, :data_table],
-                  message: """
-                  There are multiple errors with the data table:
-                  #{list}
-                  """
-                )
-              )
-          end
-
           # truncate all Action/ActionType entities because they will be unrolled/defaulted
           dsl =
             Transformer.remove_entity(dsl, [:pyro, :data_table], fn
@@ -126,7 +101,7 @@ if Code.ensure_loaded?(Ash) do
               Transformer.add_entity(dsl, [:pyro, :data_table], data_table_action, prepend: true)
             end)
 
-          {:ok, dsl}
+          handle_errors(errors, "data table", dsl)
       end
     end
 
@@ -278,16 +253,5 @@ if Code.ensure_loaded?(Ash) do
     defp maybe_append_path(root, nil), do: root
     defp maybe_append_path(root, []), do: root
     defp maybe_append_path(root, path), do: root ++ List.wrap(path)
-
-    defp default_label(%{name: name}), do: default_label(name)
-
-    defp default_label(name) when is_atom(name),
-      do: default_label(Atom.to_string(name))
-
-    defp default_label(name) when is_binary(name),
-      do:
-        name
-        |> String.split("_")
-        |> Enum.map_join(" ", &String.capitalize/1)
   end
 end

@@ -1,16 +1,18 @@
 defmodule Example.Vendor.Company do
   use Ash.Resource,
     data_layer: AshPostgres.DataLayer,
-    extensions: [Pyro.Resource],
+    extensions: [Pyro.Ash.Extensions.Resource],
     authorizers: [Ash.Policy.Authorizer],
     notifiers: [Ash.Notifier.PubSub]
 
   pyro do
     live_view do
-      page :companies do
-        list :index, :read
-        create :new, :create
-        update :edit, :update
+      page "/", :companies do
+        list "/", :index, :read
+        list "/another", :another, :read
+        list "/one-more", :one_more, :read
+        create "/create", :new, :create
+        update "/edit", :edit, :update
       end
     end
 

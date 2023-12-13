@@ -1,19 +1,20 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource do
+  defmodule Pyro.Ash.Extensions.Resource do
     @form_field %Spark.Dsl.Entity{
       describe:
-        "Declare non-default behavior for a specific form field in the `Pyro.Resource` extension.",
+        "Declare non-default behavior for a specific form field in the `Pyro.Ash.Extensions.Resource` extension.",
       name: :field,
-      schema: Pyro.Resource.Form.Field.schema(),
-      target: Pyro.Resource.Form.Field,
+      schema: Pyro.Ash.Extensions.Resource.Form.Field.schema(),
+      target: Pyro.Ash.Extensions.Resource.Form.Field,
       args: [:name]
     }
 
     @form_field_group %Spark.Dsl.Entity{
-      describe: "Configure the appearance of form field groups in the `Pyro.Resource` extension.",
+      describe:
+        "Configure the appearance of form field groups in the `Pyro.Ash.Extensions.Resource` extension.",
       name: :field_group,
-      schema: Pyro.Resource.Form.FieldGroup.schema(),
-      target: Pyro.Resource.Form.FieldGroup,
+      schema: Pyro.Ash.Extensions.Resource.Form.FieldGroup.schema(),
+      target: Pyro.Ash.Extensions.Resource.Form.FieldGroup,
       recursive_as: :fields,
       args: [:name],
       entities: [
@@ -24,8 +25,8 @@ if Code.ensure_loaded?(Ash) do
     @form_action %Spark.Dsl.Entity{
       describe: "Configure the appearance forms forms for specific action(s).",
       name: :action,
-      schema: Pyro.Resource.Form.Action.schema(),
-      target: Pyro.Resource.Form.Action,
+      schema: Pyro.Ash.Extensions.Resource.Form.Action.schema(),
+      target: Pyro.Ash.Extensions.Resource.Form.Action,
       args: [:name],
       entities: [
         fields: [@form_field, @form_field_group]
@@ -36,8 +37,8 @@ if Code.ensure_loaded?(Ash) do
       describe:
         "Configure default form appearance for actions of type(s). Will be ignored by actions configured explicitly.",
       name: :action_type,
-      schema: Pyro.Resource.Form.ActionType.schema(),
-      target: Pyro.Resource.Form.ActionType,
+      schema: Pyro.Ash.Extensions.Resource.Form.ActionType.schema(),
+      target: Pyro.Ash.Extensions.Resource.Form.ActionType,
       args: [:name],
       entities: [
         fields: [@form_field, @form_field_group]
@@ -45,7 +46,8 @@ if Code.ensure_loaded?(Ash) do
     }
 
     @form %Spark.Dsl.Section{
-      describe: "Configure the appearance of forms in the `Pyro.Resource` extension.",
+      describe:
+        "Configure the appearance of forms in the `Pyro.Ash.Extensions.Resource` extension.",
       name: :form,
       schema: [
         exclude: [
@@ -63,18 +65,18 @@ if Code.ensure_loaded?(Ash) do
 
     @data_table_column %Spark.Dsl.Entity{
       describe:
-        "Declare non-default behavior for a specific data table column in the `Pyro.Resource` extension.",
+        "Declare non-default behavior for a specific data table column in the `Pyro.Ash.Extensions.Resource` extension.",
       name: :column,
-      schema: Pyro.Resource.DataTable.Column.schema(),
-      target: Pyro.Resource.DataTable.Column,
+      schema: Pyro.Ash.Extensions.Resource.DataTable.Column.schema(),
+      target: Pyro.Ash.Extensions.Resource.DataTable.Column,
       args: [:name]
     }
 
     @data_table_action %Spark.Dsl.Entity{
       describe: "Configure the appearance of the data table for specific action(s).",
       name: :action,
-      schema: Pyro.Resource.DataTable.Action.schema(),
-      target: Pyro.Resource.DataTable.Action,
+      schema: Pyro.Ash.Extensions.Resource.DataTable.Action.schema(),
+      target: Pyro.Ash.Extensions.Resource.DataTable.Action,
       args: [:name],
       entities: [
         columns: [@data_table_column]
@@ -85,8 +87,8 @@ if Code.ensure_loaded?(Ash) do
       describe:
         "Configure the default data table appearance for actions of type(s). Will be ignored by actions configured explicitly.",
       name: :action_type,
-      schema: Pyro.Resource.DataTable.ActionType.schema(),
-      target: Pyro.Resource.DataTable.ActionType,
+      schema: Pyro.Ash.Extensions.Resource.DataTable.ActionType.schema(),
+      target: Pyro.Ash.Extensions.Resource.DataTable.ActionType,
       args: [:name],
       entities: [
         columns: [@data_table_column]
@@ -94,7 +96,8 @@ if Code.ensure_loaded?(Ash) do
     }
 
     @data_table %Spark.Dsl.Section{
-      describe: "Configure the appearance of data tables in the `Pyro.Resource` extension.",
+      describe:
+        "Configure the appearance of data tables in the `Pyro.Ash.Extensions.Resource` extension.",
       name: :data_table,
       schema: [
         exclude: [
@@ -113,48 +116,49 @@ if Code.ensure_loaded?(Ash) do
     @live_view_list %Spark.Dsl.Entity{
       describe: "Configure a list action for this resource.",
       name: :list,
-      schema: Pyro.Resource.LiveView.Page.List.schema(),
-      target: Pyro.Resource.LiveView.Page.List,
-      args: [:live_action, :action]
+      schema: Pyro.Ash.Extensions.Resource.LiveView.Page.List.schema(),
+      target: Pyro.Ash.Extensions.Resource.LiveView.Page.List,
+      args: [:path, :live_action, :action]
     }
 
     @live_view_show %Spark.Dsl.Entity{
       describe: "Configure a show action for this resource.",
       name: :show,
-      schema: Pyro.Resource.LiveView.Page.Show.schema(),
-      target: Pyro.Resource.LiveView.Page.Show,
-      args: [:live_action, :action]
+      schema: Pyro.Ash.Extensions.Resource.LiveView.Page.Show.schema(),
+      target: Pyro.Ash.Extensions.Resource.LiveView.Page.Show,
+      args: [:path, :live_action, :action]
     }
 
     @live_view_create %Spark.Dsl.Entity{
       describe: "Configure a create action for this resource.",
       name: :create,
-      schema: Pyro.Resource.LiveView.Page.Create.schema(),
-      target: Pyro.Resource.LiveView.Page.Create,
-      args: [:live_action, :action]
+      schema: Pyro.Ash.Extensions.Resource.LiveView.Page.Create.schema(),
+      target: Pyro.Ash.Extensions.Resource.LiveView.Page.Create,
+      args: [:path, :live_action, :action]
     }
 
     @live_view_update %Spark.Dsl.Entity{
       describe: "Configure a update action for this resource.",
       name: :update,
-      schema: Pyro.Resource.LiveView.Page.Update.schema(),
-      target: Pyro.Resource.LiveView.Page.Update,
-      args: [:live_action, :action]
+      schema: Pyro.Ash.Extensions.Resource.LiveView.Page.Update.schema(),
+      target: Pyro.Ash.Extensions.Resource.LiveView.Page.Update,
+      args: [:path, :live_action, :action]
     }
 
     @live_view_page %Spark.Dsl.Entity{
       describe: "Configure a page for this resource.",
       name: :page,
-      schema: Pyro.Resource.LiveView.Page.schema(),
-      target: Pyro.Resource.LiveView.Page,
-      args: [:name],
+      schema: Pyro.Ash.Extensions.Resource.LiveView.Page.schema(),
+      target: Pyro.Ash.Extensions.Resource.LiveView.Page,
+      args: [:path, :name],
+      identifier: :name,
       entities: [
         live_actions: [@live_view_list, @live_view_show, @live_view_create, @live_view_update]
       ]
     }
 
     @live_view %Spark.Dsl.Section{
-      describe: "Configure LiveViews in the `Pyro.Resource` extension.",
+      describe: "Configure LiveViews in the `Pyro.Ash.Extensions.Resource` extension.",
       name: :live_view,
       schema: [],
       entities: [@live_view_page]
@@ -201,10 +205,11 @@ if Code.ensure_loaded?(Ash) do
     }
 
     @transformers [
-      Pyro.Resource.Transformers.MergeDataTableActions,
-      Pyro.Resource.Transformers.ValidateDataTableActions,
-      Pyro.Resource.Transformers.MergeFormActions,
-      Pyro.Resource.Transformers.ValidateFormActions
+      Pyro.Ash.Extensions.Resource.Transformers.MergeDataTableActions,
+      Pyro.Ash.Extensions.Resource.Transformers.ValidateDataTableActions,
+      Pyro.Ash.Extensions.Resource.Transformers.MergeFormActions,
+      Pyro.Ash.Extensions.Resource.Transformers.ValidateFormActions,
+      Pyro.Ash.Extensions.Resource.Transformers.MergePages
     ]
 
     @sections [@pyro]

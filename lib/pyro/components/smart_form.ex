@@ -9,7 +9,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     # import Pyro.Gettext
     import Pyro.Components.Core, only: [button: 1, header: 1, input: 1]
 
-    alias Pyro.Resource.Info, as: UI
+    alias Pyro.Ash.Extensions.Resource.Info, as: UI
     alias Ash.Resource.Info, as: ResourceInfo
 
     require Ash.Query
@@ -120,7 +120,7 @@ if Code.ensure_loaded?(AshPhoenix) do
              argument: nil,
              resource: resource,
              action_info: action_info,
-             field: %Pyro.Resource.Form.Field{name: name}
+             field: %Pyro.Ash.Extensions.Resource.Form.Field{name: name}
            } = assigns
          ) do
       {attribute, argument} =
@@ -150,7 +150,7 @@ if Code.ensure_loaded?(AshPhoenix) do
       |> render_field
     end
 
-    defp render_field(%{field: %Pyro.Resource.Form.FieldGroup{}} = assigns) do
+    defp render_field(%{field: %Pyro.Ash.Extensions.Resource.Form.FieldGroup{}} = assigns) do
       assigns = assign_overridables(assigns)
 
       ~H"""
@@ -175,7 +175,10 @@ if Code.ensure_loaded?(AshPhoenix) do
 
     if Code.ensure_loaded?(Timex) && Code.ensure_loaded?(Tzdata) do
       defp render_field(
-             %{field: %Pyro.Resource.Form.Field{type: :default}, attribute: %{type: type}} =
+             %{
+               field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
+               attribute: %{type: type}
+             } =
                assigns
            )
            when type == Pyro.Ash.Type.ZonedDateTime do
@@ -195,7 +198,7 @@ if Code.ensure_loaded?(AshPhoenix) do
       end
     end
 
-    defp render_field(%{field: %Pyro.Resource.Form.Field{type: :select}} = assigns) do
+    defp render_field(%{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :select}} = assigns) do
       ~H"""
       <.input
         overrides={@overrides}
@@ -212,7 +215,9 @@ if Code.ensure_loaded?(AshPhoenix) do
       """
     end
 
-    defp render_field(%{field: %Pyro.Resource.Form.Field{type: :long_text}} = assigns) do
+    defp render_field(
+           %{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :long_text}} = assigns
+         ) do
       ~H"""
       <.input
         overrides={@overrides}
@@ -227,7 +232,9 @@ if Code.ensure_loaded?(AshPhoenix) do
       """
     end
 
-    defp render_field(%{field: %Pyro.Resource.Form.Field{type: :short_text}} = assigns) do
+    defp render_field(
+           %{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :short_text}} = assigns
+         ) do
       ~H"""
       <.input
         overrides={@overrides}
@@ -243,7 +250,7 @@ if Code.ensure_loaded?(AshPhoenix) do
 
     defp render_field(
            %{
-             field: %Pyro.Resource.Form.Field{type: :default},
+             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
              attribute: %{type: type}
            } = assigns
          )
@@ -263,7 +270,7 @@ if Code.ensure_loaded?(AshPhoenix) do
 
     defp render_field(
            %{
-             field: %Pyro.Resource.Form.Field{type: :default},
+             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
              attribute: %{type: type, constraints: constraints}
            } = assigns
          )
@@ -296,7 +303,7 @@ if Code.ensure_loaded?(AshPhoenix) do
 
     defp render_field(
            %{
-             field: %Pyro.Resource.Form.Field{type: :default},
+             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
              attribute: %{type: type}
            } = assigns
          )
@@ -317,7 +324,7 @@ if Code.ensure_loaded?(AshPhoenix) do
 
     defp render_field(
            %{
-             field: %Pyro.Resource.Form.Field{type: type},
+             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: type},
              argument: %Ash.Resource.Actions.Argument{type: arg_type},
              change: %{
                type: Ash.Resource.Change.ManageRelationship,

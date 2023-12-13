@@ -1,10 +1,9 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.Transformers.ValidateDataTableActions do
+  defmodule Pyro.Ash.Extensions.Resource.Transformers.ValidateDataTableActions do
     @moduledoc false
-    use Spark.Dsl.Transformer
-    alias Spark.Dsl.Transformer
-    alias Spark.Error.DslError
-    alias Pyro.Resource.DataTable
+
+    use Pyro.Ash.Extensions.Resource.Transformers
+    alias Pyro.Ash.Extensions.Resource.DataTable
 
     @impl true
     def after_compile?, do: true
@@ -178,31 +177,7 @@ if Code.ensure_loaded?(Ash) do
           end)
         end
 
-      case errors do
-        [] ->
-          :ok
-
-        [error] ->
-          raise(error)
-
-        errors ->
-          list =
-            errors
-            |> Enum.reverse()
-            |> Enum.map(&("   - " <> &1.message))
-            |> Enum.dedup()
-            |> Enum.join("\n")
-
-          raise(
-            DslError.exception(
-              path: [:pyro, :data_table],
-              message: """
-              There are multiple errors with the data table:
-              #{list}
-              """
-            )
-          )
-      end
+      handle_errors(errors, "data table")
     end
   end
 end

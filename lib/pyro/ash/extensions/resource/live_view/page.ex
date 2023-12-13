@@ -1,12 +1,20 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Resource.LiveView.Page do
+  defmodule Pyro.Ash.Extensions.Resource.LiveView.Page do
     @moduledoc """
     A LiveView page.
     """
+
+    use Pyro.Ash.Extensions.Resource.Schema
+
     @type t :: %__MODULE__{}
-    defstruct [:name, :view_as, :class, :path_key, :live_actions]
+    defstruct [:path, :name, :view_as, :class, :live_actions, :__identifier__]
 
     @schema [
+      path: [
+        required: true,
+        type: :string,
+        doc: "The route path for this page."
+      ],
       name: [
         type: :atom,
         required: true,
@@ -24,14 +32,9 @@ if Code.ensure_loaded?(Ash) do
         """
       ],
       class: [
-        type: :string,
+        type: css_class_type(),
         required: false,
         doc: "Customize page classes."
-      ],
-      path_key: [
-        required: false,
-        type: :string,
-        doc: "The route path key for this page (no slashes)."
       ]
     ]
 

@@ -1,16 +1,16 @@
-defmodule Pyro.Resource.InfoTest do
+defmodule Pyro.Ash.Extensions.Resource.InfoTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
   require Ash.Query
 
-  doctest Pyro.Resource.Info, import: true
+  doctest Pyro.Ash.Extensions.Resource.Info, import: true
 
   defmodule User do
     @moduledoc false
     use Ash.Resource,
       data_layer: Ash.DataLayer.Ets,
-      extensions: [Pyro.Resource],
+      extensions: [Pyro.Ash.Extensions.Resource],
       notifiers: [Ash.Notifier.PubSub]
 
     require Ash.Query
@@ -98,7 +98,7 @@ defmodule Pyro.Resource.InfoTest do
     end
 
     relationships do
-      belongs_to :best_friend, __MODULE__, api: Pyro.Resource.InfoTest.Api
+      belongs_to :best_friend, __MODULE__, api: Pyro.Ash.Extensions.Resource.InfoTest.Api
     end
 
     calculations do
@@ -152,7 +152,7 @@ defmodule Pyro.Resource.InfoTest do
     end
 
     code_interface do
-      define_for Pyro.Resource.InfoTest.Api
+      define_for Pyro.Ash.Extensions.Resource.InfoTest.Api
 
       define :autocomplete, action: :autocomplete, args: [:search]
       define :list, action: :list

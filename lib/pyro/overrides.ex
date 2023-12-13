@@ -56,7 +56,7 @@ defmodule Pyro.Overrides do
         SmartPage
       }
 
-      alias Pyro.Resource.Info, as: UI
+      alias Pyro.Ash.Extensions.Resource.Info, as: UI
       alias Phoenix.LiveView.JS
 
       Module.register_attribute(__MODULE__, :override, accumulate: true)
