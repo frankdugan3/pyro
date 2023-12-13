@@ -1,6 +1,7 @@
 defmodule ExampleWeb.Router do
   use ExampleWeb, :router
   use AshAuthentication.Phoenix.Router
+  import Pyro.Ash.Extensions.Resource.SmartRouter
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -22,7 +23,7 @@ defmodule ExampleWeb.Router do
 
     ash_authentication_live_session :authentication_optional,
       on_mount: {ExampleWeb.LiveUserAuth, :live_user_optional} do
-      live "/", HomeLive
+      live_routes_for Vendor.CompanyLive, Example.Vendor.Company, :companies
     end
 
     sign_in_route register_path: "/register", reset_path: "/reset"
