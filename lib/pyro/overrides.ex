@@ -43,33 +43,46 @@ defmodule Pyro.Overrides do
   @doc false
   @spec __using__(any) :: Macro.t()
   defmacro __using__(_env) do
-    quote do
-      require unquote(__MODULE__)
-      import unquote(__MODULE__), only: :macros
-      import Pyro.Component.Helpers
+    ash_phoenix =
+      quote do
+        alias Pyro.Components.{
+          SmartDataTable,
+          SmartForm,
+          SmartPage
+        }
+      end
 
-      alias Pyro.Components.{
-        Autocomplete,
-        Core,
-        SmartDataTable,
-        SmartForm,
-        SmartPage
-      }
+    phoenix =
+      quote do
+        require unquote(__MODULE__)
+        import unquote(__MODULE__), only: :macros
+        import Pyro.Component.Helpers
 
-      alias Pyro.Ash.Extensions.Resource.Info, as: UI
-      alias Phoenix.LiveView.JS
+        alias Pyro.Components.{
+          Autocomplete,
+          Core
+        }
 
-      Module.register_attribute(__MODULE__, :override, accumulate: true)
-      @component nil
-      @__pass_assigns_to__ %{}
+        alias Pyro.Ash.Extensions.Resource.Info, as: UI
+        alias Phoenix.LiveView.JS
 
-      @on_definition unquote(__MODULE__)
-      @before_compile unquote(__MODULE__)
+        Module.register_attribute(__MODULE__, :override, accumulate: true)
+        @component nil
+        @__pass_assigns_to__ %{}
 
-      @doc false
-      # Internally used for validation.
-      @spec __pass_assigns_to__ :: map()
-      def __pass_assigns_to__(), do: @__pass_assigns_to__
+        @on_definition unquote(__MODULE__)
+        @before_compile unquote(__MODULE__)
+
+        @doc false
+        # Internally used for validation.
+        @spec __pass_assigns_to__ :: map()
+        def __pass_assigns_to__(), do: @__pass_assigns_to__
+      end
+
+    if Code.ensure_loaded?(AshPhoenix) do
+      [phoenix, ash_phoenix]
+    else
+      phoenix
     end
   end
 

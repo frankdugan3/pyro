@@ -16,13 +16,24 @@ defmodule Pyro.Components do
   """
 
   defmacro __using__(_) do
-    quote do
-      import Pyro.Components.Core
-      import Pyro.Components.DataTable
-      import Pyro.Components.SmartPage
-      import Pyro.Components.SmartDataTable
-      import Pyro.Components.SmartForm
-      alias Pyro.Components.Autocomplete
+    phoenix =
+      quote do
+        import Pyro.Components.Core
+        import Pyro.Components.DataTable
+        alias Pyro.Components.Autocomplete
+      end
+
+    ash_phoenix =
+      quote do
+        import Pyro.Components.SmartPage
+        import Pyro.Components.SmartDataTable
+        import Pyro.Components.SmartForm
+      end
+
+    if Code.ensure_loaded?(AshPhoenix) do
+      [phoenix, ash_phoenix]
+    else
+      phoenix
     end
   end
 end
