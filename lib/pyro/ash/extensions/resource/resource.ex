@@ -206,10 +206,13 @@ if Code.ensure_loaded?(Ash) do
 
     @transformers [
       Pyro.Ash.Extensions.Resource.Transformers.MergeDataTableActions,
-      Pyro.Ash.Extensions.Resource.Transformers.ValidateDataTableActions,
       Pyro.Ash.Extensions.Resource.Transformers.MergeFormActions,
-      Pyro.Ash.Extensions.Resource.Transformers.ValidateFormActions,
       Pyro.Ash.Extensions.Resource.Transformers.MergePages
+    ]
+
+    @verifiers [
+      Pyro.Ash.Extensions.Resource.Verifiers.DataTableActions,
+      Pyro.Ash.Extensions.Resource.Verifiers.FormActions
     ]
 
     @sections [@pyro]
@@ -230,6 +233,9 @@ if Code.ensure_loaded?(Ash) do
     <!--- ash-hq-hide-stop--> <!--- -->
     """
 
-    use Spark.Dsl.Extension, sections: @sections, transformers: @transformers
+    use Spark.Dsl.Extension,
+      sections: @sections,
+      transformers: @transformers,
+      verifiers: @verifiers
   end
 end

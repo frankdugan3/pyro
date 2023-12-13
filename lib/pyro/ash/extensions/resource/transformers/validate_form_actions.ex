@@ -1,18 +1,15 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Ash.Extensions.Resource.Transformers.ValidateFormActions do
+  defmodule Pyro.Ash.Extensions.Resource.Verifiers.FormActions do
     @moduledoc false
 
-    use Pyro.Ash.Extensions.Resource.Transformers
+    use Pyro.Ash.Extensions.Resource.Verifiers
     alias Pyro.Ash.Extensions.Resource.Form
 
     @impl true
-    def after_compile?, do: true
-
-    @impl true
-    def transform(dsl_state) do
+    def verify(dsl_state) do
       {private_attributes, public_attributes} =
         dsl_state
-        |> Transformer.get_entities([:attributes])
+        |> Verifier.get_entities([:attributes])
         |> Enum.split_with(& &1.private?)
 
       {writable_attributes, unwritable_attributes} =
@@ -22,8 +19,8 @@ if Code.ensure_loaded?(Ash) do
       private_attribute_names = MapSet.new(private_attributes, & &1.name)
       unwritable_attribute_names = MapSet.new(unwritable_attributes, & &1.name)
 
-      form_actions = Transformer.get_entities(dsl_state, [:pyro, :form])
-      actions = Transformer.get_entities(dsl_state, [:actions])
+      form_actions = Verifier.get_entities(dsl_state, [:pyro, :form])
+      actions = Verifier.get_entities(dsl_state, [:actions])
 
       errors =
         Enum.reduce(

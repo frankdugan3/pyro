@@ -1,33 +1,30 @@
 if Code.ensure_loaded?(Ash) do
-  defmodule Pyro.Ash.Extensions.Resource.Transformers.ValidateDataTableActions do
+  defmodule Pyro.Ash.Extensions.Resource.Verifiers.DataTableActions do
     @moduledoc false
 
-    use Pyro.Ash.Extensions.Resource.Transformers
+    use Pyro.Ash.Extensions.Resource.Verifiers
     alias Pyro.Ash.Extensions.Resource.DataTable
 
     @impl true
-    def after_compile?, do: true
-
-    @impl true
-    def transform(dsl_state) do
+    def verify(dsl_state) do
       {private_attributes, public_attributes} =
         dsl_state
-        |> Transformer.get_entities([:attributes])
+        |> Verifier.get_entities([:attributes])
         |> Enum.split_with(& &1.private?)
 
       {private_aggregates, public_aggregates} =
         dsl_state
-        |> Transformer.get_entities([:aggregates])
+        |> Verifier.get_entities([:aggregates])
         |> Enum.split_with(& &1.private?)
 
       {private_calculations, public_calculations} =
         dsl_state
-        |> Transformer.get_entities([:calculations])
+        |> Verifier.get_entities([:calculations])
         |> Enum.split_with(& &1.private?)
 
       {private_relationships, public_relationships} =
         dsl_state
-        |> Transformer.get_entities([:relationships])
+        |> Verifier.get_entities([:relationships])
         |> Enum.split_with(& &1.private?)
 
       private_fields =
@@ -48,7 +45,7 @@ if Code.ensure_loaded?(Ash) do
         ])
         |> MapSet.new(& &1.name)
 
-      data_table_actions = Transformer.get_entities(dsl_state, [:pyro, :data_table])
+      data_table_actions = Verifier.get_entities(dsl_state, [:pyro, :data_table])
 
       errors =
         Enum.reduce(
