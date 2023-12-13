@@ -8,16 +8,35 @@ defmodule Example.Vendor.Company do
   pyro do
     live_view do
       page "/", :companies do
-        list "/", :index, :read
-        list "/another", :another, :read
-        list "/one-more", :one_more, :read
+        list "/", :index, :read do
+          label :inherit
+          description :inherit
+        end
+
+        show "/", :show, :read
+        create "/create", :new, :create
+        update "/edit", :edit, :update
+      end
+
+      page "/", :show_company do
+        view_as(:show_and_modal)
+        show("/company", :another, :read)
+        create "/create", :new, :create
+        update "/edit", :edit, :update
+      end
+
+      page "/individual-company", :individuals do
+        view_as :individual
+        show "/show", :another, :read
         create "/create", :new, :create
         update "/edit", :edit, :update
       end
     end
 
     data_table do
-      action_type :read do
+      action :read do
+        label "Du Hast Mich"
+        description "Du Hasst Mich"
         exclude [:id]
         column :name
       end

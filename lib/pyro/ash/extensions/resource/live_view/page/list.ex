@@ -32,12 +32,12 @@ if Code.ensure_loaded?(Ash) do
         doc: "How to display the action."
       ],
       label: [
-        type: :string,
+        type: inheritable_type(),
         required: false,
         doc: "The label for this action (defaults to humanized live_action)."
       ],
       description: [
-        type: {:or, [:string, {:one_of, [:inherit]}]},
+        type: inheritable_type(),
         required: false,
         doc: "The description for this action."
       ],

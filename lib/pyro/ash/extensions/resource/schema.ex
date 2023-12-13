@@ -4,6 +4,10 @@ if Code.ensure_loaded?(Ash) do
       :any
     end
 
+    def inheritable_type(type \\ :string) do
+      {:or, [type, {:one_of, [:inherit]}]}
+    end
+
     defmacro __using__(_env) do
       quote do
         import unquote(__MODULE__)
