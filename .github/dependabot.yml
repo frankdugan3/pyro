@@ -1,6 +1,10 @@
 version: 2
 updates:
-- package-ecosystem: mix
-  directory: "/"
-  schedule:
-    interval: "weekly"
+  - package-ecosystem: mix
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+  - package-ecosystem: mix
+    directory: '/example'
+    schedule:
+      interval: 'weekly'
