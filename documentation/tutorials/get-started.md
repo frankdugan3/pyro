@@ -16,22 +16,34 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    def deps do
      [
     {:pyro, "~> 0.2.0"},
+
+    # Heroicon support in components
     {:heroicons,
       github: "tailwindlabs/heroicons",
       tag: "v2.0.18",
       app: false,
       compile: false,
-      sparse: "optimized"}, # Heroicon support in components
-    {:ash_phoenix, "~> 1.2"}, # Optional: Ash integration
-    {:ash, "~> 2.4"}, # Optional: Ash integration
-    {:makeup_eex, "~> 0.1.1"}, # Optional: Code highlighting components
-    {:makeup_elixir, "~> 0.16"}, # Optional: Code highlighting components
-    {:makeup_html, "~> 0.1.0"}, # Optional: Code highlighting components
-    {:makeup_js, "~> 0.1.0"}, # Optional: Code highlighting components
-    {:makeup_json, "~> 0.1.0"}, # Optional: Code highlighting components
-    {:makeup, "~> 1.1"}, # Optional: Code highlighting components
-    {:timex, "~> 3.0"}, # Optional: Date/Time/Zone components & tooling
-    {:tzdata, "~> 1.1.0"}, # Optional: Date/Time/Zone components & tooling
+      sparse: "optimized"},
+
+    ### OPTIONAL DEPS BELOW ###
+
+    # Ash resource extension to declare UI via DSL
+    {:ash, "~> 2.4"},
+
+    # "Smart" components that build UI from DSL
+    {:ash_phoenix, "~> 1.2"},
+
+    # Date/Time/Zone components & tooling
+    {:timex, "~> 3.0"},
+    {:tzdata, "~> 1.1"},
+
+    # Code highlighting components:
+    {:makeup, "~> 1.1"},
+    {:makeup_eex, "~> 0.1"},
+    {:makeup_elixir, "~> 0.16"},
+    {:makeup_html, "~> 0.1"},
+    {:makeup_js, "~> 0.1"},
+    {:makeup_json, "~> 0.1"},
      ]
    end
    ```
