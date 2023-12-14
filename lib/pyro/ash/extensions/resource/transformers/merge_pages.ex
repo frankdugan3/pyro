@@ -84,23 +84,34 @@ if Code.ensure_loaded?(Ash) do
 
       live_actions =
         Enum.reduce(live_action_types.show, list_actions, fn show, acc ->
-          child_actions =
-            Enum.concat([
-              live_action_types.create,
-              live_action_types.update
-            ])
+          show_identity = identity_to_path(show.identity)
 
           acc =
-            Enum.reduce(child_actions, acc, fn action, acc ->
+            Enum.reduce(live_action_types.update, acc, fn update, acc ->
               path =
-                build_path([page.path, identity_to_path(action.identity), show.path, action.path])
+                build_path([
+                  page.path,
+                  show_identity,
+                  show.path,
+                  identity_to_path(update.identity),
+                  update.path
+                ])
+
+              live_action = String.to_atom("#{show.live_action}_#{update.live_action}")
+              [%{update | path: path, live_action: live_action} | acc]
+            end)
+
+          acc =
+            Enum.reduce(live_action_types.create, acc, fn action, acc ->
+              path =
+                build_path([page.path, show_identity, show.path, action.path])
 
               live_action = String.to_atom("#{show.live_action}_#{action.live_action}")
               [%{action | path: path, live_action: live_action} | acc]
             end)
 
           [
-            %{show | path: build_path([page.path, identity_to_path(show.identity), show.path])}
+            %{show | path: build_path([page.path, show_identity, show.path])}
             | acc
           ]
         end)
@@ -127,8 +138,7 @@ if Code.ensure_loaded?(Ash) do
             %{show | path: build_path([page.path, identity_path, show.path])}
 
           %Page.Create{} = create ->
-            identity_path = identity_to_path(create.identity)
-            %{create | path: build_path([page.path, identity_path, create.path])}
+            %{create | path: build_path([page.path, create.path])}
 
           %Page.Update{} = update ->
             identity_path = identity_to_path(update.identity)
