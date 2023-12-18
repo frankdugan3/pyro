@@ -44,5 +44,5 @@ pyro-*.tar
 
 # We don't want to track migrations or snapshots for the example app
 
-/example/priv/migrations
+/example/priv/repo/migrations
 /example/priv/resource_snapshots

@@ -82,9 +82,17 @@ defmodule Example.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      reset: [
+        "ash_postgres.drop",
+        "ash_postgres.create",
+        "cmd rm -rf priv/repo/migrations",
+        "cmd rm -rf priv/resource_snapshots",
+        "ash_postgres.generate_migrations",
+        "ash_postgres.migrate",
+        "seed"
+      ],
+      seed: "run priv/repo/seeds.exs",
+      setup: ["deps.get", "seed", "assets.setup", "assets.build"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
