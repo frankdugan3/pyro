@@ -15,6 +15,8 @@ config :example, ash_apis: [Example.Authentication, Example.Vendor]
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
+config :pyro, gettext: Example.Gettext
+
 config :spark, :formatter,
   remove_parens?: true,
   "Ash.Resource": [

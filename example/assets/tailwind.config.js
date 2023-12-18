@@ -8,6 +8,7 @@ module.exports = {
   content: [
     './js/**/*.js',
     '../lib/example_web.ex',
+    '../lib/example/**/*.*ex',
     '../lib/example_web/**/*.*ex',
     '../../lib/pyro/**/*.*ex',
   ],

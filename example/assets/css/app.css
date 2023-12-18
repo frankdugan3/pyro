@@ -3,3 +3,55 @@
 @import 'tailwindcss/utilities';
 
 /* This file is for your main application CSS */
+
+@layer components {
+  /* D A T A    T A B L E */
+
+  .pdt {
+    @apply relative w-full mb-24;
+  }
+
+  .pdt-s,
+  .pdt-su {
+    @apply sticky top-0 p-0 z-10 text-sm;
+  }
+
+  .pdt-s-i {
+    @apply align-text-top select-none;
+  }
+
+  .pdt-s-i-c {
+    @apply bg-blue-500 text-white text-[.65rem] px-[.3rem] py-[.1rem] text-center rounded-full align-text-top select-none;
+  }
+
+  .pdt-s-b,
+  .pdt-s-ba,
+  .pdt-su {
+    @apply text-center px-2 py-1 font-black border-b-2 border-solid backdrop-blur;
+  }
+
+  .pdt-s-b,
+  .pdt-s-ba {
+    @apply w-full block whitespace-nowrap appearance-none outline-none focus:bg-slate-300/25 focus:dark:bg-slate-50/25 hover:bg-slate-300/25 hover:dark:bg-slate-50/25;
+  }
+
+  .pdt-s-b,
+  .pdt-su {
+    @apply border-slate-950/25 dark:border-slate-50/25;
+  }
+
+  .pdt-s-ba {
+    @apply border-sky-500/75;
+  }
+
+  .pdt-r {
+    @apply odd:bg-slate-100 odd:dark:bg-slate-950;
+  }
+
+  .pdt-c {
+    @apply px-1;
+  }
+  .pdt-f {
+    @apply fixed bottom-2 left-2 backdrop-blur flex flex-wrap items-center col-span-full gap-4 rounded-lg border border-slate-50/25 border-solid px-2 py-2 max-w-fit select-none;
+  }
+}

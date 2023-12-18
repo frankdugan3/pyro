@@ -52,7 +52,8 @@ defmodule ExampleWeb do
   def live_view do
     quote do
       use Pyro.LiveView,
-        layout: {ExampleWeb.Layouts, :app}
+      layout: {ExampleWeb.Layouts, :app},
+      container: {:div, class: "grid overflow-hidden grid-rows-[auto,1fr]"}
 
       unquote(html_helpers())
     end

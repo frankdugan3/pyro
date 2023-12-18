@@ -30,6 +30,8 @@ defmodule ExampleWeb.Router do
     sign_out_route AuthController
     auth_routes_for Example.Authentication.User, to: AuthController
     reset_route []
+
+    post "/session/set-timezone", SessionSetTimezoneController, :set
   end
 
   # Other scopes may use custom stacks.

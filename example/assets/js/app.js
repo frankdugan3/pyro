@@ -21,7 +21,9 @@ import 'phoenix_html'
 import { Socket } from 'phoenix'
 import { LiveSocket } from 'phoenix_live_view'
 import topbar from '../vendor/topbar'
-import { hooks, getTimezone } from 'pyro'
+import { hooks, getTimezone, sendTimezoneToServer } from 'pyro'
+
+sendTimezoneToServer()
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -29,6 +31,33 @@ let csrfToken = document
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken, timezone: getTimezone() },
   hooks: { ...hooks },
+  metadata: {
+    click: (e, el) => {
+      return {
+        shiftKey: e.shiftKey,
+        ctrlKey: e.ctrlKey,
+        // detail: e.detail || 1,
+      }
+    },
+    // keydown: (e, el) => {
+    //   return {
+    //     altKey: e.altKey,
+    //     code: e.code,
+    //     ctrlKey: e.ctrlKey,
+    //     key: e.key,
+    //     shiftKey: e.shiftKey,
+    //   }
+    // },
+    // keyup: (e, el) => {
+    //   return {
+    //     altKey: e.altKey,
+    //     code: e.code,
+    //     ctrlKey: e.ctrlKey,
+    //     key: e.key,
+    //     shiftKey: e.shiftKey,
+    //   }
+    // },
+  },
 })
 
 // Show progress bar on live navigation and form submits
@@ -39,8 +68,11 @@ window.addEventListener('phx:page-loading-stop', (_info) => topbar.hide())
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 
-// expose liveSocket on window for web console debug logs and latency simulation:
-// >> liveSocket.enableDebug()
-// >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
-// >> liveSocket.disableLatencySim()
-window.liveSocket = liveSocket
+if (process.env.NODE_ENV !== 'production') {
+  liveSocket.enableDebug()
+  window.liveSocket = liveSocket
+}
+
+console.log(`What, you think you're some kind of developer? Get out of my space!!
+
+(╯°□°）╯︵ ┻━┻`)
