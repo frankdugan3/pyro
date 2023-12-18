@@ -150,7 +150,7 @@ if Code.ensure_loaded?(Ash) do
       name: :page,
       schema: Pyro.Ash.Extensions.Resource.LiveView.Page.schema(),
       target: Pyro.Ash.Extensions.Resource.LiveView.Page,
-      args: [:path, :name],
+      args: [:path, :name, :api],
       identifier: :name,
       entities: [
         live_actions: [@live_view_list, @live_view_show, @live_view_create, @live_view_update]

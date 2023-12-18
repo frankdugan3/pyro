@@ -28,17 +28,14 @@ if Code.ensure_loaded?(Ash) do
       resource = Macro.expand(resource, __CALLER__)
       pyro_page = Pyro.Ash.Extensions.Resource.Info.page_for(resource, page_name)
 
-      routes =
-        for %{path: path, live_action: live_action} <- pyro_page.live_actions do
-          quote do
-            live unquote(path),
-                 unquote(live_view),
-                 unquote(live_action)
-          end
+      for %{path: path, live_action: live_action} <-
+            pyro_page.live_actions do
+        quote do
+          live unquote(path),
+               unquote(live_view),
+               unquote(live_action),
+               as: unquote(page_name)
         end
-
-      quote do
-        unquote(routes)
       end
     end
   end

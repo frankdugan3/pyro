@@ -63,7 +63,7 @@ if Code.ensure_loaded?(Ash) do
       ],
       identity: [
         required: false,
-        type: {:or, [:atom, {:list, :atom}]},
+        type: {:wrap_list, :atom},
         default: :id,
         doc: "The identity used to load the record."
       ]

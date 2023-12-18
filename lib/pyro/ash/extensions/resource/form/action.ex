@@ -10,7 +10,7 @@ if Code.ensure_loaded?(Ash) do
 
     @schema [
       name: [
-        type: {:or, [:atom, {:list, :atom}]},
+        type: {:wrap_list, :atom},
         required: true,
         doc: "The action name(s) for this form."
       ],

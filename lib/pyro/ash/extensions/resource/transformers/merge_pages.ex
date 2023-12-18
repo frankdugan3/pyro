@@ -33,6 +33,13 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp merge_page(
+           %Page{route_helper: nil, name: name} = page,
+           acc
+         ) do
+      merge_page(%{page | route_helper: String.to_atom("#{name}_path")}, acc)
+    end
+
+    defp merge_page(
            %Page{view_as: :list_and_modal, live_actions: live_actions} = page,
            {dsl, errors}
          ) do
@@ -43,10 +50,18 @@ if Code.ensure_loaded?(Ash) do
 
       live_actions =
         Enum.reduce(live_action_types.list, [], fn list, acc ->
+          acc =
+            Enum.reduce(live_action_types.create, acc, fn create, acc ->
+              path =
+                build_path([page.path, list.path, create.path])
+
+              live_action = String.to_atom("#{list.live_action}_#{create.live_action}")
+              [%{create | path: path, live_action: live_action} | acc]
+            end)
+
           child_actions =
             Enum.concat([
               live_action_types.show,
-              live_action_types.create,
               live_action_types.update
             ])
 

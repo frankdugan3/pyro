@@ -7,7 +7,17 @@ if Code.ensure_loaded?(Ash) do
     use Pyro.Ash.Extensions.Resource.Schema
 
     @type t :: %__MODULE__{}
-    defstruct [:path, :name, :view_as, :class, :live_actions, :__identifier__]
+    defstruct [
+      :path,
+      :name,
+      :api,
+      :view_as,
+      :class,
+      :keep_live?,
+      :live_actions,
+      :route_helper,
+      :__identifier__
+    ]
 
     @schema [
       path: [
@@ -19,6 +29,11 @@ if Code.ensure_loaded?(Ash) do
         type: :atom,
         required: true,
         doc: "The live action for this page."
+      ],
+      api: [
+        type: :atom,
+        required: true,
+        doc: "The API for routes on this page (can also specify per-route/per-action)."
       ],
       view_as: [
         type: {:one_of, [:list_and_modal, :show_and_modal, :individual]},
@@ -35,6 +50,17 @@ if Code.ensure_loaded?(Ash) do
         type: css_class_type(),
         required: false,
         doc: "Customize page classes."
+      ],
+      route_helper: [
+        type: :atom,
+        required: false,
+        doc: "The route helper name to be generated. Defaults to [name]_path."
+      ],
+      keep_live?: [
+        type: :boolean,
+        required: false,
+        default: false,
+        doc: "Subscribe to resource updates and keep the view up to date."
       ]
     ]
 
