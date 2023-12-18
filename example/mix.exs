@@ -46,7 +46,7 @@ defmodule Example.MixProject do
       {:gettext, "~> 0.20"},
       {:heroicons,
        github: "tailwindlabs/heroicons",
-       tag: "v2.1.0",
+       tag: "v2.1.1",
        app: false,
        compile: false,
        sparse: "optimized"},
