@@ -41,3 +41,8 @@ pyro-*.tar
 /example/priv/static/assets/
 /example/priv/static/cache_manifest.json
 /example/assets/node_modules/
+
+# We don't want to track migrations or snapshots for the example app
+
+/example/priv/migrations
+/example/priv/resource_snapshots
