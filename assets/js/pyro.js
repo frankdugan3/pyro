@@ -8,6 +8,48 @@ window.addEventListener('pyro:clear', (e) => {
   }
 })
 
+window.addEventListener(`pyro:scroll-top`, (e) => {
+  if (e && e.detail && e.detail.id) {
+    let el = document.getElementById(e.detail.id)
+    if (el) {
+      maybeScrollParent(el)
+    } else {
+      console.error(
+        `pyro:scroll-top requested for DOM ID #${e.detail.id} doesn't exist!`,
+      )
+    }
+  } else if (e && e.detail && e.detail.selector) {
+    let el = document.querySelector(e.detail.selector)
+    if (el) {
+      maybeScrollParent(el)
+    } else {
+      console.error(
+        `pyro:scroll-top requested for DOM selector #${e.detail.selector} doesn't exist!`,
+      )
+    }
+  } else {
+    console.error(
+      `pyro:scroll-top event doesn't contain e.detail.id or e.detail.selector!`,
+    )
+  }
+})
+
+// Scroll element or parents if already scrolled
+function maybeScrollParent(el, depth = 0) {
+  if (el.scrollTop == 0 && el.parentElement && el.parentElement.scrollTop > 0) {
+    el.parentElement.scrollTop = 0
+  } else if (
+    el.scrollTop == 0 &&
+    el.parentElement &&
+    el.parentElement.scrollTop == 0 &&
+    depth < 5
+  ) {
+    maybeScrollParent(el.parentElement, depth + 1)
+  } else {
+    el.scrollTop = 0
+  }
+}
+
 // #############################################################################
 // ####    T I M E Z O N E    T O O L I N G
 // #############################################################################
