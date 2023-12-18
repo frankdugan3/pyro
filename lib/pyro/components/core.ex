@@ -75,14 +75,10 @@ defmodule Pyro.Components.Core do
 
   attr :class, :css_classes,
     overridable: true,
-    required: true,
     doc: "merge/override default classes of the `code` element"
 
   attr :rest, :global, doc: "additional HTML attributes added to the `a` tag"
-
-  slot :inner_block,
-    required: true,
-    doc: "the content rendered inside of the `a` tag"
+  slot :inner_block, required: true, doc: "the content rendered inside of the `a` tag"
 
   def a(assigns) do
     assigns = assign_overridables(assigns)
@@ -104,6 +100,209 @@ defmodule Pyro.Components.Core do
   end
 
   @doc """
+  Renders a back navigation link.
+
+  ## Examples
+
+      <.back navigate={~p"/posts"}>Back to posts</.back>
+      <.back icon_name="hero-arrow-left" navigate={~p"/"}>
+        Go back to the about page.
+      </.back>
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+
+  attr :icon_name, :string,
+    overridable: true,
+    required: true,
+    doc: "the name of the icon; see `icon/1` for details"
+
+  attr :navigate, :any, required: true
+  attr :class, :css_classes, overridable: true
+  attr :icon_class, :css_classes, overridable: true
+
+  slot :inner_block, required: true
+
+  def back(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <.link navigate={@navigate} class={@class}>
+      <.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
+      <%= render_slot(@inner_block) %>
+    </.link>
+    """
+  end
+
+  @doc """
+  Renders a button.
+
+  Supports:
+
+  - Any button type
+  - Any anchor type
+    - LivePatch
+    - LiveRedirect
+    - External href links
+
+  ## Examples
+
+      <.button>Send!</.button>
+      <.button phx-click="go" class="ml-2">Send!</.button>
+      <.button navigate={~p"/home"}>Home</.button>
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+
+  attr :confirm, :string,
+    default: nil,
+    doc: "text to display in a confirm dialog before emitting click event"
+
+  attr :csrf_token, :string, default: nil
+  attr :disabled, :boolean, default: false
+  attr :href, :any
+
+  attr :icon_name, :string,
+    default: nil,
+    doc: "the name of the icon to display (nil for none); see `icon/1` for details"
+
+  attr :loading, :boolean, default: false, doc: "display a loading spinner"
+  attr :method, :string, default: "get"
+  attr :navigate, :string
+  attr :patch, :string
+  attr :ping, :boolean, default: false, doc: "show a ping indicator"
+  attr :replace, :boolean, default: false
+  attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target form name value]
+
+  attr :type, :string,
+    default: "button",
+    values: ~w[button reset submit],
+    doc: "type of the button"
+
+  attr :color, :string, overridable: true, required: true, doc: "the color of the button"
+  attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the button"
+  attr :variant, :string, overridable: true, required: true, doc: "style of button"
+  attr :class, :css_classes, overridable: true
+  attr :icon_class, :css_classes, overridable: true
+  attr :ping_class, :css_classes, overridable: true
+  attr :ping_animation_class, :css_classes, overridable: true
+
+  slot :inner_block, required: true, doc: "the content of the button"
+
+  def button(assigns) do
+    assigns
+    |> assign_overridables()
+    |> render_button()
+  end
+
+  defp render_button(%{href: _href} = assigns) do
+    ~H"""
+    <.link
+      href={@href}
+      replace={@replace}
+      method={@method}
+      csrf_token={@csrf_token}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.icon
+        :if={!@loading && @icon_name}
+        overrides={@overrides}
+        name={@icon_name}
+        class={@icon_class}
+      />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_animation_class} />
+        <span class={@ping_class} />
+      <% end %>
+    </.link>
+    """
+  end
+
+  defp render_button(%{patch: _patch} = assigns) do
+    ~H"""
+    <.link
+      patch={@patch}
+      replace={@replace}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.icon
+        :if={!@loading && @icon_name}
+        overrides={@overrides}
+        name={@icon_name}
+        class={@icon_class}
+      />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_animation_class} />
+        <span class={@ping_class} />
+      <% end %>
+    </.link>
+    """
+  end
+
+  defp render_button(%{navigate: _navigate} = assigns) do
+    ~H"""
+    <.link
+      navigate={@navigate}
+      replace={@replace}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.icon
+        :if={!@loading && @icon_name}
+        overrides={@overrides}
+        name={@icon_name}
+        class={@icon_class}
+      />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_animation_class} />
+        <span class={@ping_class} />
+      <% end %>
+    </.link>
+    """
+  end
+
+  defp render_button(assigns) do
+    ~H"""
+    <button
+      type={@type}
+      disabled={@disabled}
+      data-confirm={@confirm}
+      data-submit={!!@confirm}
+      class={@class}
+      {@rest}
+    >
+      <.spinner :if={@loading} overrides={@overrides} size={@size} />
+      <.icon
+        :if={!@loading && @icon_name}
+        overrides={@overrides}
+        name={@icon_name}
+        class={@icon_class}
+      />
+      <%= render_slot(@inner_block) %>
+      <%= if @ping do %>
+        <span class={@ping_animation_class} />
+        <span class={@ping_class} />
+      <% end %>
+    </button>
+    """
+  end
+
+  @doc """
   Renders a code block.
   """
 
@@ -112,7 +311,6 @@ defmodule Pyro.Components.Core do
   attr :id, :string, required: true
   attr :copy, :boolean, overridable: true, required: true
   attr :copy_label, :string, overridable: true, required: true
-  attr :copy_class, :css_classes, overridable: true, required: true
   attr :copy_message, :string, overridable: true
 
   attr :language, :string,
@@ -122,8 +320,9 @@ defmodule Pyro.Components.Core do
 
   attr :class, :css_classes,
     overridable: true,
-    required: true,
     doc: "merge/override default classes of the `code` element"
+
+  attr :copy_class, :css_classes, overridable: true
 
   def code(assigns) do
     assigns = assign_overridables(assigns)
@@ -143,214 +342,6 @@ defmodule Pyro.Components.Core do
     end
   else
     defp format_code(source, _), do: source
-  end
-
-  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :id, :string, required: true
-  attr :value, :string, required: true, doc: "text to copy"
-  attr :label, :string, default: nil, doc: "button label, defaults to value"
-  attr :disabled, :boolean, default: false
-
-  attr :icon_name, :string,
-    default: nil,
-    doc: "the name of the icon to display (nil for none); see `icon/1` for details"
-
-  attr :ttl, :integer,
-    overridable: true,
-    required: true,
-    doc: "how long to show the flash message after copying"
-
-  attr :case, :string,
-    overridable: true,
-    required: true,
-    values: ~w[uppercase normal-case lowercase capitalize],
-    doc: "the case of the text"
-
-  attr :color, :string, overridable: true, required: true, doc: "the color of the button"
-  attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
-  attr :size, :string, overridable: true, required: true, doc: "the size of the button"
-  attr :variant, :string, overridable: true, required: true, doc: "style of button"
-  attr :class, :css_classes, overridable: true, required: true
-
-  attr :message, :string,
-    overridable: true,
-    required: true,
-    doc: "message to display after copying"
-
-  attr :icon_class, :css_classes, overridable: true, required: true
-  attr :rest, :global
-
-  def copy_to_clipboard(assigns) do
-    assigns = assign_overridables(assigns)
-
-    ~H"""
-    <button
-      id={@id}
-      type="button"
-      class={@class}
-      disabled={@disabled}
-      phx-hook="PyroCopyToClipboard"
-      data-value={@value}
-      data-message={@message}
-      data-ttl={@ttl}
-      title="Copy to clipboard"
-      {@rest}
-    >
-      <.icon :if={@icon_name} overrides={@overrides} name={@icon_name} class={@icon_class} />
-      <%= @label || @value %>
-    </button>
-    """
-  end
-
-  @doc """
-  Renders a navigation link, taking into account whether the URI is the current page.
-  """
-
-  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :label, :string, required: true, doc: "the label of of the link"
-  attr :uri, :string, required: true, doc: "the URI of the link"
-  attr :current_uri, :string, required: true, doc: "the current URI of the page"
-
-  attr :is_current, :boolean,
-    overridable: true,
-    required: true,
-    doc: "does `:uri` match `:current_uri`?"
-
-  attr :class, :css_classes,
-    overridable: true,
-    required: true,
-    doc: "the class of the navigation link"
-
-  def nav_link(assigns) do
-    assigns = assign_overridables(assigns)
-
-    ~H"""
-    <.link :if={!@is_current} class={@class} navigate={@uri}>
-      <%= @label %>
-    </.link>
-    <span :if={@is_current} class={@class}>
-      <%= @label %>
-    </span>
-    """
-  end
-
-  @doc """
-  A progress element. Styling the progress element is tricky, so this wraps it with some nice conveniences.
-  """
-
-  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :max, :integer, default: 100
-  attr :value, :integer, default: 0
-  attr :color, :string, overridable: true, required: true, doc: "the color of the progress bar"
-  attr :size, :string, overridable: true, required: true, doc: "the size of the progress bar"
-
-  attr :class, :css_classes,
-    overridable: true,
-    required: true,
-    doc: "the class of the progress bar"
-
-  attr :rest, :global
-
-  def progress(assigns) do
-    assigns = assign_overridables(assigns)
-
-    ~H"""
-    <progress value={@value} max={@max} class={@class} {@rest} />
-    """
-  end
-
-  @doc """
-  A simple spinner component.
-  """
-
-  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :show, :boolean, default: true, doc: "show or hide spinner"
-  attr :rest, :global
-  attr :size, :string, overridable: true, required: true, doc: "the size of the spinner"
-  attr :class, :css_classes, overridable: true, required: true
-
-  def spinner(assigns) do
-    assigns = assign_overridables(assigns)
-
-    ~H"""
-    <svg {@rest} class={@class} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-      <path
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-    """
-  end
-
-  @doc """
-  A tooltip component.
-
-  - JS hook that "nudges" tooltip into view
-  - Simple props for tooltip text and custom icon
-  - Optional slots for icon and/or tooltip content
-
-  ## Examples
-
-      <.tooltip id="tooltip-1" tooltip="A default tooltip!" />
-      <.tooltip id="tooltip-2"
-                icon_name="hero-light-bulb-solid"
-                tooltip="Custom icon." />
-      <.tooltip id="tooltip-3">
-        <:icon>?</:icon>
-        <div class="bg-red-500 text-white p-4 w-48 shadow-lg rounded">
-          Custom tooltip slot and custom icon slot.
-        </div>
-      </.tooltip>
-  """
-
-  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :id, :string, required: true
-  attr :tooltip, :string, default: nil
-  attr :vertical_offset, :string, overridable: true, required: true
-  attr :horizontal_offset, :string, overridable: true, required: true
-  attr :tooltip_class, :css_classes, overridable: true, required: true
-  attr :tooltip_text_class, :css_classes, overridable: true, required: true
-  attr :icon_class, :css_classes, overridable: true
-
-  attr :icon_name, :string,
-    overridable: true,
-    required: true,
-    doc: "the name of the icon; see `icon/1` for details"
-
-  attr :class, :css_classes, overridable: true, required: true
-
-  slot :icon
-  slot :inner_block
-
-  def tooltip(assigns) do
-    assigns = assign_overridables(assigns)
-
-    assigns[:tooltip] || assigns[:inner_block] ||
-      raise ArgumentError, "missing :tooltip assign or :inner_block slot"
-
-    ~H"""
-    <span id={@id} class={@class}>
-      <%= if assigns[:icon] !== [] do %>
-        <%= render_slot(@icon) %>
-      <% else %>
-        <.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
-      <% end %>
-      <span
-        id={@id <> "-tooltip"}
-        class={@tooltip_class}
-        data-vertical-offset={@vertical_offset}
-        data-horizontal-offset={@horizontal_offset}
-        phx-hook="PyroNudgeIntoView"
-      >
-        <%= if assigns[:inner_block] !== [] do %>
-          <%= render_slot(@inner_block) %>
-        <% else %>
-          <span class={@tooltip_text_class} phx-no-format><%= @tooltip %></span>
-        <% end %>
-      </span>
-    </span>
-    """
   end
 
   @doc """
@@ -383,44 +374,20 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :css_classes, overridable: true, required: true
 
   attr :scheme, :atom,
     overridable: true,
     required: true,
     doc: "the scheme used to initialize the color scheme switcher"
 
-  attr :label_system, :string,
-    overridable: true,
-    required: false,
-    doc: "the label for the system scheme"
-
-  attr :label_dark, :string,
-    overridable: true,
-    required: false,
-    doc: "the label for the dark scheme"
-
-  attr :label_light, :string,
-    overridable: true,
-    required: false,
-    doc: "the label for the light scheme"
-
-  attr :icon_system, :string,
-    overridable: true,
-    required: false,
-    doc: "the icon for the system scheme"
-
-  attr :icon_dark, :string,
-    overridable: true,
-    required: false,
-    doc: "the icon for the dark scheme"
-
-  attr :icon_light, :string,
-    overridable: true,
-    required: false,
-    doc: "the icon for the light scheme"
-
+  attr :label_system, :string, overridable: true, doc: "the label for the system scheme"
+  attr :label_dark, :string, overridable: true, doc: "the label for the dark scheme"
+  attr :label_light, :string, overridable: true, doc: "the label for the light scheme"
+  attr :icon_system, :string, overridable: true, doc: "the icon for the system scheme"
+  attr :icon_dark, :string, overridable: true, doc: "the icon for the dark scheme"
+  attr :icon_light, :string, overridable: true, doc: "the icon for the light scheme"
   attr :show_labels, :boolean, default: false, doc: "show or hide labels"
+  attr :class, :css_classes, overridable: true
 
   def color_scheme_switcher(assigns) do
     assigns = assign_overridables(assigns)
@@ -461,9 +428,7 @@ defmodule Pyro.Components.Core do
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
   </head>
   ```
-
   """
-  @doc type: :component
   def color_scheme_switcher_js(assigns) do
     ~H"""
     <script>
@@ -550,235 +515,81 @@ defmodule Pyro.Components.Core do
     """
   end
 
-  @doc """
-  A slide-over component.
-
-  ## Example
-
-      <%= if @slide_over do %>
-        <.slide_over origin={@slide_over} max_width="sm" title="Slide Over">
-          <p>
-            This is a slide over.
-          </p>
-        </.slide_over>
-      <% end %>
-  """
-
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :css_classes, overridable: true, required: true
-  attr :overlay_class, :css_classes, overridable: true, required: true
-  attr :wrapper_class, :css_classes, overridable: true, required: true
-  attr :header_class, :css_classes, overridable: true, required: true
-  attr :header_inner_class, :css_classes, overridable: true, required: true
-  attr :header_title_class, :css_classes, overridable: true, required: true
-  attr :header_close_button_class, :css_classes, overridable: true, required: true
-  attr :content_class, :css_classes, overridable: true, required: true
+  attr :id, :string, required: true
+  attr :value, :string, required: true, doc: "text to copy"
+  attr :label, :string, default: nil, doc: "button label, defaults to value"
+  attr :disabled, :boolean, default: false
 
-  attr :close_icon_class, :css_classes, overridable: true, required: false
-  attr :close_icon_name, :string, overridable: true, required: true
-
-  attr :title, :string, doc: "the title of the slide-over"
-
-  attr :id, :string, default: "slide-over"
-  attr :origin, :string, overridable: true, required: true
-  attr :max_width, :string, overridable: true, required: true
-
-  attr :hide_js, :any, overridable: true, required: true
-
-  attr :close_even_name, :string,
-    default: "close_slide_over",
-    doc: "the name of the event to send when the slide-over is closed"
-
-  attr :close_slide_over_target, :string,
+  attr :icon_name, :string,
     default: nil,
-    doc:
-      "the specific live component to target for the close event, e.g. close_slide_over_target={@myself}"
+    doc: "the name of the icon to display (nil for none); see `icon/1` for details"
 
+  attr :ttl, :integer,
+    overridable: true,
+    required: true,
+    doc: "how long to show the flash message after copying"
+
+  attr :color, :string, overridable: true, required: true, doc: "the color of the button"
+  attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the button"
+  attr :variant, :string, overridable: true, required: true, doc: "style of button"
+
+  attr :message, :string,
+    overridable: true,
+    required: true,
+    doc: "message to display after copying"
+
+  attr :class, :css_classes, overridable: true
+  attr :icon_class, :css_classes, overridable: true
   attr :rest, :global
-  slot :inner_block, required: true
 
-  def slide_over(assigns) do
+  def copy_to_clipboard(assigns) do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <div id={@id} {@rest}>
-      <div id={"#{@id}-overlay"} class={@overlay_class} aria-hidden="true"></div>
-
-      <div class={@wrapper_class} role="dialog" aria-modal="true">
-        <div
-          id={"#{@id}-content"}
-          class={@class}
-          phx-click-away={
-            apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
-          }
-          phx-window-keydown={
-            apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
-          }
-          phx-key="escape"
-        >
-          <%!-- Header --%>
-          <div class={@header_class}>
-            <div class={@header_inner_class}>
-              <div class={@header_title_class}>
-                <%= @title %>
-              </div>
-
-              <button
-                phx-click={
-                  apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
-                }
-                class={@header_close_button_class}
-              >
-                <div class="sr-only">Close</div>
-                <.icon class={@close_icon_class} name={@close_icon_name} />
-              </button>
-            </div>
-          </div>
-          <%!-- Content --%>
-          <div class={@content_class}>
-            <%= render_slot(@inner_block) %>
-          </div>
-        </div>
-      </div>
-    </div>
+    <button
+      id={@id}
+      type="button"
+      class={@class}
+      disabled={@disabled}
+      phx-hook="PyroCopyToClipboard"
+      data-value={@value}
+      data-message={@message}
+      data-ttl={@ttl}
+      title="Copy to clipboard"
+      {@rest}
+    >
+      <.icon :if={@icon_name} overrides={@overrides} name={@icon_name} class={@icon_class} />
+      <%= @label || @value %>
+    </button>
     """
   end
 
-  @moduledoc """
-  Drop-in (prop/API compatible) replacement (and enhancement) of `core_components.ex` as generated by `Phoenix`, providing core UI components.
-
-  Compared to the generated components, Pyro's implementation adds:
-
-  - Maintenance/bugfixes/new features, since it's a library
-  - A powerful [override system](#module-overridable-component-attributes) for customization
-  - A special `:css_classes` type that utilizes the configured CSS merge utility
-  - The button component implements both button and anchor tags (button-styled links!)
-  - Inputs
-    - `autofocus` prop to enable a hook for reliable focus on mount
-    - `hidden` input type with a slot for custom content
-  - A rich flash experience
-    - Auto-remove after (configurable) timeout
-    - Progress bar for auto-removed flash messages
-    - Define which flashes are included in which trays (supports multiple trays)
-  - Slightly cleaner, more semantic markup
-
-  But wait, *there's more*! Those are just the `core_components` drop-in replacements  — Pyro has lots of other components on top of that. Check out the components section of the docs for the other modules.
-  """
-
   @doc """
-  TODO: This component is not fully converted to use overrides/properly styled.
-  Renders a modal.
-
-  ## Examples
-
-      <.modal id="confirm-modal">
-        Are you sure?
-        <:confirm>OK</:confirm>
-        <:cancel>Cancel</:cancel>
-      </.modal>
-
-  JS commands may be passed to the `:on_cancel` and `on_confirm` attributes
-  for the caller to react to each button press, for example:
-
-      <.modal id="confirm" on_confirm={JS.push("delete")} on_cancel={JS.navigate(~p"/posts")}>
-        Are you sure you?
-        <:confirm>OK</:confirm>
-        <:cancel>Cancel</:cancel>
-      </.modal>
+  Generates a generic error message.
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :id, :string, required: true
-  attr :show, :boolean, default: false
-  attr :on_cancel, JS, default: %JS{}
-  attr :on_confirm, JS, default: %JS{}
-  attr :show_js, :any, overridable: true, required: true
-  attr :hide_js, :any, overridable: true, required: true
-  attr :class, :css_classes, overridable: true, required: true
-  slot :inner_block, required: true
-  slot :title
-  slot :subtitle
-  slot :confirm
-  slot :cancel
 
-  def modal(assigns) do
+  attr :icon_name, :string,
+    overridable: true,
+    required: true,
+    doc: "the name of the icon; see `icon/1` for details"
+
+  attr :class, :css_classes, overridable: true
+  attr :icon_class, :css_classes, overridable: true
+
+  slot :inner_block, required: true
+
+  def error(assigns) do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <div
-      id={@id}
-      phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
-      phx-remove={apply(@hide_js, [%JS{}, @id])}
-      data-cancel={JS.exec(@on_cancel, "phx-remove")}
-      class={@class}
-    >
-      <div id={"#{@id}-bg"} class="fixed inset-0 bg-zinc-50/90 transition-opacity" aria-hidden="true" />
-      <div
-        class="fixed inset-0 overflow-y-auto"
-        aria-labelledby={"#{@id}-title"}
-        aria-describedby={"#{@id}-description"}
-        role="dialog"
-        aria-modal="true"
-        tabindex="0"
-      >
-        <div class="flex min-h-full items-center justify-center">
-          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
-            <.focus_wrap
-              id={"#{@id}-container"}
-              phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
-              phx-key="escape"
-              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
-            >
-              <div class="absolute top-6 right-5">
-                <button
-                  phx-click={JS.exec("data-cancel", to: "##{@id}")}
-                  type="button"
-                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
-                  aria-label={gettext("close")}
-                >
-                  <.icon name="hero-x-mark-solid" class="h-5 w-5" />
-                </button>
-              </div>
-              <div id={"#{@id}-content"}>
-                <header :if={@title != []}>
-                  <h1 id={"#{@id}-title"} class={@header_title_class}>
-                    <%= render_slot(@title) %>
-                  </h1>
-                  <p
-                    :if={@subtitle != []}
-                    id={"#{@id}-description"}
-                    class="mt-2 text-sm leading-6 text-zinc-600"
-                  >
-                    <%= render_slot(@subtitle) %>
-                  </p>
-                </header>
-                <%= render_slot(@inner_block) %>
-                <div :if={@confirm != [] or @cancel != []} class="ml-6 mb-4 flex items-center gap-5">
-                  <.button
-                    :for={confirm <- @confirm}
-                    overrides={@overrides}
-                    id={"#{@id}-confirm"}
-                    phx-click={@on_confirm}
-                    phx-disable-with
-                    class="py-2 px-3"
-                  >
-                    <%= render_slot(confirm) %>
-                  </.button>
-                  <.link
-                    :for={cancel <- @cancel}
-                    phx-click={apply(@hide_js, [@on_cancel, @id])}
-                    class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
-                  >
-                    <%= render_slot(cancel) %>
-                  </.link>
-                </div>
-              </div>
-            </.focus_wrap>
-          </div>
-        </div>
-      </div>
-    </div>
+    <p class={@class}>
+      <.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
+      <%= render_slot(@inner_block) %>
+    </p>
     """
   end
 
@@ -812,13 +623,13 @@ defmodule Pyro.Components.Core do
     overridable: true,
     doc: "used for styling a flash with a different kind"
 
-  attr :class, :css_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true
   attr :control_class, :css_classes, overridable: true
   attr :close_button_class, :css_classes, overridable: true
   attr :close_icon_class, :css_classes, overridable: true
-  attr :message_class, :css_classes, overridable: true, required: true
-  attr :progress_class, :css_classes, overridable: true, required: true
-  attr :title_class, :css_classes, overridable: true, required: true
+  attr :message_class, :css_classes, overridable: true
+  attr :progress_class, :css_classes, overridable: true
+  attr :title_class, :css_classes, overridable: true
   attr :title_icon_class, :css_classes, overridable: true
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
 
@@ -885,7 +696,7 @@ defmodule Pyro.Components.Core do
     required: true,
     doc: "the kinds of flashes to display"
 
-  attr :class, :css_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash tray"
 
   def flash_group(assigns) do
@@ -947,216 +758,70 @@ defmodule Pyro.Components.Core do
   end
 
   @doc """
-  Renders a simple form.
-
-  ## Examples
-
-      <.simple_form for={@form} phx-change="validate" phx-submit="save">
-        <.input field={@form[:email]} label="Email"/>
-        <.input field={@form[:username]} label="Username" />
-        <:actions>
-          <.button>Save</.button>
-        </:actions>
-      </.simple_form>
+  Renders a header with title and optional subtitle/actions.
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :for, :any, required: true, doc: "the datastructure for the form"
-  attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
-
-  attr :class, :css_classes, overridable: true, required: true
-  attr :actions_class, :css_classes, overridable: true, required: true
-
-  attr :rest, :global,
-    include: ~w(autocomplete name rel action enctype method novalidate target multipart),
-    doc: "the arbitrary HTML attributes to apply to the form tag"
-
+  attr :class, :css_classes, overridable: true
+  attr :title_class, :css_classes, overridable: true
+  attr :subtitle_class, :css_classes, overridable: true
+  attr :actions_class, :css_classes, overridable: true
   slot :inner_block, required: true
-  slot :actions, doc: "the slot for form actions, such as a submit button"
+  slot :subtitle
+  slot :actions
 
-  def simple_form(assigns) do
+  def header(assigns) do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <.form :let={f} for={@for} as={@as} class={@class} {@rest}>
-      <%= render_slot(@inner_block, f) %>
-      <section :for={action <- @actions} class={@actions_class}>
-        <%= render_slot(action, f) %>
-      </section>
-    </.form>
+    <header class={@class}>
+      <div>
+        <h1 class={@title_class}>
+          <%= render_slot(@inner_block) %>
+        </h1>
+        <p :if={@subtitle != []} class={@subtitle_class}>
+          <%= render_slot(@subtitle) %>
+        </p>
+      </div>
+      <div :if={@actions != []} class={@actions_class}>
+        <%= render_slot(@actions) %>
+      </div>
+    </header>
     """
   end
 
   @doc """
-  Renders a button.
+  Renders an icon.
 
-  Supports:
+  > #### Tip {: .info}
+  >
+  > See the [Heroicons website](https://heroicons.com/) to preview/search the available icons.
 
-  - Any button type
-  - Any anchor type
-    - LivePatch
-    - LiveRedirect
-    - External href links
+  Additionally, there are long-term plans to add more icon libraries.
 
   ## Examples
 
-      <.button>Send!</.button>
-      <.button phx-click="go" class="ml-2">Send!</.button>
-      <.button navigate={~p"/home"}>Home</.button>
+      <.icon name="hero-x-mark-solid" />
+      <.icon name="hero-arrow-path" class="ml-1 w-3 h-3 animate-spin" />
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
 
-  attr :confirm, :string,
-    default: nil,
-    doc: "text to display in a confirm dialog before emitting click event"
-
-  attr :csrf_token, :string, default: nil
-  attr :disabled, :boolean, default: false
-  attr :href, :any
-
-  attr :icon_name, :string,
-    default: nil,
-    doc: "the name of the icon to display (nil for none); see `icon/1` for details"
-
-  attr :loading, :boolean, default: false, doc: "display a loading spinner"
-  attr :method, :string, default: "get"
-  attr :navigate, :string
-  attr :patch, :string
-  attr :ping, :boolean, default: false, doc: "show a ping indicator"
-  attr :replace, :boolean, default: false
-  attr :rest, :global, include: ~w[download hreflang referrerpolicy rel target form name value]
-
-  attr :type, :string,
-    default: "button",
-    values: ~w[button reset submit],
-    doc: "type of the button"
-
-  attr :case, :string,
-    overridable: true,
+  attr :name, :string,
     required: true,
-    values: ~w[uppercase normal-case lowercase capitalize],
-    doc: "the case of the text"
+    doc: "the icon name"
 
-  attr :color, :string, overridable: true, required: true, doc: "the color of the button"
-  attr :shape, :string, overridable: true, required: true, doc: "shape of the button"
-  attr :size, :string, overridable: true, required: true, doc: "the size of the button"
-  attr :variant, :string, overridable: true, required: true, doc: "style of button"
-  attr :class, :css_classes, overridable: true, required: true
-  attr :icon_class, :css_classes, overridable: true, required: true
-  attr :ping_class, :css_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true
 
-  slot :inner_block, required: true, doc: "the content of the button"
+  attr :rest, :global,
+    doc: "the arbitrary HTML attributes for the svg container",
+    include: ~w(fill stroke stroke-width)
 
-  def button(assigns) do
-    assigns
-    |> assign_overridables()
-    |> render_button()
-  end
+  def icon(assigns) do
+    assigns = assign_overridables(assigns)
 
-  defp render_button(%{href: _href} = assigns) do
     ~H"""
-    <.link
-      href={@href}
-      replace={@replace}
-      method={@method}
-      csrf_token={@csrf_token}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <.spinner :if={@loading} overrides={@overrides} size={@size} />
-      <.icon
-        :if={!@loading && @icon_name}
-        overrides={@overrides}
-        name={@icon_name}
-        class={@icon_class}
-      />
-      <%= render_slot(@inner_block) %>
-      <%= if @ping do %>
-        <span class={@ping_class <> " animate-ping opacity-75"} />
-        <span class={@ping_class} />
-      <% end %>
-    </.link>
-    """
-  end
-
-  defp render_button(%{patch: _patch} = assigns) do
-    ~H"""
-    <.link
-      patch={@patch}
-      replace={@replace}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <.spinner :if={@loading} overrides={@overrides} size={@size} />
-      <.icon
-        :if={!@loading && @icon_name}
-        overrides={@overrides}
-        name={@icon_name}
-        class={@icon_class}
-      />
-      <%= render_slot(@inner_block) %>
-      <%= if @ping do %>
-        <span class={@ping_class <> " animate-ping opacity-75"} />
-        <span class={@ping_class} />
-      <% end %>
-    </.link>
-    """
-  end
-
-  defp render_button(%{navigate: _navigate} = assigns) do
-    ~H"""
-    <.link
-      navigate={@navigate}
-      replace={@replace}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <.spinner :if={@loading} overrides={@overrides} size={@size} />
-      <.icon
-        :if={!@loading && @icon_name}
-        overrides={@overrides}
-        name={@icon_name}
-        class={@icon_class}
-      />
-      <%= render_slot(@inner_block) %>
-      <%= if @ping do %>
-        <span class={@ping_class <> " animate-ping opacity-75"} />
-        <span class={@ping_class} />
-      <% end %>
-    </.link>
-    """
-  end
-
-  defp render_button(assigns) do
-    ~H"""
-    <button
-      type={@type}
-      disabled={@disabled}
-      data-confirm={@confirm}
-      data-submit={!!@confirm}
-      class={@class}
-      {@rest}
-    >
-      <.spinner :if={@loading} overrides={@overrides} size={@size} />
-      <.icon
-        :if={!@loading && @icon_name}
-        overrides={@overrides}
-        name={@icon_name}
-        class={@icon_class}
-      />
-      <%= render_slot(@inner_block) %>
-      <%= if @ping do %>
-        <span class={@ping_class <> " animate-ping opacity-75"} />
-        <span class={@ping_class} />
-      <% end %>
-    </button>
+    <span class={[@name, @class]} />
     """
   end
 
@@ -1219,36 +884,31 @@ defmodule Pyro.Components.Core do
     required: true,
     doc: "clear input value on pressing Escape"
 
+  attr :tz, :string, default: "Etc/UTC", doc: "timezone"
+
   attr :class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the field container element"
 
   attr :input_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the input element"
 
   attr :input_check_label_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the label element for a check input"
 
   attr :input_datetime_zoned_wrapper_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the input wrapper element for a datetime zoned input"
 
   attr :description_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the field description"
-
-  attr :tz, :string, default: "Etc/UTC", doc: "timezone"
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
-                                   pattern placeholder readonly required rows size step)
+                                 pattern placeholder readonly required rows size step)
 
   slot :inner_block
 
@@ -1430,8 +1090,8 @@ defmodule Pyro.Components.Core do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :css_classes, overridable: true, required: true
   attr :for, :string, default: nil
+  attr :class, :css_classes, overridable: true
   slot :inner_block, required: true
 
   def label(assigns) do
@@ -1445,62 +1105,364 @@ defmodule Pyro.Components.Core do
   end
 
   @doc """
-  Generates a generic error message.
+  Renders a description list.
+
+  ## Examples
+
+      <.list>
+        <:item title="Title"><%= @post.title %></:item>
+        <:item title="Views"><%= @post.views %></:item>
+      </.list>
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :class, :css_classes, overridable: true
+  attr :dd_class, :css_classes, overridable: true
+  attr :dt_class, :css_classes, overridable: true
 
-  attr :icon_name, :string,
-    overridable: true,
-    required: true,
-    doc: "the name of the icon; see `icon/1` for details"
+  slot :item, required: true do
+    attr :title, :string, required: true
+  end
 
-  attr :icon_class, :css_classes, overridable: true
-  attr :class, :css_classes, overridable: true, required: true
-
-  slot :inner_block, required: true
-
-  def error(assigns) do
+  def list(assigns) do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <p class={@class}>
-      <.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
-      <%= render_slot(@inner_block) %>
-    </p>
+    <dl class={@class}>
+      <%= for item <- @item do %>
+        <dt class={@dt_class}><%= item.title %></dt>
+        <dd class={@dd_class}><%= render_slot(item) %></dd>
+      <% end %>
+    </dl>
     """
   end
 
   @doc """
-  Renders a header with title and optional subtitle/actions.
+  TODO: This component is not fully converted to use overrides/properly styled.
+  Renders a modal.
+
+  ## Examples
+
+      <.modal id="confirm-modal">
+        Are you sure?
+        <:confirm>OK</:confirm>
+        <:cancel>Cancel</:cancel>
+      </.modal>
+
+  JS commands may be passed to the `:on_cancel` and `on_confirm` attributes
+  for the caller to react to each button press, for example:
+
+      <.modal id="confirm" on_confirm={JS.push("delete")} on_cancel={JS.navigate(~p"/posts")}>
+        Are you sure you?
+        <:confirm>OK</:confirm>
+        <:cancel>Cancel</:cancel>
+      </.modal>
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :css_classes, overridable: true, required: true
-  attr :title_class, :css_classes, overridable: true, required: true
-  attr :subtitle_class, :css_classes, overridable: true, required: true
-  attr :actions_class, :css_classes, overridable: true, required: true
+  attr :id, :string, required: true
+  attr :show, :boolean, default: false
+  attr :on_cancel, JS, default: %JS{}
+  attr :on_confirm, JS, default: %JS{}
+  attr :show_js, :any, overridable: true, required: true
+  attr :hide_js, :any, overridable: true, required: true
+  attr :class, :css_classes, overridable: true
   slot :inner_block, required: true
+  slot :title
   slot :subtitle
-  slot :actions
+  slot :confirm
+  slot :cancel
 
-  def header(assigns) do
+  def modal(assigns) do
+    assigns = assign_overridables(assigns)
+    # TODO: Style sucks
+    ~H"""
+    <div
+      id={@id}
+      phx-mounted={@show && apply(@show_js, [%JS{}, @id])}
+      phx-remove={apply(@hide_js, [%JS{}, @id])}
+      data-cancel={JS.exec(@on_cancel, "phx-remove")}
+      class={@class}
+    >
+      <div id={"#{@id}-bg"} class="fixed inset-0 bg-zinc-50/90 transition-opacity" aria-hidden="true" />
+      <div
+        class="fixed inset-0 overflow-y-auto"
+        aria-labelledby={"#{@id}-title"}
+        aria-describedby={"#{@id}-description"}
+        role="dialog"
+        aria-modal="true"
+        tabindex="0"
+      >
+        <div class="flex min-h-full items-center justify-center">
+          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
+            <.focus_wrap
+              id={"#{@id}-container"}
+              phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
+              phx-key="escape"
+              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
+              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
+            >
+              <div class="absolute top-6 right-5">
+                <button
+                  phx-click={JS.exec("data-cancel", to: "##{@id}")}
+                  type="button"
+                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
+                  aria-label={gettext("close")}
+                >
+                  <.icon name="hero-x-mark-solid" class="h-5 w-5" />
+                </button>
+              </div>
+              <div id={"#{@id}-content"}>
+                <header :if={@title != []}>
+                  <h1 id={"#{@id}-title"} class={@header_title_class}>
+                    <%= render_slot(@title) %>
+                  </h1>
+                  <p
+                    :if={@subtitle != []}
+                    id={"#{@id}-description"}
+                    class="mt-2 text-sm leading-6 text-zinc-600"
+                  >
+                    <%= render_slot(@subtitle) %>
+                  </p>
+                </header>
+                <%= render_slot(@inner_block) %>
+                <div :if={@confirm != [] or @cancel != []} class="ml-6 mb-4 flex items-center gap-5">
+                  <.button
+                    :for={confirm <- @confirm}
+                    overrides={@overrides}
+                    id={"#{@id}-confirm"}
+                    phx-click={@on_confirm}
+                    phx-disable-with
+                    class="py-2 px-3"
+                  >
+                    <%= render_slot(confirm) %>
+                  </.button>
+                  <.link
+                    :for={cancel <- @cancel}
+                    phx-click={apply(@hide_js, [@on_cancel, @id])}
+                    class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+                  >
+                    <%= render_slot(cancel) %>
+                  </.link>
+                </div>
+              </div>
+            </.focus_wrap>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a navigation link, taking into account whether the URI is the current page.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :label, :string, required: true, doc: "the label of of the link"
+  attr :uri, :string, required: true, doc: "the URI of the link"
+  attr :current_uri, :string, required: true, doc: "the current URI of the page"
+  attr :class, :css_classes, overridable: true, doc: "the class of the navigation link"
+
+  def nav_link(assigns) do
+    %{path: current_path} = URI.parse(assigns[:current_uri])
+    %{path: path} = URI.parse(assigns[:uri])
+
+    assigns =
+      assigns
+      |> assign(:is_current?, current_path == path)
+      |> assign_overridables()
+
+    ~H"""
+    <.link :if={!@is_current} class={@class} navigate={@uri}>
+      <%= @label %>
+    </.link>
+    <span :if={@is_current} class={@class}>
+      <%= @label %>
+    </span>
+    """
+  end
+
+  @doc """
+  A progress element. Styling the progress element is tricky, so this wraps it with some nice conveniences.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :max, :integer, default: 100
+  attr :value, :integer, default: 0
+  attr :color, :string, overridable: true, required: true, doc: "the color of the progress bar"
+  attr :size, :string, overridable: true, required: true, doc: "the size of the progress bar"
+
+  attr :class, :css_classes,
+    overridable: true,
+    doc: "the class of the progress bar"
+
+  attr :rest, :global
+
+  def progress(assigns) do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <header class={@class}>
-      <div>
-        <h1 class={@title_class}>
-          <%= render_slot(@inner_block) %>
-        </h1>
-        <p :if={@subtitle != []} class={@subtitle_class}>
-          <%= render_slot(@subtitle) %>
-        </p>
+    <progress value={@value} max={@max} class={@class} {@rest} />
+    """
+  end
+
+  @doc """
+  Renders a simple form.
+
+  ## Examples
+
+      <.simple_form for={@form} phx-change="validate" phx-submit="save">
+        <.input field={@form[:email]} label="Email"/>
+        <.input field={@form[:username]} label="Username" />
+        <:actions>
+          <.button>Save</.button>
+        </:actions>
+      </.simple_form>
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :for, :any, required: true, doc: "the datastructure for the form"
+  attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+
+  attr :class, :css_classes, overridable: true
+  attr :actions_class, :css_classes, overridable: true
+
+  attr :rest, :global,
+    include: ~w(autocomplete name rel action enctype method novalidate target multipart),
+    doc: "the arbitrary HTML attributes to apply to the form tag"
+
+  slot :inner_block, required: true
+  slot :actions, doc: "the slot for form actions, such as a submit button"
+
+  def simple_form(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <.form :let={f} for={@for} as={@as} class={@class} {@rest}>
+      <%= render_slot(@inner_block, f) %>
+      <section :for={action <- @actions} class={@actions_class}>
+        <%= render_slot(action, f) %>
+      </section>
+    </.form>
+    """
+  end
+
+  @doc """
+  A slide-over component.
+
+  ## Example
+
+      <%= if @slide_over do %>
+        <.slide_over origin={@slide_over} max_width="sm" title="Slide Over">
+          <p>
+            This is a slide over.
+          </p>
+        </.slide_over>
+      <% end %>
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :close_icon_name, :string, overridable: true, required: true
+
+  attr :title, :string, doc: "the title of the slide-over"
+
+  attr :id, :string, default: "slide-over"
+  attr :origin, :string, overridable: true, required: true
+  attr :max_width, :string, overridable: true, required: true
+
+  attr :hide_js, :any, overridable: true, required: true
+
+  attr :close_even_name, :string,
+    default: "close_slide_over",
+    doc: "the name of the event to send when the slide-over is closed"
+
+  attr :close_slide_over_target, :string,
+    default: nil,
+    doc:
+      "the specific live component to target for the close event, e.g. close_slide_over_target={@myself}"
+
+  attr :class, :css_classes, overridable: true
+  attr :overlay_class, :css_classes, overridable: true
+  attr :wrapper_class, :css_classes, overridable: true
+  attr :header_class, :css_classes, overridable: true
+  attr :header_inner_class, :css_classes, overridable: true
+  attr :header_title_class, :css_classes, overridable: true
+  attr :header_close_button_class, :css_classes, overridable: true
+  attr :content_class, :css_classes, overridable: true
+  attr :close_icon_class, :css_classes, overridable: true
+
+  attr :rest, :global
+  slot :inner_block, required: true
+
+  def slide_over(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <div id={@id} {@rest}>
+      <div id={"#{@id}-overlay"} class={@overlay_class} aria-hidden="true"></div>
+
+      <div class={@wrapper_class} role="dialog" aria-modal="true">
+        <div
+          id={"#{@id}-content"}
+          class={@class}
+          phx-click-away={
+            apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
+          }
+          phx-window-keydown={
+            apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
+          }
+          phx-key="escape"
+        >
+          <%!-- Header --%>
+          <div class={@header_class}>
+            <div class={@header_inner_class}>
+              <div class={@header_title_class}>
+                <%= @title %>
+              </div>
+
+              <button
+                phx-click={
+                  apply(@hide_js, [%JS{}, @id, @origin, @close_even_name, @close_slide_over_target])
+                }
+                class={@header_close_button_class}
+              >
+                <div class="sr-only">Close</div>
+                <.icon class={@close_icon_class} name={@close_icon_name} />
+              </button>
+            </div>
+          </div>
+          <%!-- Content --%>
+          <div class={@content_class}>
+            <%= render_slot(@inner_block) %>
+          </div>
+        </div>
       </div>
-      <div :if={@actions != []} class={@actions_class}>
-        <%= render_slot(@actions) %>
-      </div>
-    </header>
+    </div>
+    """
+  end
+
+  @doc """
+  A simple spinner component.
+  """
+
+  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :show, :boolean, default: true, doc: "show or hide spinner"
+  attr :rest, :global
+  attr :size, :string, overridable: true, required: true, doc: "the size of the spinner"
+  attr :class, :css_classes, overridable: true
+
+  def spinner(assigns) do
+    assigns = assign_overridables(assigns)
+
+    ~H"""
+    <svg {@rest} class={@class} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+      <path
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
     """
   end
 
@@ -1529,16 +1491,16 @@ defmodule Pyro.Components.Core do
 
   attr :rows, :list, required: true
 
-  attr :class, :css_classes, overridable: true, required: true
-  attr :action_class, :css_classes, overridable: true, required: true
-  attr :action_td_class, :css_classes, overridable: true, required: true
-  attr :action_wrapper_class, :css_classes, overridable: true, required: true
-  attr :tbody_class, :css_classes, overridable: true, required: true
-  attr :td_class, :css_classes, overridable: true, required: true
-  attr :th_action_class, :css_classes, overridable: true, required: true
-  attr :th_label_class, :css_classes, overridable: true, required: true
-  attr :thead_class, :css_classes, overridable: true, required: true
-  attr :tr_class, :css_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true
+  attr :action_class, :css_classes, overridable: true
+  attr :action_td_class, :css_classes, overridable: true
+  attr :action_wrapper_class, :css_classes, overridable: true
+  attr :tbody_class, :css_classes, overridable: true
+  attr :td_class, :css_classes, overridable: true
+  attr :th_action_class, :css_classes, overridable: true
+  attr :th_label_class, :css_classes, overridable: true
+  attr :thead_class, :css_classes, overridable: true
+  attr :tr_class, :css_classes, overridable: true
 
   slot :col, required: true do
     attr :label, :string
@@ -1585,104 +1547,72 @@ defmodule Pyro.Components.Core do
   end
 
   @doc """
-  Renders a description list.
+  A tooltip component.
+
+  - JS hook that "nudges" tooltip into view
+  - Simple props for tooltip text and custom icon
+  - Optional slots for icon and/or tooltip content
 
   ## Examples
 
-      <.list>
-        <:item title="Title"><%= @post.title %></:item>
-        <:item title="Views"><%= @post.views %></:item>
-      </.list>
+      <.tooltip id="tooltip-1" tooltip="A default tooltip!" />
+      <.tooltip id="tooltip-2"
+                icon_name="hero-light-bulb-solid"
+                tooltip="Custom icon." />
+      <.tooltip id="tooltip-3">
+        <:icon>?</:icon>
+        <div class="bg-red-500 text-white p-4 w-48 shadow-lg rounded">
+          Custom tooltip slot and custom icon slot.
+        </div>
+      </.tooltip>
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :css_classes, overridable: true, required: true
-  attr :dd_class, :css_classes, overridable: true, required: true
-  attr :dt_class, :css_classes, overridable: true, required: true
-
-  slot :item, required: true do
-    attr :title, :string, required: true
-  end
-
-  def list(assigns) do
-    assigns = assign_overridables(assigns)
-
-    ~H"""
-    <dl class={@class}>
-      <%= for item <- @item do %>
-        <dt class={@dt_class}><%= item.title %></dt>
-        <dd class={@dd_class}><%= render_slot(item) %></dd>
-      <% end %>
-    </dl>
-    """
-  end
-
-  @doc """
-  Renders a back navigation link.
-
-  ## Examples
-
-      <.back navigate={~p"/posts"}>Back to posts</.back>
-      <.back icon_name="hero-arrow-left" navigate={~p"/"}>
-        Go back to the about page.
-      </.back>
-  """
-
-  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :id, :string, required: true
+  attr :tooltip, :string, default: nil
+  attr :vertical_offset, :string, overridable: true, required: true
+  attr :horizontal_offset, :string, overridable: true, required: true
 
   attr :icon_name, :string,
     overridable: true,
     required: true,
     doc: "the name of the icon; see `icon/1` for details"
 
-  attr :class, :css_classes, overridable: true, required: true
-  attr :icon_class, :css_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true
+  attr :tooltip_class, :css_classes, overridable: true
+  attr :tooltip_text_class, :css_classes, overridable: true
+  attr :icon_class, :css_classes, overridable: true
 
-  attr :navigate, :any, required: true
-  slot :inner_block, required: true
+  slot :icon
+  slot :inner_block
 
-  def back(assigns) do
+  def tooltip(assigns) do
     assigns = assign_overridables(assigns)
 
-    ~H"""
-    <.link navigate={@navigate} class={@class}>
-      <.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
-      <%= render_slot(@inner_block) %>
-    </.link>
-    """
-  end
-
-  @doc """
-  Renders an icon.
-
-  > #### Tip {: .info}
-  >
-  > See the [Heroicons website](https://heroicons.com/) to preview/search the available icons.
-
-  Additionally, there are long-term plans to add more icon libraries.
-
-  ## Examples
-
-      <.icon name="hero-x-mark-solid" />
-      <.icon name="hero-arrow-path" class="ml-1 w-3 h-3 animate-spin" />
-  """
-
-  attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-  attr :class, :css_classes, overridable: true, required: true
-
-  attr :name, :string,
-    required: true,
-    doc: "the icon name"
-
-  attr :rest, :global,
-    doc: "the arbitrary HTML attributes for the svg container",
-    include: ~w(fill stroke stroke-width)
-
-  def icon(assigns) do
-    assigns = assign_overridables(assigns)
+    assigns[:tooltip] || assigns[:inner_block] ||
+      raise ArgumentError, "missing :tooltip assign or :inner_block slot"
 
     ~H"""
-    <span class={[@name, @class]} />
+    <span id={@id} class={@class}>
+      <%= if assigns[:icon] !== [] do %>
+        <%= render_slot(@icon) %>
+      <% else %>
+        <.icon overrides={@overrides} name={@icon_name} class={@icon_class} />
+      <% end %>
+      <span
+        id={@id <> "-tooltip"}
+        class={@tooltip_class}
+        data-vertical-offset={@vertical_offset}
+        data-horizontal-offset={@horizontal_offset}
+        phx-hook="PyroNudgeIntoView"
+      >
+        <%= if assigns[:inner_block] !== [] do %>
+          <%= render_slot(@inner_block) %>
+        <% else %>
+          <span class={@tooltip_text_class} phx-no-format><%= @tooltip %></span>
+        <% end %>
+      </span>
+    </span>
     """
   end
 

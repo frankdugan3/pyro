@@ -59,32 +59,31 @@ defmodule Pyro.Components.Autocomplete do
     default: false,
     doc: "enable autofocus hook to reliably focus input on mount"
 
-  attr :class, :css_classes, overridable: true, required: true
+  attr :class, :css_classes, overridable: true
 
   attr :input_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the input element"
 
   attr :listbox_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the listbox element"
 
   attr :listbox_option_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the listbox option element"
 
   attr :description_class, :css_classes,
     overridable: true,
-    required: true,
     doc: "class of the field description"
 
   slot :option_template
 
   def render(assigns) do
     assigns = assign_overridables(assigns)
+
+    # TODO: Follow guidance here: https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
+    # TODO: Rename to combobox -- there may not be a good reason to have two separate components.
 
     ~H"""
     <div

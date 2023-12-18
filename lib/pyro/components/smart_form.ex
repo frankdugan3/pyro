@@ -9,7 +9,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     # import Pyro.Gettext
     import Pyro.Components.Core, only: [button: 1, header: 1, input: 1]
 
-    alias Pyro.Ash.Extensions.Resource.Info, as: UI
+    alias Pyro.Ash.Extensions.Resource.Info, as: PI
     alias Ash.Resource.Info, as: ResourceInfo
 
     require Ash.Query
@@ -25,15 +25,16 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :for, :map, required: true, doc: "the datastructure for the form"
     attr :resource, :atom, required: true, doc: "the resource of the form"
     attr :actor, :map, default: nil, doc: "the actor to be passed to actions"
-    attr :autocomplete, :string, overridable: true, required: true
-    attr :actions_class, :css_classes, overridable: true, required: true
-    attr :class, :css_classes, overridable: true, required: true
-    slot :actions, doc: "extra form actions"
     attr :tz, :string, default: "Etc/UTC", doc: "timezone"
+    attr :autocomplete, :string, overridable: true, required: true
+    attr :class, :css_classes, overridable: true
+    attr :actions_class, :css_classes, overridable: true
 
     attr :rest, :global,
       include: ~w(name rel action enctype method novalidate target),
       doc: "the arbitrary HTML attributes to apply to the form tag"
+
+    slot :actions, doc: "extra form actions"
 
     def smart_form(%{action_info: :unassigned, for: %{action: action}} = assigns) do
       assigns
@@ -42,7 +43,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     def smart_form(%{pyro_form: :unassigned, for: %{action: action}} = assigns) do
-      pyro_form = UI.form_for(assigns[:resource], action)
+      pyro_form = PI.form_for(assigns[:resource], action)
 
       if pyro_form == nil,
         do:
@@ -110,9 +111,9 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :attribute, Ash.Resource.Attribute, default: nil
     attr :argument, Ash.Resource.Actions.Argument, default: nil
     attr :change, :map, default: nil
-    attr :field_group_class, :css_classes, overridable: true, required: true
-    attr :field_group_label_class, :css_classes, overridable: true, required: true
     attr :tz, :string, required: true, doc: "timezone"
+    attr :field_group_class, :css_classes, overridable: true
+    attr :field_group_label_class, :css_classes, overridable: true
 
     defp render_field(
            %{

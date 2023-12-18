@@ -4,52 +4,40 @@ if Code.ensure_loaded?(AshPhoenix) do
     A smart component that auto-renders Forms for Ash from a given pyro DSL configuration.
     """
 
-    use Pyro.Component
+    use Pyro.Components.SmartComponent
 
-    # import Pyro.Components.DataTable, only: [data_table: 1]
-
-    alias Pyro.Resource.Info, as: UI
-    alias Ash.Resource.Info, as: ResourceInfo
-
-    require Ash.Query
+    import Pyro.Components.DataTable, only: [data_table: 1]
 
     @doc """
-    Renders a smart Ash form.
+    Renders a smart data table.
     """
 
     attr :overrides, :list, default: nil, doc: @overrides_attr_doc
-    attr :action_info, :any, default: :unassigned
-    attr :pyro_data_table, :any, default: :unassigned
-    attr :class, :css_classes, overridable: true, required: true
-    attr :resource, :atom, required: true, doc: "the resource of the form"
+    attr :id, :string, required: true
+    attr :pyro_data_table, Pyro.Ash.Extensions.Resource.DataTable.Action, required: true
+    attr :rows, :list, required: true
+    attr :sort, :list, required: true
+    attr :resource, :atom, required: true, doc: "the resource of the data table"
     attr :actor, :map, default: nil, doc: "the actor to be passed to actions"
     attr :tz, :string, default: "Etc/UTC", doc: "timezone"
-
-    def smart_data_table(%{action_info: :unassigned, for: %{action: action}} = assigns) do
-      assigns
-      |> assign(:action_info, ResourceInfo.action(assigns[:resource], action))
-      |> smart_data_table()
-    end
-
-    def smart_data_table(%{pyro_data_table: :unassigned, for: %{action: action}} = assigns) do
-      pyro_data_table = UI.data_table_for(assigns[:resource], action)
-
-      if pyro_data_table == nil,
-        do:
-          raise("""
-          Resource #{assigns[:resource]} does not have a pyro form defined for the action #{action}!
-          """)
-
-      assigns
-      |> assign(:pyro_data_table, pyro_data_table)
-      |> smart_data_table()
-    end
+    attr :class, :css_classes, overridable: true
 
     def smart_data_table(assigns) do
       assigns = assign_overridables(assigns)
 
       ~H"""
-      <div></div>
+      <.data_table id={@id} rows={@rows} sort={@sort} class={smart_class(@class, assigns)}>
+        <:col
+          :let={row}
+          :for={col <- @pyro_data_table.columns}
+          label={col.label}
+          sort_key={if col.sortable?, do: col.name}
+          class={smart_class(col.class, col)}
+          cell_class={smart_class(col.cell_class, col)}
+        >
+          <%= apply(col.render_cell, [%{row: row, col: col}]) %>
+        </:col>
+      </.data_table>
       """
     end
   end
