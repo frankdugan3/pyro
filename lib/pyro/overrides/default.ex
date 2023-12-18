@@ -80,7 +80,6 @@ defmodule Pyro.Overrides.Default do
     set :shapes, ~w[rounded square pill]
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]
-    set :case, "uppercase"
   end
 
   def button_class(passed_assigns) do
@@ -103,8 +102,7 @@ defmodule Pyro.Overrides.Default do
       size_class(passed_assigns[:size]),
       color_class(passed_assigns[:color]),
       shape,
-      variant,
-      passed_assigns[:case]
+      variant
     ]
   end
 
@@ -236,7 +234,7 @@ defmodule Pyro.Overrides.Default do
   end
 
   def input_class(passed_assigns) do
-    ["pyro-input__input", "pyro--errors": passed_assigns[:errors] != []]
+    ["pyro-input__input", "has-errors": passed_assigns[:errors] != []]
   end
 
   override Core, :label do
@@ -337,7 +335,6 @@ defmodule Pyro.Overrides.Default do
     set :shapes, ~w[rounded square pill]
     set :size, "md"
     set :sizes, ~w[xs sm md lg xl]
-    set :case, "uppercase"
     set :message, "Copied! 📋"
     set :ttl, 3_000
   end
@@ -426,8 +423,39 @@ defmodule Pyro.Overrides.Default do
   ##############################################################################
 
   override Pyro.Components.DataTable, :data_table do
-    set :class, "pyro-data_table"
-    # grid overflow-auto content-start relative gap-px px-2 pb-16
+    set :class, "pdt"
+    set :row_class, "group pdt-r"
+    set :footer_class, "pdt-f"
+  end
+
+  override Pyro.Components.DataTable, :sort do
+    set :class, &__MODULE__.data_table_sort_class/1
+    set :btn_class, &__MODULE__.data_table_sort_button_class/1
+  end
+
+  def data_table_sort_class(passed_assigns) do
+    if passed_assigns[:sort_key] == nil do
+      "pdt-su"
+    else
+      "pdt-s"
+    end
+  end
+
+  def data_table_sort_button_class(passed_assigns) do
+    if passed_assigns[:direction] == nil do
+      "pdt-s-b"
+    else
+      "pdt-s-ba"
+    end
+  end
+
+  override Pyro.Components.DataTable, :cell do
+    set :class, "pdt-c"
+  end
+
+  override Pyro.Components.DataTable, :sort_icon do
+    set :class, "pdt-s-i"
+    set :index_class, "pdt-s-i-c"
   end
 
   # override Pyro.Components.DataTable, :sort do
@@ -582,6 +610,14 @@ defmodule Pyro.Overrides.Default do
     ####    S M A R T    C O M P O N E N T S
     ##############################################################################
 
+    override SmartDataTable, :smart_data_table do
+      set :class, &__MODULE__.smart_data_table_class/1
+    end
+
+    def smart_data_table_class(passed_assigns) do
+      get_nested(passed_assigns, [:pyro_data_table, :class])
+    end
+
     override SmartForm, :smart_form do
       set :class, &__MODULE__.smart_form_class/1
       set :actions_class, "pyro-smart_form__actions"
@@ -589,7 +625,7 @@ defmodule Pyro.Overrides.Default do
     end
 
     def smart_form_class(passed_assigns) do
-      ["pyro-smart_form", passed_assigns.pyro_form.class || nil]
+      ["pyro-smart_form", get_nested(passed_assigns, [:pyro_form, :class])]
     end
 
     override SmartForm, :render_field do
@@ -599,22 +635,6 @@ defmodule Pyro.Overrides.Default do
 
     def smart_form_field_group_class(passed_assigns) do
       ["pyro-smart_form__render_field__group", get_nested(passed_assigns, [:field, :class])]
-    end
-
-    override SmartDataTable, :smart_data_table do
-      set :class, &__MODULE__.smart_data_table_class/1
-    end
-
-    def smart_data_table_class(passed_assigns) do
-      ["pyro-smart_data_table", get_nested(passed_assigns, [:pyro_data_table, :class])]
-    end
-
-    override SmartPage, :smart_page do
-      set :class, &__MODULE__.smart_page_class/1
-    end
-
-    def smart_page_class(passed_assigns) do
-      ["pyro-smart_page", get_nested(passed_assigns, [:pyro_page, :class])]
     end
   end
 end

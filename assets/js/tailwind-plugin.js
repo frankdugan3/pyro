@@ -67,6 +67,7 @@ module.exports = plugin.withOptions(function (options = {}) {
       '.phx-change-loading&',
       '.phx-change-loading &',
     ])
+    addVariant('has-errors', '&.has-errors')
     addVariant('aria-selected', '&[aria-selected]')
     addVariant('aria-checked', '&[aria-checked]')
 
@@ -108,7 +109,7 @@ module.exports = plugin.withOptions(function (options = {}) {
             {},
         },
 
-        html: { 'scrollbar-gutter': 'stable' },
+        // html: { 'scrollbar-gutter': 'stable' },
         body: { '@apply antialiased': {} },
       })
     }
@@ -264,11 +265,11 @@ module.exports = plugin.withOptions(function (options = {}) {
             '@apply w-auto rounded text-sky-500 dark:text-sky-500': {},
           },
           '&[type="select"]': { '@apply py-2 px-3': {} },
-          '&.pyro--errors': {
+          '&.has-errors': {
             '@apply border-red-600 focus:border-red-600 focus:ring-red-600/10 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500/25':
               {},
           },
-          '&:not(.pyro--errors)': {
+          '&:not(.has-errors)': {
             '@apply border-slate-300 dark:border-slate-700 focus:border-slate-500 focus:ring-slate-800/5 dark:focus:border-slate-50 dark:focus:ring-slate-50/25':
               {},
           },
@@ -408,20 +409,6 @@ module.exports = plugin.withOptions(function (options = {}) {
         '&:hover .pyro-tooltip__tooltip': { '@apply visible': {} },
         '&__text': {
           '@apply bg-sky-500 text-white min-w-[20rem] p-2 rounded text-sm font-normal whitespace-pre':
-            {},
-        },
-      },
-
-      // DataTable.data_table
-      '.pyro-data_table': {
-        '@apply relative w-full': {},
-        '& thead tr th ': {
-          '@apply backdrop-blur sticky top-0 border-b border-slate-50/25 border-solid text-center px-2 py-1 font-black':
-            {},
-        },
-        '& tbody tr td': { '@apply px-1': {} },
-        '& tfoot tr td': {
-          '@apply backdrop-blur sticky bottom-0 border-b border-slate-50/25 border-solid px-2 py-1 font-black':
             {},
         },
       },

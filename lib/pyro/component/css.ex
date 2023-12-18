@@ -46,18 +46,17 @@ defmodule Pyro.Component.CSS do
       ```
       """
       def classes(classes) do
-        case classes
-             |> List.wrap()
-             |> Enum.reduce([], &reduce_class/2)
-             |> List.flatten()
-             |> Enum.uniq()
-             |> Enum.join(" ") do
-          "" -> nil
-          merged -> merged
-        end
+        classes
+        |> List.wrap()
+        |> Enum.reduce([], &reduce_class/2)
+        |> List.flatten()
+        |> Enum.uniq()
+        |> Enum.join(" ")
       end
 
-      def reduce_class({:remove, to_remove}, acc) do
+      defp reduce_class(nil, acc), do: acc
+
+      defp reduce_class({:remove, to_remove}, acc) do
         to_remove = List.wrap(to_remove) |> Enum.map(&to_string/1)
 
         acc
@@ -65,27 +64,27 @@ defmodule Pyro.Component.CSS do
         |> Enum.filter(&(&1 not in to_remove))
       end
 
-      def reduce_class({:truncate, class}, _acc) do
+      defp reduce_class({:truncate, class}, _acc) do
         reduce_class(class, [])
       end
 
-      def reduce_class(class, acc) when is_map(class) do
+      defp reduce_class(class, acc) when is_map(class) do
         Enum.reduce(class, acc, &reduce_class/2)
       end
 
-      def reduce_class(class, acc) when is_list(class) do
+      defp reduce_class(class, acc) when is_list(class) do
         Enum.reduce(class, acc, &reduce_class/2)
       end
 
-      def reduce_class({class, true}, acc) do
+      defp reduce_class({class, true}, acc) do
         reduce_class(class, acc)
       end
 
-      def reduce_class(class, acc) when is_atom(class) do
+      defp reduce_class(class, acc) when is_atom(class) do
         reduce_class(Atom.to_string(class), acc)
       end
 
-      def reduce_class(class, acc) when is_binary(class) do
+      defp reduce_class(class, acc) when is_binary(class) do
         [
           class
           |> String.split(" ", trim: true)
@@ -94,7 +93,7 @@ defmodule Pyro.Component.CSS do
         ]
       end
 
-      def reduce_class(_class, acc), do: acc
+      defp reduce_class(_class, acc), do: acc
 
     function when is_function(function, 1) ->
       def classes(classes), do: apply(function, [classes])
