@@ -25,7 +25,7 @@ defmodule Pyro.Components do
 
     ash_phoenix =
       quote do
-        import Pyro.Components.SmartPage
+        alias Pyro.Components.SmartPage
         import Pyro.Components.SmartDataTable
         import Pyro.Components.SmartForm
       end

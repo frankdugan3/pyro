@@ -316,11 +316,6 @@ defmodule Pyro.Component do
   end
 
   @doc false
-  # Internal tooling to merge classes at runtime
-  def maybe_merge_classes(assigns, attr, override, %{class?: true}) do
-    Pyro.Component.CSS.classes([override, assigns[attr]])
-  end
-
   def maybe_merge_classes(assigns, attr, override, %{type: :css_classes}) do
     Pyro.Component.CSS.classes([override, assigns[attr]])
   end
