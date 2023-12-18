@@ -18,6 +18,7 @@ defmodule Example.Vendor.Company do
           label :inherit
           description :inherit
         end
+
         list "/sequel", :sequel, :read
         list "/more", :list, :read
 
@@ -34,16 +35,18 @@ defmodule Example.Vendor.Company do
         exclude [:id]
 
         column :name
+
         column :code do
           cell_class "whitespace-nowrap"
+
           render_cell fn assigns ->
             ~H"""
             <%= Map.get(@row, @col[:name]) %>
             <Pyro.Components.Core.icon name="hero-rocket-launch" />
             """
           end
-
         end
+
         column :description
       end
     end
