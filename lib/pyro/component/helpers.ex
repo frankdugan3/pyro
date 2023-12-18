@@ -64,6 +64,47 @@ defmodule Pyro.Component.Helpers do
     end
   end
 
+  if Code.ensure_loaded?(Timex) do
+    def local_tz(), do: Timex.Timezone.Local.lookup()
+    def local_now(), do: Timex.now(local_tz())
+    def local_now(tz), do: Timex.now(tz)
+
+    defp format(nil, _format), do: nil
+
+    defp format(timestamp, format),
+      do: Timex.Format.DateTime.Formatters.Default.format!(timestamp, format)
+  else
+    def local_tz(), do: "Etc/UTC"
+    def local_now(), do: DateTime.utc_now()
+    def local_now(_tz), do: DateTime.utc_now()
+
+    defp format(nil, _format), do: nil
+
+    defp format(timestamp, _format),
+      do: DateTime.to_string(timestamp)
+  end
+
+  @default_datetime_format "{ISOdate} {h24}:{m} {Zabbr}"
+
+  def format_timestamp(nil), do: nil
+
+  def format_timestamp(timestamp) do
+    timestamp
+    |> DateTime.shift_zone!(local_tz())
+    |> format(@default_datetime_format)
+  end
+
+  @spec format_timestamp(DateTime.t(), binary(), binary()) :: binary()
+  def format_timestamp(
+        timestamp,
+        time_zone,
+        format \\ @default_datetime_format
+      ) do
+    timestamp
+    |> DateTime.shift_zone!(time_zone)
+    |> format(format)
+  end
+
   @doc """
   Translates the errors for a field from a keyword list of errors.
   """
