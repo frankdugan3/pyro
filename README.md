@@ -63,20 +63,15 @@ end
 
 For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page.
 
-## Roadmap
+## Roadmap to 1.0
 
-- [ ] Function Components
-  - [ ] Navbar/NavItem [#5](https://github.com/frankdugan3/pyro/issues/5)
-  - [ ] Tabs [#13](https://github.com/frankdugan3/pyro/issues/13)
-  - [ ] Breadcrumbs [#11](https://github.com/frankdugan3/pyro/issues/11)
-- [ ] Smart Components
-  - [ ] `Pyro.Components.SmartDataTable` [#16](https://github.com/frankdugan3/pyro/issues/16)
-  - [ ] `Pyro.Components.SmartCardGrid` [#10](https://github.com/frankdugan3/pyro/issues/10)
-  - [ ] Extensible AshAuthentication support [#15](https://github.com/frankdugan3/pyro/issues/15)
-- [ ] DX
-  - [ ] Strong test suite
-  - [ ] More override presets
-  - [ ] Code patching tools [#1](https://github.com/frankdugan3/pyro/issues/1)
+- [ ] Complete implementation of key components/features
+- [ ] Split into `pyro` and `ash_pyro` to separate Phoenix and Ash features
+- [ ] Add `pyro.new` generator
+- [ ] Reasonable test coverage
+- [ ] Write adequate guides
+- [ ] Dogfood website
+- [ ] Collect feedback/stabilize API
 
 ## Development
 
