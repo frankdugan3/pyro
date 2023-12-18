@@ -17,6 +17,7 @@ module.exports = plugin.withOptions(function (options = {}) {
         ['', '/24/outline'],
         ['-solid', '/24/solid'],
         ['-mini', '/20/solid'],
+        ['-micro', '/20/solid'],
       ]
       icons.forEach(([suffix, dir]) => {
         fs.readdirSync(path.join(iconsDir, dir)).forEach((file) => {

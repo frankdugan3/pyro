@@ -42,7 +42,7 @@ defmodule Example.Vendor.Company do
           render_cell fn assigns ->
             ~H"""
             <%= Map.get(@row, @col[:name]) %>
-            <Pyro.Components.Core.icon name="hero-rocket-launch" />
+            <Pyro.Components.Core.icon name="hero-rocket-launch-micro" />
             """
           end
         end
