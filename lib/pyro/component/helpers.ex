@@ -39,29 +39,28 @@ defmodule Pyro.Component.Helpers do
     end
   end
 
-  @doc false
-  def translate_error({msg, opts}) do
-    # When using gettext, we typically pass the strings we want
-    # to translate as a static argument:
-    #
-    #     # Translate "is invalid" in the "errors" domain
-    #     dgettext("errors", "is invalid")
-    #
-    #     # Translate the number of files with plural rules
-    #     dngettext("errors", "1 file", "%{count} files", count)
-    #
-    # Because the error messages we show in our forms and APIs
-    # are defined inside Ecto, we need to translate them dynamically.
-    # This requires us to call the Gettext module passing our gettext
-    # backend as first argument.
-    #
-    # Note we use the "errors" domain, which means translations
-    # should be written to the errors.po file. The :count option is
-    # set by Ecto and indicates we should also apply plural rules.
-    if count = opts[:count] do
-      Gettext.dngettext(Pyro.Gettext, "errors", msg, msg, count, opts)
-    else
-      Gettext.dgettext(Pyro.Gettext, "errors", msg, opts)
+  @gettext_module Application.compile_env(:pyro, :gettext)
+
+  if @gettext_module do
+    def gettext(text) do
+      apply(@gettext_module, :gettext, [text])
+    end
+
+    @doc false
+    def translate_error({msg, opts}) do
+      if count = opts[:count] do
+        Gettext.dngettext(@gettext_module, "errors", msg, msg, count, opts)
+      else
+        Gettext.dgettext(@gettext_module, "errors", msg, opts)
+      end
+    end
+  else
+    def gettext(text), do: text
+
+    def translate_error({msg, opts}) do
+      Enum.reduce(opts, msg, fn {key, value}, acc ->
+        String.replace(acc, "%{#{key}}", fn _ -> to_string(value) end)
+      end)
     end
   end
 

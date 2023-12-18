@@ -1,7 +1,27 @@
 defmodule Pyro.Components.Core do
   use Pyro.Component
 
-  import Pyro.Gettext
+  @moduledoc """
+  A core set of functional `.heex` components for building web apps. It is similar to (and often API-compatible with) Phoenix's generated `core_components.ex`.
+
+  Compared to Phoenix's generated components, Pyro's implementation adds:
+
+  - Maintenance/bugfixes/new features, since it's a library
+  - A powerful [override system](#module-overridable-component-attributes) for customization
+  - A special `:css_classes` type that utilizes the configured CSS merge utility
+  - The button component implements both button and anchor tags (button-styled links!)
+  - Inputs
+    - `autofocus` prop to enable a hook for reliable focus on mount
+    - `hidden` input type with a slot for custom content
+  - A rich flash experience
+    - Auto-remove after (configurable) timeout
+    - Progress bar for auto-removed flash messages
+    - Define which flashes are included in which trays (supports multiple trays)
+  - Slightly cleaner, more semantic markup
+  - Extra components
+
+  There are more complex components outside the `Core` module, be sure to check those out as well.
+  """
 
   @doc """
   Renders a link. This basically wraps `Phoenix.Component.link/1` with some overridable attributes, in particular `class` for consistent, DRY link default styling.

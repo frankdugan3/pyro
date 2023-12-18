@@ -52,6 +52,7 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
 
    ```elixir
    config :pyro, :overrides, [Pyro.Overrides.Default]
+   config :pyro, gettext: MyApp.Gettext # optional
    ```
 
 3. Update your `tailwind.config.js`, this is a working example configuration:
