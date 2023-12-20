@@ -886,6 +886,13 @@ defmodule Pyro.Components.Core do
 
   attr :tz, :string, default: "Etc/UTC", doc: "timezone"
 
+  attr :get_tz_options, :any,
+    overridable: true,
+    required: true,
+    doc: "a 0 arity function that returns a list of valid timezones"
+
+  attr :tz_options, :list, default: nil
+
   attr :class, :css_classes,
     overridable: true,
     doc: "class of the field container element"
@@ -952,47 +959,51 @@ defmodule Pyro.Components.Core do
     """
   end
 
-  if Code.ensure_loaded?(Timex) && Code.ensure_loaded?(Tzdata) do
-    defp render_input(%{type: "datetime-zoned"} = assigns) do
-      assigns = assign_date_time_timezone_value(assigns)
+  defp render_input(
+         %{type: "datetime-zoned", tz_options: nil, get_tz_options: get_tz_options} = assigns
+       ) do
+    render_input(assign(assigns, :tz_options, apply(get_tz_options, [])))
+  end
 
-      ~H"""
-      <div phx-feedback-for={@name} class={@class}>
-        <.label for={@id} overrides={@overrides}><%= @label %></.label>
-        <div class={@input_datetime_zoned_wrapper_class}>
-          <input
-            type="datetime-local"
-            id={@id}
-            class={@input_class}
-            name={@name <> "[date_time]"}
-            value={@date_time_value}
-            step="1"
-            phx-keydown={!@clear_on_escape || JS.dispatch("pyro:clear")}
-            phx-key={!@clear_on_escape || "Escape"}
-            phx-mounted={!@autofocus || JS.focus()}
-          />
-          <input
-            type="search"
-            id={@id <> "_time_zone"}
-            class={@input_class}
-            name={@name <> "[time_zone]"}
-            value={@timezone_value}
-            list={@id <> "_time_zone_list"}
-            phx-keydown={!@clear_on_escape || JS.dispatch("pyro:clear")}
-            phx-key={!@clear_on_escape || "Escape"}
-          />
-          <datalist id={@id <> "_time_zone_list"}>
-            <option :for={z <- tz_options()} value={z} />
-          </datalist>
-        </div>
-        <%= render_slot(@inner_block) %>
-        <p :if={@description} class={@description_class}>
-          <%= @description %>
-        </p>
-        <.error :for={msg <- @errors} overrides={@overrides}><%= msg %></.error>
+  defp render_input(%{type: "datetime-zoned"} = assigns) do
+    assigns = assign_date_time_timezone_value(assigns)
+
+    ~H"""
+    <div phx-feedback-for={@name} class={@class}>
+      <.label for={@id} overrides={@overrides}><%= @label %></.label>
+      <div class={@input_datetime_zoned_wrapper_class}>
+        <input
+          type="datetime-local"
+          id={@id}
+          class={@input_class}
+          name={@name <> "[date_time]"}
+          value={@date_time_value}
+          step="1"
+          phx-keydown={!@clear_on_escape || JS.dispatch("pyro:clear")}
+          phx-key={!@clear_on_escape || "Escape"}
+          phx-mounted={!@autofocus || JS.focus()}
+        />
+        <input
+          type="search"
+          id={@id <> "_time_zone"}
+          class={@input_class}
+          name={@name <> "[time_zone]"}
+          value={@timezone_value}
+          list={@id <> "_time_zone_list"}
+          phx-keydown={!@clear_on_escape || JS.dispatch("pyro:clear")}
+          phx-key={!@clear_on_escape || "Escape"}
+        />
+        <datalist id={@id <> "_time_zone_list"}>
+          <option :for={z <- @tz_options} value={z} />
+        </datalist>
       </div>
-      """
-    end
+      <%= render_slot(@inner_block) %>
+      <p :if={@description} class={@description_class}>
+        <%= @description %>
+      </p>
+      <.error :for={msg <- @errors} overrides={@overrides}><%= msg %></.error>
+    </div>
+    """
   end
 
   defp render_input(%{type: "select"} = assigns) do
@@ -1616,62 +1627,37 @@ defmodule Pyro.Components.Core do
     """
   end
 
-  if Code.ensure_loaded?(Timex) && Code.ensure_loaded?(Tzdata) do
-    defp tz_options do
-      [
-        "US/Eastern"
-        | [
-            "US/Central"
-            | [
-                "US/Mountain"
-                | [
-                    "US/Pacific"
-                    | Tzdata.zone_list()
-                  ]
-              ]
-          ]
-      ]
-    end
+  defp assign_date_time_timezone_value(assigns) do
+    tz = assigns[:tz]
 
-    defp assign_date_time_timezone_value(assigns) do
-      tz = assigns[:tz]
+    case assigns[:value] do
+      nil ->
+        assigns
+        |> assign(:date_time_value, "")
+        |> assign(:timezone_value, tz)
 
-      case assigns[:value] do
-        nil ->
+      %{"date_time" => date_time, "time_zone" => time_zone} ->
+        assigns
+        |> assign(:date_time_value, date_time)
+        |> assign(:timezone_value, time_zone)
+
+      date_time ->
+        with {:ok, shifted} <- DateTime.shift_zone(date_time, tz) do
+          year = shifted.year |> Integer.to_string() |> String.pad_leading(4, "0")
+          month = shifted.month |> Integer.to_string() |> String.pad_leading(2, "0")
+          day = shifted.day |> Integer.to_string() |> String.pad_leading(2, "0")
+          hour = shifted.hour |> Integer.to_string() |> String.pad_leading(2, "0")
+          minute = shifted.minute |> Integer.to_string() |> String.pad_leading(2, "0")
+
           assigns
-          |> assign(:date_time_value, nil)
+          |> assign(:date_time_value, "#{year}-#{month}-#{day}T#{hour}:#{minute}")
           |> assign(:timezone_value, tz)
-
-        %{"date_time" => date_time, "time_zone" => time_zone} ->
-          assigns
-          |> assign(:date_time_value, date_time)
-          |> assign(:timezone_value, time_zone)
-
-        value ->
-          if Timex.is_valid?(value) do
+        else
+          _ ->
             assigns
-            |> assign(
-              :date_time_value,
-              value
-              |> Timex.Timezone.convert(tz)
-              |> case do
-                {:error, _} ->
-                  ""
-
-                time ->
-                  Timex.Format.DateTime.Formatters.Default.format!(
-                    time,
-                    "{ISOdate}T{h24}:{m}:{s}"
-                  )
-              end
-            )
+            |> assign(:date_time_value, "")
             |> assign(:timezone_value, tz)
-          else
-            assigns
-            |> assign(:date_time_value, value)
-            |> assign(:timezone_value, tz)
-          end
-      end
+        end
     end
   end
 end

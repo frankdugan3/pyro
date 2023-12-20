@@ -34,7 +34,9 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
     {:ash_phoenix, "~> 1.2"},
 
     # Date/Time/Zone components & tooling
-    {:timex, "~> 3.0"},
+    {:tz, "~> 0.26"},
+    {:tz_extra, "~> 0.26"},
+    #   or
     {:tzdata, "~> 1.1"},
 
     # Code highlighting components:

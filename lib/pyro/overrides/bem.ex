@@ -254,6 +254,7 @@ defmodule Pyro.Overrides.BEM do
     set :input_datetime_zoned_wrapper_class, @prefixed_input <> "__input_datetime_zoned_wrapper"
     set :description_class, @prefixed_input <> "__description"
     set :clear_on_escape, true
+    set :get_tz_options, &Pyro.Component.Helpers.all_timezones/0
   end
 
   def input_class(passed_assigns) do

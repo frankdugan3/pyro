@@ -143,8 +143,8 @@ defmodule Pyro.MixProject do
       {:ash_authentication, "~> 3.12", optional: true},
       {:ash_authentication_phoenix, "~> 1.9", optional: true},
       {:makeup, "~> 1.1", optional: true},
-      {:timex, "~> 3.0", optional: true},
-      {:tzdata, "~> 1.1.0", optional: true}
+      {:tzdata, "~> 1.1.0", optional: true},
+      {:tz_extra, "~> 0.26", optional: true}
     ]
   end
 

@@ -13,7 +13,7 @@ config :example,
 
 config :example, ash_apis: [Example.Authentication, Example.Vendor]
 
-config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
 config :pyro, gettext: Example.Gettext
 
@@ -78,7 +78,7 @@ config :esbuild,
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.3.7",
+  version: "3.4.0",
   default: [
     args: ~w(
       --config=tailwind.config.js

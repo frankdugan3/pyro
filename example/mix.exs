@@ -19,7 +19,7 @@ defmodule Example.MixProject do
   def application do
     [
       mod: {Example.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon, :timex]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
@@ -69,8 +69,8 @@ defmodule Example.MixProject do
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
-      {:timex, "~> 3.0"},
-      {:tzdata, "~> 1.1.0"}
+      {:tz, "~> 0.26"},
+      {:tz_extra, "~> 0.26"}
     ]
   end
 

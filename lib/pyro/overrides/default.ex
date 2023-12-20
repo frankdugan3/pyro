@@ -231,6 +231,7 @@ defmodule Pyro.Overrides.Default do
     set :input_datetime_zoned_wrapper_class, "pyro-input__input_datetime_zoned_wrapper"
     set :description_class, "pyro-input__description"
     set :clear_on_escape, true
+    set :get_tz_options, &Pyro.Component.Helpers.all_timezones/0
   end
 
   def input_class(passed_assigns) do

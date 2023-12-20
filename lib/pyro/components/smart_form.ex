@@ -174,29 +174,27 @@ if Code.ensure_loaded?(AshPhoenix) do
       """
     end
 
-    if Code.ensure_loaded?(Timex) && Code.ensure_loaded?(Tzdata) do
-      defp render_field(
-             %{
-               field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
-               attribute: %{type: type}
-             } =
-               assigns
-           )
-           when type == Pyro.Ash.Type.ZonedDateTime do
-        ~H"""
-        <.input
-          overrides={@overrides}
-          field={@form[@field.name]}
-          type="datetime-zoned"
-          class={@field.class}
-          input_class={@field.input_class}
-          label={@field.label}
-          autofocus={@field.autofocus}
-          description={@field.description || @attribute.description}
-          tz={@tz}
-        />
-        """
-      end
+    defp render_field(
+           %{
+             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
+             attribute: %{type: type}
+           } =
+             assigns
+         )
+         when type == Pyro.Ash.Type.ZonedDateTime do
+      ~H"""
+      <.input
+        overrides={@overrides}
+        field={@form[@field.name]}
+        type="datetime-zoned"
+        class={@field.class}
+        input_class={@field.input_class}
+        label={@field.label}
+        autofocus={@field.autofocus}
+        description={@field.description || @attribute.description}
+        tz={@tz}
+      />
+      """
     end
 
     defp render_field(%{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :select}} = assigns) do

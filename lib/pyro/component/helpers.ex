@@ -64,45 +64,49 @@ defmodule Pyro.Component.Helpers do
     end
   end
 
-  if Code.ensure_loaded?(Timex) do
-    def local_tz(), do: Timex.Timezone.Local.lookup()
-    def local_now(), do: Timex.now(local_tz())
-    def local_now(tz), do: Timex.now(tz)
+  @default_tz "Etc/UTC"
 
-    defp format(nil, _format), do: nil
+  def local_tz(), do: @default_tz
+  def local_now(), do: DateTime.utc_now()
+  def local_now(tz), do: DateTime.now!(tz)
 
-    defp format(timestamp, format),
-      do: Timex.Format.DateTime.Formatters.Default.format!(timestamp, format)
-  else
-    def local_tz(), do: "Etc/UTC"
-    def local_now(), do: DateTime.utc_now()
-    def local_now(_tz), do: DateTime.utc_now()
-
-    defp format(nil, _format), do: nil
-
-    defp format(timestamp, _format),
-      do: DateTime.to_string(timestamp)
-  end
-
-  @default_datetime_format "{ISOdate} {h24}:{m} {Zabbr}"
-
-  def format_timestamp(nil), do: nil
-
-  def format_timestamp(timestamp) do
-    timestamp
-    |> DateTime.shift_zone!(local_tz())
-    |> format(@default_datetime_format)
-  end
-
-  @spec format_timestamp(DateTime.t(), binary(), binary()) :: binary()
   def format_timestamp(
         timestamp,
-        time_zone,
-        format \\ @default_datetime_format
+        tz,
+        formatter \\ &default_timestamp_formatter/1
       ) do
-    timestamp
-    |> DateTime.shift_zone!(time_zone)
-    |> format(format)
+    case DateTime.shift_zone(timestamp, tz) do
+      {:ok, shifted} ->
+        apply(formatter, [shifted])
+
+      _ ->
+        ""
+    end
+  end
+
+  def default_timestamp_formatter(%NaiveDateTime{} = ts), do: NaiveDateTime.to_string(ts)
+
+  def default_timestamp_formatter(%DateTime{} = ts) do
+    year = ts.year |> Integer.to_string() |> String.pad_leading(4, "0")
+    month = ts.month |> Integer.to_string() |> String.pad_leading(2, "0")
+    day = ts.day |> Integer.to_string() |> String.pad_leading(2, "0")
+    hour = ts.hour |> Integer.to_string() |> String.pad_leading(2, "0")
+    minute = ts.minute |> Integer.to_string() |> String.pad_leading(2, "0")
+
+    "#{year}-#{month}-#{day} #{hour}:#{minute} #{ts.zone_abbr}"
+  end
+
+  def default_timestamp_formatter(_), do: ""
+
+  cond do
+    Code.ensure_loaded?(TzExtra) ->
+      def all_timezones, do: TzExtra.time_zone_identifiers(include_alias: true)
+
+    Code.ensure_loaded?(TzData) ->
+      def all_timezones, do: Tzdata.zone_list()
+
+    true ->
+      def all_timezones, do: [@default_tz]
   end
 
   @doc """
