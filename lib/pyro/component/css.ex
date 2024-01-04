@@ -57,7 +57,7 @@ defmodule Pyro.Component.CSS do
       defp reduce_class(nil, acc), do: acc
 
       defp reduce_class({:remove, to_remove}, acc) do
-        to_remove = List.wrap(to_remove) |> Enum.map(&to_string/1)
+        to_remove = to_remove |> List.wrap() |> Enum.map(&to_string/1)
 
         acc
         |> List.flatten()

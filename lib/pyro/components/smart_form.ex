@@ -9,8 +9,8 @@ if Code.ensure_loaded?(AshPhoenix) do
     # import Pyro.Gettext
     import Pyro.Components.Core, only: [button: 1, header: 1, input: 1]
 
-    alias Pyro.Ash.Extensions.Resource.Info, as: PI
     alias Ash.Resource.Info, as: ResourceInfo
+    alias Pyro.Ash.Extensions.Resource.Info, as: PI
 
     require Ash.Query
 
@@ -148,7 +148,7 @@ if Code.ensure_loaded?(AshPhoenix) do
       |> assign(:argument, argument)
       |> assign(:multiple, multiple)
       |> assign(:change, change)
-      |> render_field
+      |> render_field()
     end
 
     defp render_field(%{field: %Pyro.Ash.Extensions.Resource.Form.FieldGroup{}} = assigns) do
@@ -175,11 +175,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     defp render_field(
-           %{
-             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
-             attribute: %{type: type}
-           } =
-             assigns
+           %{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default}, attribute: %{type: type}} = assigns
          )
          when type == Pyro.Ash.Type.ZonedDateTime do
       ~H"""
@@ -214,9 +210,7 @@ if Code.ensure_loaded?(AshPhoenix) do
       """
     end
 
-    defp render_field(
-           %{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :long_text}} = assigns
-         ) do
+    defp render_field(%{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :long_text}} = assigns) do
       ~H"""
       <.input
         overrides={@overrides}
@@ -231,9 +225,7 @@ if Code.ensure_loaded?(AshPhoenix) do
       """
     end
 
-    defp render_field(
-           %{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :short_text}} = assigns
-         ) do
+    defp render_field(%{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :short_text}} = assigns) do
       ~H"""
       <.input
         overrides={@overrides}
@@ -248,10 +240,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     defp render_field(
-           %{
-             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
-             attribute: %{type: type}
-           } = assigns
+           %{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default}, attribute: %{type: type}} = assigns
          )
          when type in [Ash.Type.String, Ash.Type.CiString] do
       ~H"""
@@ -276,8 +265,8 @@ if Code.ensure_loaded?(AshPhoenix) do
          when type in [Ash.Type.Atom] do
       # TODO: This needs to be considered. Do we require options from the Pyro config if `one_of` not defined? Do we allow arbitrary string input?
       assigns =
-        assigns
-        |> assign(
+        assign(
+          assigns,
           :options,
           case Keyword.get(constraints, :one_of) do
             nil -> []
@@ -301,10 +290,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     defp render_field(
-           %{
-             field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default},
-             attribute: %{type: type}
-           } = assigns
+           %{field: %Pyro.Ash.Extensions.Resource.Form.Field{type: :default}, attribute: %{type: type}} = assigns
          )
          when type in [Ash.Type.Boolean] do
       ~H"""
@@ -327,12 +313,8 @@ if Code.ensure_loaded?(AshPhoenix) do
              argument: %Ash.Resource.Actions.Argument{type: arg_type},
              change: %{
                type: Ash.Resource.Change.ManageRelationship,
-               manage_opts: %{
-                 on_lookup: {:relate, _, _}
-               },
-               relationship: %{
-                 api: api
-               }
+               manage_opts: %{on_lookup: {:relate, _, _}},
+               relationship: %{api: api}
              }
            } = assigns
          )
@@ -442,11 +424,9 @@ if Code.ensure_loaded?(AshPhoenix) do
         {defaults, manage_opts} = get_defaults_and_options(manage_opts)
 
         manage_opts =
-          Ash.Changeset.ManagedRelationshipHelpers.sanitize_opts(
-            relationship,
-            Keyword.merge(defaults, manage_opts)
-          )
-          |> Enum.into(%{})
+          relationship
+          |> Ash.Changeset.ManagedRelationshipHelpers.sanitize_opts(Keyword.merge(defaults, manage_opts))
+          |> Map.new()
 
         change = %{
           type: Ash.Resource.Change.ManageRelationship,

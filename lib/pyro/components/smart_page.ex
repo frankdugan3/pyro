@@ -4,12 +4,13 @@ if Code.ensure_loaded?(AshPhoenix) do
     Auto-render a full-featured page from a given Pyro DSL configuration.
     """
 
-    import Pyro.Component.Helpers
     import Phoenix.Component, only: [assign: 3]
     import Phoenix.LiveView, only: [connected?: 1, get_connect_params: 1]
-    alias Pyro.Ash.Extensions.Resource.LiveView.Page
-    alias Pyro.Ash.Extensions.Resource.Info, as: PI
+    import Pyro.Component.Helpers
+
     alias Ash.Resource.Info, as: RI
+    alias Pyro.Ash.Extensions.Resource.Info, as: PI
+    alias Pyro.Ash.Extensions.Resource.LiveView.Page
 
     @doc """
     Get the timezone from session or connect_params, defaulting to the local timezone.
@@ -63,7 +64,8 @@ if Code.ensure_loaded?(AshPhoenix) do
       end
 
       routes =
-        Macro.expand(opts[:router], __CALLER__)
+        opts[:router]
+        |> Macro.expand(__CALLER__)
         |> Module.concat(Helpers)
 
       unless opts[:router] do
@@ -81,18 +83,19 @@ if Code.ensure_loaded?(AshPhoenix) do
 
       live_view =
         quote do
-          import unquote(__MODULE__)
           import Pyro.Components.SmartComponent
-          alias Pyro.Ash.Extensions.Resource.Info, as: PI
+          import unquote(__MODULE__)
+
           alias Ash.Resource.Info, as: RI
+          alias Pyro.Ash.Extensions.Resource.Info, as: PI
           alias Pyro.Components.DataTable
+
+          require Ash.Query
 
           Module.register_attribute(__MODULE__, :resource, persist: true)
           Module.register_attribute(__MODULE__, :pyro_page, persist: true)
           @resource unquote(resource)
           @pyro_page PI.page_for(@resource, unquote(page_name))
-
-          require Ash.Query
 
           @impl true
           def render(var!(assigns)) do
@@ -147,13 +150,7 @@ if Code.ensure_loaded?(AshPhoenix) do
           end
 
           @impl true
-          def handle_event(
-                "reset-table",
-                %{
-                  "component-id" => unquote(list_component_id)
-                },
-                socket
-              ) do
+          def handle_event("reset-table", %{"component-id" => unquote(list_component_id)}, socket) do
             handle_params(%{}, "", assign(socket, :params, %{unquote(list_component_id) => %{}}))
           end
 
@@ -182,8 +179,7 @@ if Code.ensure_loaded?(AshPhoenix) do
             component_params = Map.put(component_params, "sort", sort)
 
             params =
-              socket.assigns.params
-              |> Map.put(unquote(list_component_id), component_params)
+              Map.put(socket.assigns.params, unquote(list_component_id), component_params)
 
             {:noreply,
              socket
@@ -228,11 +224,9 @@ if Code.ensure_loaded?(AshPhoenix) do
           defp validate_filter_params(socket, _params), do: socket
           defp validate_display_params(socket, _params), do: socket
 
-          defp maybe_patch_params(%{assigns: %{params: valid_params}} = socket, params)
-               when valid_params == params do
+          defp maybe_patch_params(%{assigns: %{params: valid_params}} = socket, params) when valid_params == params do
             query =
-              unquote(resource)
-              |> Ash.Query.sort(socket.assigns.list_sort)
+              Ash.Query.sort(unquote(resource), socket.assigns.list_sort)
 
             assign(
               socket,
@@ -248,15 +242,8 @@ if Code.ensure_loaded?(AshPhoenix) do
           end
 
           #  TODO: This will need to handle different action types besides list
-          defp maybe_patch_params(
-                 %{assigns: %{params: valid_params, live_action: live_action}} = socket,
-                 _params
-               ),
-               do:
-                 push_patch(socket,
-                   to: route_for(socket, live_action, valid_params),
-                   replace: true
-                 )
+          defp maybe_patch_params(%{assigns: %{params: valid_params, live_action: live_action}} = socket, _params),
+            do: push_patch(socket, to: route_for(socket, live_action, valid_params), replace: true)
         end
 
       handle_action =
@@ -274,19 +261,12 @@ if Code.ensure_loaded?(AshPhoenix) do
     end
 
     defp build_handle_action(
-           %Page.List{
-             live_action: live_action,
-             label: label,
-             action: action,
-             description: description
-           },
+           %Page.List{live_action: live_action, label: label, action: action, description: description},
            %Page{view_as: :list_and_modal, route_helper: route_helper},
            routes
          ) do
       quote do
-        def handle_action(
-              %{assigns: %{live_action: unquote(live_action), current_user: actor}} = socket
-            ) do
+        def handle_action(%{assigns: %{live_action: unquote(live_action), current_user: actor}} = socket) do
           socket
           |> assign(:pyro_data_table, PI.data_table_for(@resource, unquote(action)))
           |> assign(

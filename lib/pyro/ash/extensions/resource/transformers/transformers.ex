@@ -1,8 +1,9 @@
 if Code.ensure_loaded?(Ash) do
   defmodule Pyro.Ash.Extensions.Resource.Transformers do
     @moduledoc false
-    alias Spark.Dsl.Transformer
     import Pyro.Component.Helpers, only: [get_nested: 3]
+
+    alias Spark.Dsl.Transformer
 
     def filter_actions(dsl, filter) do
       dsl
@@ -16,26 +17,22 @@ if Code.ensure_loaded?(Ash) do
 
     def inherit_pyro_config(dsl, kind, action, option, default \\ nil)
 
-    def inherit_pyro_config(dsl, path, action, option, default)
-        when is_list(path) do
+    def inherit_pyro_config(dsl, path, action, option, default) when is_list(path) do
       dsl
       |> Transformer.get_entities(path)
       |> Enum.find(&(&1.name == action))
       |> get_nested([option], default)
     end
 
-    def inherit_pyro_config(dsl, kind, action, option, default)
-        when kind in [:form] do
+    def inherit_pyro_config(dsl, kind, action, option, default) when kind in [:form] do
       inherit_pyro_config(dsl, [:pyro, :form], action, option, default)
     end
 
-    def inherit_pyro_config(dsl, kind, action, option, default)
-        when kind in [:data_table] do
+    def inherit_pyro_config(dsl, kind, action, option, default) when kind in [:data_table] do
       inherit_pyro_config(dsl, [:pyro, :data_table], action, option, default)
     end
 
-    def inherit_pyro_config(dsl, kind, action, option, default)
-        when kind in [:card, :card_grid] do
+    def inherit_pyro_config(dsl, kind, action, option, default) when kind in [:card, :card_grid] do
       inherit_pyro_config(dsl, [:pyro, :card_grid], action, option, default)
     end
 
@@ -70,21 +67,19 @@ if Code.ensure_loaded?(Ash) do
 
     def default_label(%{name: name}), do: default_label(name)
 
-    def default_label(name) when is_atom(name),
-      do: default_label(Atom.to_string(name))
+    def default_label(name) when is_atom(name), do: default_label(Atom.to_string(name))
 
     def default_label(name) when is_binary(name),
-      do:
-        name
-        |> String.split("_")
-        |> Enum.map_join(" ", &String.capitalize/1)
+      do: name |> String.split("_") |> Enum.map_join(" ", &String.capitalize/1)
 
     defmacro __using__(_env) do
       quote do
         use Spark.Dsl.Transformer
+
+        import unquote(__MODULE__)
+
         alias Spark.Dsl.Transformer
         alias Spark.Error.DslError
-        import unquote(__MODULE__)
       end
     end
   end

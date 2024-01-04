@@ -11,6 +11,7 @@ if Code.ensure_loaded?(AshPhoenix) do
     defmacro __using__(_env) do
       quote do
         use Pyro.Component
+
         import unquote(__MODULE__)
       end
     end

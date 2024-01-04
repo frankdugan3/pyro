@@ -3,8 +3,9 @@ defmodule ExampleWeb.LiveUserAuth do
   Helpers for authenticating users in LiveViews.
   """
 
-  import Phoenix.Component
   use ExampleWeb, :verified_routes
+
+  import Phoenix.Component
 
   def on_mount(:live_user_optional, _params, _session, socket) do
     if socket.assigns[:current_user] do

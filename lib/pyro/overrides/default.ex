@@ -10,13 +10,14 @@ defmodule Pyro.Overrides.Default do
   ####    S T Y L E    S E T T I N G S
   ##############################################################################
 
+  use Pyro.Overrides
+
+  import Pyro.Component.Helpers, only: [get_nested: 2]
+
   @variant_colors ~w[slate gray zinc neutral stone red orange amber yellow lime green emerald teal cyan sky blue indigo violet purple fuchsia pink rose]
   @invariant_colors ~w[transparent white black]
   @all_colors @variant_colors ++ @invariant_colors
   @flash_kinds ~w[info error warning success] ++ @variant_colors
-
-  use Pyro.Overrides
-  import Pyro.Component.Helpers, only: [get_nested: 2]
 
   defp color_class(color) do
     case color do
@@ -187,8 +188,7 @@ defmodule Pyro.Overrides.Default do
     JS.show(js,
       to: selector,
       transition:
-        {"transition-all transform ease-out duration-300",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
+        {"transition-all transform ease-out duration-300", "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
          "opacity-100 translate-y-0 sm:scale-100"}
     )
   end
@@ -198,8 +198,7 @@ defmodule Pyro.Overrides.Default do
       to: selector,
       time: 200,
       transition:
-        {"transition-all transform ease-in duration-200",
-         "opacity-100 translate-y-0 sm:scale-100",
+        {"transition-all transform ease-in duration-200", "opacity-100 translate-y-0 sm:scale-100",
          "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
     )
   end
@@ -269,8 +268,7 @@ defmodule Pyro.Overrides.Default do
     |> JS.show(
       to: "##{id}-container",
       transition:
-        {"transition-all transform ease-out duration-300",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
+        {"transition-all transform ease-out duration-300", "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
          "opacity-100 translate-y-0 sm:scale-100"}
     )
     |> JS.add_class("overflow-hidden", to: "body")
@@ -287,8 +285,7 @@ defmodule Pyro.Overrides.Default do
       to: "##{id}-container",
       time: 200,
       transition:
-        {"transition-all transform ease-in duration-200",
-         "opacity-100 translate-y-0 sm:scale-100",
+        {"transition-all transform ease-in duration-200", "opacity-100 translate-y-0 sm:scale-100",
          "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
     )
     |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})

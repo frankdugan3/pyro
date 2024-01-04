@@ -3,6 +3,7 @@ if Code.ensure_loaded?(Ash) do
     @moduledoc false
 
     use Pyro.Ash.Extensions.Resource.Transformers
+
     alias Pyro.Ash.Extensions.Resource.LiveView.Page
 
     @dependant_transformers Ash.Resource.Dsl.transformers() ++
@@ -32,17 +33,11 @@ if Code.ensure_loaded?(Ash) do
       end
     end
 
-    defp merge_page(
-           %Page{route_helper: nil, name: name} = page,
-           acc
-         ) do
+    defp merge_page(%Page{route_helper: nil, name: name} = page, acc) do
       merge_page(%{page | route_helper: String.to_atom("#{name}_path")}, acc)
     end
 
-    defp merge_page(
-           %Page{view_as: :list_and_modal, live_actions: live_actions} = page,
-           {dsl, errors}
-         ) do
+    defp merge_page(%Page{view_as: :list_and_modal, live_actions: live_actions} = page, {dsl, errors}) do
       live_action_types =
         live_actions
         |> Enum.map(&expand_live_action_defaults(&1, dsl))
@@ -83,10 +78,7 @@ if Code.ensure_loaded?(Ash) do
       {dsl, errors}
     end
 
-    defp merge_page(
-           %Page{view_as: :show_and_modal, live_actions: live_actions} = page,
-           {dsl, errors}
-         ) do
+    defp merge_page(%Page{view_as: :show_and_modal, live_actions: live_actions} = page, {dsl, errors}) do
       live_action_types =
         live_actions
         |> Enum.map(&expand_live_action_defaults(&1, dsl))
@@ -137,10 +129,7 @@ if Code.ensure_loaded?(Ash) do
       {dsl, errors}
     end
 
-    defp merge_page(
-           %Page{view_as: :individual, live_actions: live_actions} = page,
-           {dsl, errors}
-         ) do
+    defp merge_page(%Page{view_as: :individual, live_actions: live_actions} = page, {dsl, errors}) do
       live_actions =
         live_actions
         |> Enum.map(&expand_live_action_defaults(&1, dsl))
@@ -183,11 +172,13 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp expand_live_action_defaults(%Page.Update{load_action: nil} = live_action, dsl) do
-      case filter_actions(dsl, &(&1.type == :read && &1.primary? == true)) |> List.first() do
-        nil -> live_action
-        %{name: name} -> %{live_action | load_action: name}
-      end
-      |> expand_live_action_defaults(dsl)
+      case_result =
+        case dsl |> filter_actions(&(&1.type == :read && &1.primary? == true)) |> List.first() do
+          nil -> live_action
+          %{name: name} -> %{live_action | load_action: name}
+        end
+
+      expand_live_action_defaults(case_result, dsl)
     end
 
     defp expand_live_action_defaults(%{label: :inherit} = live_action, dsl) do
@@ -200,21 +191,18 @@ if Code.ensure_loaded?(Ash) do
           default_label(live_action.live_action)
         )
 
-      %{live_action | label: label}
-      |> expand_live_action_defaults(dsl)
+      expand_live_action_defaults(%{live_action | label: label}, dsl)
     end
 
     defp expand_live_action_defaults(%{live_action: name, label: nil} = live_action, dsl) do
-      %{live_action | label: default_label(name)}
-      |> expand_live_action_defaults(dsl)
+      expand_live_action_defaults(%{live_action | label: default_label(name)}, dsl)
     end
 
     defp expand_live_action_defaults(%{description: :inherit} = live_action, dsl) do
       description =
         inherit_pyro_config(dsl, live_action.display_as, live_action.action, :description)
 
-      %{live_action | description: description}
-      |> expand_live_action_defaults(dsl)
+      expand_live_action_defaults(%{live_action | description: description}, dsl)
     end
 
     defp expand_live_action_defaults(live_action, _dsl), do: live_action

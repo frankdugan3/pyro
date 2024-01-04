@@ -1,4 +1,5 @@
 defmodule Example.Authentication do
+  @moduledoc false
   use Ash.Api
 
   authorization do

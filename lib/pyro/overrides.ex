@@ -45,25 +45,21 @@ defmodule Pyro.Overrides do
   defmacro __using__(_env) do
     ash_phoenix =
       quote do
-        alias Pyro.Components.{
-          SmartDataTable,
-          SmartForm,
-          SmartPage
-        }
+        alias Pyro.Components.SmartDataTable
+        alias Pyro.Components.SmartForm
+        alias Pyro.Components.SmartPage
       end
 
     phoenix =
       quote do
-        require unquote(__MODULE__)
-        import unquote(__MODULE__), only: :macros
         import Pyro.Component.Helpers
-
-        alias Pyro.Components.{
-          Autocomplete,
-          Core
-        }
+        import unquote(__MODULE__), only: :macros
 
         alias Phoenix.LiveView.JS
+        alias Pyro.Components.Autocomplete
+        alias Pyro.Components.Core
+
+        require unquote(__MODULE__)
 
         Module.register_attribute(__MODULE__, :override, accumulate: true)
         @component nil
@@ -75,7 +71,7 @@ defmodule Pyro.Overrides do
         @doc false
         # Internally used for validation.
         @spec __pass_assigns_to__ :: map()
-        def __pass_assigns_to__(), do: @__pass_assigns_to__
+        def __pass_assigns_to__, do: @__pass_assigns_to__
       end
 
     if Code.ensure_loaded?(AshPhoenix) do
@@ -189,8 +185,7 @@ defmodule Pyro.Overrides do
           override
       end)
 
-    env.module
-    |> Module.put_attribute(:override, overrides)
+    Module.put_attribute(env.module, :override, overrides)
 
     overrides =
       Map.new(overrides, fn {component, selector, value} -> {{component, selector}, value} end)
@@ -203,7 +198,7 @@ defmodule Pyro.Overrides do
     ## Overrides
 
     #{overrides |> Enum.group_by(fn {{component, _}, _} -> component end) |> Enum.map_join("\n", fn {{module, component}, overrides} ->
-      label = case module.__info__(:functions) |> Enum.find(&(&1 == {component, 1})) do
+      label = case :functions |> module.__info__() |> Enum.find(&(&1 == {component, 1})) do
         nil -> "#{module}.#{component}/1 (private)"
         _ -> "`#{module}.#{component}/1`"
       end
@@ -211,8 +206,8 @@ defmodule Pyro.Overrides do
       - #{label}
       #{Enum.map_join(overrides, "\n", fn {{_, selector}, value} ->
         value = case value do
-          {:pass_assigns_to, value} -> value |> inspect |> String.replace("&", "")
-          value when is_function(value) -> value |> inspect |> String.replace("&", "")
+          {:pass_assigns_to, value} -> value |> inspect() |> String.replace("&", "")
+          value when is_function(value) -> value |> inspect() |> String.replace("&", "")
           value -> inspect(value)
         end
         "  - `:#{selector}` `#{value}`"
@@ -251,8 +246,7 @@ defmodule Pyro.Overrides do
   """
   @spec override_for(module, atom, atom) :: any
   def override_for(module, component, prop) do
-    configured_overrides()
-    |> Enum.reduce_while(nil, fn override_module, _ ->
+    Enum.reduce_while(configured_overrides(), nil, fn override_module, _ ->
       case Code.ensure_compiled(module) do
         {:module, _} ->
           override_module.overrides()
@@ -272,7 +266,7 @@ defmodule Pyro.Overrides do
   Get the configured or default override modules.
   """
   @spec configured_overrides() :: [module]
-  def configured_overrides() do
+  def configured_overrides do
     Application.get_env(:pyro, :overrides, [__MODULE__.Default])
   end
 end

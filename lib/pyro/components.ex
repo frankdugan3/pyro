@@ -20,14 +20,16 @@ defmodule Pyro.Components do
       quote do
         import Pyro.Components.Core
         import Pyro.Components.DataTable
+
         alias Pyro.Components.Autocomplete
       end
 
     ash_phoenix =
       quote do
-        alias Pyro.Components.SmartPage
         import Pyro.Components.SmartDataTable
         import Pyro.Components.SmartForm
+
+        alias Pyro.Components.SmartPage
       end
 
     if Code.ensure_loaded?(AshPhoenix) do

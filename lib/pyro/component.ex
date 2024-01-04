@@ -52,6 +52,7 @@ defmodule Pyro.Component do
         import Kernel, except: [def: 2, defp: 2]
         import Phoenix.Component, except: [attr: 2, attr: 3]
         import Phoenix.Component.Declarative
+
         require Phoenix.Template
 
         for {prefix_match, value} <-
@@ -66,15 +67,16 @@ defmodule Pyro.Component do
 
     pyro =
       quote do
+        import unquote(__MODULE__)
+        import unquote(__MODULE__).Helpers
+
+        alias Phoenix.LiveView.JS
+
         @overrides_attr_doc unquote(@overrides_attr_doc)
 
         Module.register_attribute(__MODULE__, :__overridable_attrs__, accumulate: true)
         Module.register_attribute(__MODULE__, :__assign_overridables_calls__, accumulate: true)
         Module.put_attribute(__MODULE__, :__overridable_components__, %{})
-
-        import unquote(__MODULE__)
-        import unquote(__MODULE__).Helpers
-        alias Phoenix.LiveView.JS
 
         @on_definition unquote(__MODULE__)
         @before_compile unquote(__MODULE__)
@@ -228,10 +230,11 @@ defmodule Pyro.Component do
     Module.put_attribute(module, :__assign_overridables_calls__, component_name)
 
     quote bind_quoted: [assigns: assigns, module: module, component_name: component_name] do
-      __overridable_components__()[component_name][:overridable_attrs]
-      |> Enum.reduce(assigns, fn %{name: name, required: required} = opts, assigns ->
-        # TODO: Validate values at runtime; load overridable values if atom instead of list.
-
+      Enum.reduce(__overridable_components__()[component_name][:overridable_attrs], assigns, fn %{
+                                                                                                  name: name,
+                                                                                                  required: required
+                                                                                                } = opts,
+                                                                                                assigns ->
         override =
           Map.get(assigns, :overrides) ||
             Pyro.Overrides.configured_overrides()
@@ -265,6 +268,8 @@ defmodule Pyro.Component do
                 end
             end
       end)
+
+      # TODO: Validate values at runtime; load overridable values if atom instead of list.
     end
   end
 
@@ -333,8 +338,7 @@ defmodule Pyro.Component do
          Enum.find(args, fn {arg, _line, _} -> arg == :assigns end) do
       # Get list of attribute line numbers for this component
       attr_lines =
-        (Module.get_attribute(env.module, :__components__)[name][:attrs] || [])
-        |> Enum.map(& &1.line)
+        Enum.map(Module.get_attribute(env.module, :__components__)[name][:attrs] || [], & &1.line)
 
       # Only include overrides that have the same line
       attrs =
@@ -408,11 +412,9 @@ defmodule Pyro.Component do
     assign_overridable_calls = Module.get_attribute(env.module, :__assign_overridables_calls__)
 
     overridable_components =
-      env.module
-      |> Module.get_attribute(:__overridable_components__)
+      Module.get_attribute(env.module, :__overridable_components__)
 
-    overridable_components
-    |> Enum.each(fn {name, opts} ->
+    Enum.each(overridable_components, fn {name, opts} ->
       unless name in assign_overridable_calls do
         raise CompileError,
           file: env.file,
@@ -440,7 +442,7 @@ defmodule Pyro.Component do
 
         The components in this module support the following overridable attributes:
 
-        #{overridable_components |> Enum.map_join("\n", fn {component, %{overridable_attrs: attrs}} -> """
+        #{Enum.map_join(overridable_components, "\n", fn {component, %{overridable_attrs: attrs}} -> """
           - `#{component}/1`
           #{Enum.map_join(attrs, "\n", fn %{name: name, type: type, required: required} -> "  - `#{inspect(name)}` `#{inspect(type)}`" <> if required, do: " (required)", else: "" end)}
           """ end)}
@@ -466,15 +468,14 @@ defmodule Pyro.Component do
                       docs <> "\n" <> unquote(override_docs)
                   end)
 
-      def __overridable_components__() do
+      def __overridable_components__ do
         @__overridable_components__
       end
     end
   end
 
   @doc false
-  def __overridable_attr__!(module, name, type, opts, line, file)
-      when is_atom(name) and is_list(opts) do
+  def __overridable_attr__!(module, name, type, opts, line, file) when is_atom(name) and is_list(opts) do
     {overridable, opts} = Keyword.pop(opts, :overridable, false)
     {required, opts} = Keyword.pop(opts, :required, false)
 
@@ -497,8 +498,7 @@ defmodule Pyro.Component do
     :ok
   end
 
-  defp expand_alias({:__aliases__, _, _} = alias, env),
-    do: Macro.expand(alias, %{env | function: {:__attr__, 3}})
+  defp expand_alias({:__aliases__, _, _} = alias, env), do: Macro.expand(alias, %{env | function: {:__attr__, 3}})
 
   defp expand_alias(other, _env), do: other
 
@@ -518,9 +518,5 @@ defmodule Pyro.Component do
   end
 
   @spec module_label(module) :: String.t()
-  defp module_label(module),
-    do:
-      module
-      |> Module.split()
-      |> Enum.join(".")
+  defp module_label(module), do: module |> Module.split() |> Enum.join(".")
 end

@@ -3,6 +3,7 @@ if Code.ensure_loaded?(Ash) do
     @moduledoc false
 
     use Pyro.Ash.Extensions.Resource.Verifiers
+
     alias Pyro.Ash.Extensions.Resource.DataTable
 
     @impl true
@@ -28,21 +29,23 @@ if Code.ensure_loaded?(Ash) do
         |> Enum.split_with(& &1.private?)
 
       private_fields =
-        Enum.concat([
+        [
           private_attributes,
           private_aggregates,
           private_calculations,
           private_relationships
-        ])
+        ]
+        |> Enum.concat()
         |> MapSet.new(& &1.name)
 
       public_fields =
-        Enum.concat([
+        [
           public_attributes,
           public_aggregates,
           public_calculations,
           public_relationships
-        ])
+        ]
+        |> Enum.concat()
         |> MapSet.new(& &1.name)
 
       data_table_actions = Verifier.get_entities(dsl_state, [:pyro, :data_table])
@@ -55,7 +58,8 @@ if Code.ensure_loaded?(Ash) do
             %DataTable.Action{name: action_name, columns: columns, exclude: exclude}, errors ->
               # No duplicate path-names
               errors =
-                Enum.group_by(columns, fn %{path: path, name: name} ->
+                columns
+                |> Enum.group_by(fn %{path: path, name: name} ->
                   path
                   |> Kernel.++([name])
                   |> Enum.join(".")
@@ -78,7 +82,8 @@ if Code.ensure_loaded?(Ash) do
                 end)
 
               errors =
-                Enum.group_by(columns, fn %{path: path, label: label} ->
+                columns
+                |> Enum.group_by(fn %{path: path, label: label} ->
                   path
                   |> Kernel.++([label])
                   |> Enum.join(".")
@@ -110,8 +115,7 @@ if Code.ensure_loaded?(Ash) do
                     [
                       DslError.exception(
                         path: [:pyro, :data_table, :action, action_name],
-                        message:
-                          "action #{inspect(action_name)}, attribute #{inspect(name)} not in data table columns"
+                        message: "action #{inspect(action_name)}, attribute #{inspect(name)} not in data table columns"
                       )
                       | errors
                     ]
@@ -128,8 +132,7 @@ if Code.ensure_loaded?(Ash) do
                       [
                         DslError.exception(
                           path: [:pyro, :data_table, :action, action_name],
-                          message:
-                            "action #{inspect(action_name)}, #{inspect(column_name)} is a private field"
+                          message: "action #{inspect(action_name)}, #{inspect(column_name)} is a private field"
                         )
                         | errors
                       ]

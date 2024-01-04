@@ -1,6 +1,7 @@
 if Code.ensure_loaded?(Ash) do
   defmodule Pyro.Ash.Extensions.Resource.Schema do
-    def css_class_type() do
+    @moduledoc false
+    def css_class_type do
       {:or, [:string, {:fun, 1}]}
     end
 

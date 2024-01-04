@@ -69,6 +69,10 @@ defmodule Pyro.Overrides.BEM do
   ####    S T Y L E    S E T T I N G S
   ##############################################################################
 
+  use Pyro.Overrides
+
+  import Pyro.Component.Helpers, only: [get_nested: 2]
+
   @prefix Application.compile_env(:pyro, :bem_prefix, "")
   @color_variants Application.compile_env(
                     :pyro,
@@ -87,9 +91,6 @@ defmodule Pyro.Overrides.BEM do
                      ~w[solid inverted outline]
                    )
   @button_shapes Application.compile_env(:pyro, :bem_button_shapes, ~w[rounded square pill])
-
-  use Pyro.Overrides
-  import Pyro.Component.Helpers, only: [get_nested: 2]
 
   ##############################################################################
   ####    C O R E    C O M P O N E N T S
@@ -302,7 +303,7 @@ defmodule Pyro.Overrides.BEM do
   end
 
   def nav_link_class(passed_assigns) do
-    [@prefixed_nav_link, "#{@prefixed_nav_link}--current": passed_assigns[:is_current]]
+    [@prefixed_nav_link, {:"#{@prefixed_nav_link}--current", passed_assigns[:is_current]}]
   end
 
   @prefixed_progress @prefix <> "progress"
@@ -315,7 +316,7 @@ defmodule Pyro.Overrides.BEM do
   end
 
   def progress_class(passed_assigns) do
-    color =
+    case_result =
       case passed_assigns[:color] do
         "error" -> "red"
         "info" -> "sky"
@@ -323,7 +324,9 @@ defmodule Pyro.Overrides.BEM do
         "success" -> "green"
         color -> color
       end
-      |> then(&(@prefixed_progress <> "--" <> &1))
+
+    color =
+      then(case_result, &(@prefixed_progress <> "--" <> &1))
 
     size = @prefixed_progress <> "--" <> passed_assigns[:size]
 

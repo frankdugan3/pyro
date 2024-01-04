@@ -3,6 +3,7 @@ if Code.ensure_loaded?(Ash) do
     @moduledoc false
 
     use Pyro.Ash.Extensions.Resource.Transformers
+
     alias Pyro.Ash.Extensions.Resource.DataTable
 
     @ash_resource_transformers Ash.Resource.Dsl.transformers()
@@ -32,7 +33,8 @@ if Code.ensure_loaded?(Ash) do
 
           # determine the actions that need data table definitions
           expected_action_names =
-            filter_actions(dsl, fn action ->
+            dsl
+            |> filter_actions(fn action ->
               action.name not in excluded_data_table_action_names &&
                 action.type in [:read]
             end)
@@ -62,8 +64,7 @@ if Code.ensure_loaded?(Ash) do
       end
     end
 
-    defp reduce_data_table_entities(%DataTable.ActionType{name: names} = type, acc)
-         when is_list(names) do
+    defp reduce_data_table_entities(%DataTable.ActionType{name: names} = type, acc) when is_list(names) do
       columns = merge_columns(type.columns)
 
       Enum.reduce(names, acc, fn name, acc ->
@@ -81,8 +82,7 @@ if Code.ensure_loaded?(Ash) do
       merge_action_type(acc, Map.put(type, :columns, columns))
     end
 
-    defp reduce_data_table_entities(%DataTable.Action{name: names} = action, acc)
-         when is_list(names) do
+    defp reduce_data_table_entities(%DataTable.Action{name: names} = action, acc) when is_list(names) do
       columns = merge_columns(action.columns)
 
       Enum.reduce(names, acc, fn name, acc ->
@@ -104,8 +104,7 @@ if Code.ensure_loaded?(Ash) do
       acc
     end
 
-    defp merge_action_type(%{errors: errors} = acc, %{name: name})
-         when name not in [:read] do
+    defp merge_action_type(%{errors: errors} = acc, %{name: name}) when name not in [:read] do
       errors = [
         DslError.exception(
           path: [:pyro, :data_table, :action_type],
@@ -119,9 +118,7 @@ if Code.ensure_loaded?(Ash) do
       Map.put(acc, :errors, errors)
     end
 
-    defp merge_action_type(%{data_table_types: %{read: _}, errors: errors} = acc, %{
-           name: :read
-         }) do
+    defp merge_action_type(%{data_table_types: %{read: _}, errors: errors} = acc, %{name: :read}) do
       errors = [
         DslError.exception(
           path: [:pyro, :data_table, :action_type],
@@ -232,8 +229,7 @@ if Code.ensure_loaded?(Ash) do
             else
               merge_action(
                 acc,
-                %DataTable.Action{name: name}
-                |> Map.merge(Map.drop(type_default, [:__struct__, :name]))
+                Map.merge(%DataTable.Action{name: name}, Map.drop(type_default, [:__struct__, :name]))
               )
             end
         end

@@ -24,9 +24,9 @@ defmodule ExampleWeb do
       use Phoenix.Router, helpers: true
 
       # Import common connection and controller functions to use in pipelines
-      import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+      import Plug.Conn
     end
   end
 
@@ -42,8 +42,8 @@ defmodule ExampleWeb do
         formats: [:html, :json],
         layouts: [html: ExampleWeb.Layouts]
 
-      import Plug.Conn
       import ExampleWeb.Gettext
+      import Plug.Conn
 
       unquote(verified_routes())
     end
@@ -84,10 +84,11 @@ defmodule ExampleWeb do
     quote do
       use Pyro.Components
 
+      import ExampleWeb.Gettext
+
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      import ExampleWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

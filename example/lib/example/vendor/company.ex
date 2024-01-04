@@ -1,6 +1,5 @@
 defmodule Example.Vendor.Company do
-  require Phoenix.Component
-
+  @moduledoc false
   use Ash.Resource,
     data_layer: AshPostgres.DataLayer,
     extensions: [Pyro.Ash.Extensions.Resource],
@@ -8,6 +7,8 @@ defmodule Example.Vendor.Company do
     notifiers: [Ash.Notifier.PubSub]
 
   import Phoenix.Component, only: [sigil_H: 2]
+
+  require Phoenix.Component
 
   pyro do
     live_view do

@@ -52,8 +52,7 @@ defmodule Pyro.Components.Autocomplete do
     default: "[no results]",
     doc: "the message to display if there are no results for the search phrase"
 
-  attr :field, Phoenix.HTML.FormField,
-    doc: "a form field struct retrieved from the form, for example: @form[:email]"
+  attr :field, Phoenix.HTML.FormField, doc: "a form field struct retrieved from the form, for example: @form[:email]"
 
   attr :autofocus, :boolean,
     default: false,
@@ -163,10 +162,7 @@ defmodule Pyro.Components.Autocomplete do
   end
 
   @impl true
-  def update(
-        %{field: %Phoenix.HTML.FormField{} = field} = assigns,
-        %{assigns: %{field: :unset}} = socket
-      ) do
+  def update(%{field: %Phoenix.HTML.FormField{} = field} = assigns, %{assigns: %{field: :unset}} = socket) do
     {:ok,
      socket
      |> assign(assigns)
@@ -180,8 +176,7 @@ defmodule Pyro.Components.Autocomplete do
   end
 
   @impl true
-  def update(%{field: %{value: value}} = assigns, %{assigns: %{value: old_value}} = socket)
-      when value !== old_value do
+  def update(%{field: %{value: value}} = assigns, %{assigns: %{value: old_value}} = socket) when value !== old_value do
     {:ok,
      socket
      |> assign(assigns)
@@ -245,14 +240,8 @@ defmodule Pyro.Components.Autocomplete do
   end
 
   defp assign_label(
-         %{
-           assigns: %{
-             value: value,
-             saved_value: saved_value,
-             lookup_fn: lookup_fn,
-             option_label_key: option_label_key
-           }
-         } = socket
+         %{assigns: %{value: value, saved_value: saved_value, lookup_fn: lookup_fn, option_label_key: option_label_key}} =
+           socket
        )
        when value != saved_value do
     label = Map.get(lookup_fn.(value), option_label_key)
@@ -267,9 +256,8 @@ defmodule Pyro.Components.Autocomplete do
 
   defp expanded?(results, _search, _saved_label) when results != [], do: true
 
-  defp expanded?(_results, search, saved_label)
-       when is_binary(search) and search != "" and search !== saved_label,
-       do: true
+  defp expanded?(_results, search, saved_label) when is_binary(search) and search != "" and search !== saved_label,
+    do: true
 
   defp expanded?(_results, _search, _saved_label), do: false
 end

@@ -23,15 +23,17 @@ defmodule Pyro.LiveView do
       end
 
     quote bind_quoted: [opts: opts] do
-      import Phoenix.LiveView
       @behaviour Phoenix.LiveView
+
+      use Pyro.Component, opts
+
+      import Phoenix.LiveView
+
       @before_compile Phoenix.LiveView.Renderer
 
       @phoenix_live_opts opts
       Module.register_attribute(__MODULE__, :phoenix_live_mount, accumulate: true)
       @before_compile Phoenix.LiveView
-
-      use Pyro.Component, opts
     end
   end
 end

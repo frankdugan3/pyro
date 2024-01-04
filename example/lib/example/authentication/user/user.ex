@@ -1,4 +1,5 @@
 defmodule Example.Authentication.User do
+  @moduledoc false
   use Ash.Resource,
     data_layer: AshPostgres.DataLayer,
     extensions: [AshAuthentication],

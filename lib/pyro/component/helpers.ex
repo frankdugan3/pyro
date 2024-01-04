@@ -3,9 +3,9 @@ defmodule Pyro.Component.Helpers do
   A library of helpers for using/authoring Pyro components.
   """
 
-  require Logger
-
   alias Phoenix.LiveView.JS
+
+  require Logger
 
   # Lifted from this comment: https://github.com/phoenixframework/phoenix_live_view/pull/1721#issuecomment-1439701395
   @doc """
@@ -75,11 +75,11 @@ defmodule Pyro.Component.Helpers do
   >
   > Requires a timezone database to be properly installed and configured.
   """
-  def default_timezone() do
+  def default_timezone do
     Application.get_env(:pyro, :default_timezone, "Etc/UTC")
   end
 
-  def local_now(), do: local_now(default_timezone())
+  def local_now, do: local_now(default_timezone())
 
   def local_now(tz) do
     case DateTime.now(tz) do
@@ -187,13 +187,11 @@ defmodule Pyro.Component.Helpers do
   def get_nested(value, [], _), do: value
   def get_nested(%{} = map, [key], default), do: Map.get(map, key, default)
 
-  def get_nested(%{} = map, [key | keys], default),
-    do: get_nested(Map.get(map, key), keys, default)
+  def get_nested(%{} = map, [key | keys], default), do: get_nested(Map.get(map, key), keys, default)
 
   def get_nested([_ | _] = keyword, [key], default), do: Keyword.get(keyword, key, default)
 
-  def get_nested([_ | _] = keyword, [key | keys], default),
-    do: get_nested(Keyword.get(keyword, key), keys, default)
+  def get_nested([_ | _] = keyword, [key | keys], default), do: get_nested(Keyword.get(keyword, key), keys, default)
 
   def get_nested(_, _, default), do: default
 end

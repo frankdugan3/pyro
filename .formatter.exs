@@ -68,6 +68,6 @@ pyro_locals_without_parens = [
   export: [
     locals_without_parens: spark_locals_without_parens ++ pyro_locals_without_parens
   ],
-  plugins: [Spark.Formatter, Phoenix.LiveView.HTMLFormatter],
+  plugins: [Spark.Formatter, Phoenix.LiveView.HTMLFormatter, Styler],
   inputs: ["*.{heex,ex,exs}", "{config,lib}/**/*.{heex,ex,exs}"]
 ]

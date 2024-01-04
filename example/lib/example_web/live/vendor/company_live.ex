@@ -1,4 +1,5 @@
 defmodule ExampleWeb.Vendor.CompanyLive do
+  @moduledoc false
   use ExampleWeb, :live_view
 
   use SmartPage,

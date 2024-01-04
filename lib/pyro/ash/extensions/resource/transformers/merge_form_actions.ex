@@ -3,6 +3,7 @@ if Code.ensure_loaded?(Ash) do
     @moduledoc false
 
     use Pyro.Ash.Extensions.Resource.Transformers
+
     alias Pyro.Ash.Extensions.Resource.Form
 
     @ash_resource_transformers Ash.Resource.Dsl.transformers()
@@ -106,8 +107,7 @@ if Code.ensure_loaded?(Ash) do
       end
     end
 
-    defp merge_action_type(%{errors: errors} = acc, %{name: name})
-         when name not in [:create, :update, :destroy] do
+    defp merge_action_type(%{errors: errors} = acc, %{name: name}) when name not in [:create, :update, :destroy] do
       errors = [
         DslError.exception(
           path: [:pyro, :form, :action_type],
@@ -257,8 +257,7 @@ if Code.ensure_loaded?(Ash) do
             else
               merge_action(
                 acc,
-                %Form.Action{name: name}
-                |> Map.merge(Map.drop(type_default, [:__struct__, :name]))
+                Map.merge(%Form.Action{name: name}, Map.drop(type_default, [:__struct__, :name]))
               )
             end
         end

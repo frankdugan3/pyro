@@ -1,4 +1,5 @@
 defmodule Pyro.Components.DataTable do
+  @moduledoc false
   use Pyro.Component
 
   import Pyro.Components.Core
@@ -334,12 +335,14 @@ defmodule Pyro.Components.DataTable do
   defp page_count(%{count: 0}), do: 0
 
   defp page_count(%{count: count, limit: limit}) do
-    if rem(count, limit) == 0 do
-      div(count, limit)
-    else
-      div(count, limit) + 1
-    end
-    |> Kernel.-(1)
+    if_result =
+      if rem(count, limit) == 0 do
+        div(count, limit)
+      else
+        div(count, limit) + 1
+      end
+
+    Kernel.-(if_result, 1)
   end
 
   defp page_count(_), do: raise("Need to implement keyset pagination!")
@@ -364,8 +367,7 @@ defmodule Pyro.Components.DataTable do
   defp delimit_integer(number), do: floor(number)
 
   def encode_sort(sort) do
-    sort
-    |> Enum.map_join(",", fn
+    Enum.map_join(sort, ",", fn
       {k, :asc} -> "#{k}"
       {k, :asc_nils_last} -> "#{k}"
       {k, :asc_nils_first} -> "++#{k}"
@@ -382,27 +384,29 @@ defmodule Pyro.Components.DataTable do
         {k, v} -> {k, v}
       end)
 
-    case Enum.find(sort, fn {k, _v} -> k == sort_key end) do
-      nil ->
-        added = [{sort_key, :asc}]
-        if shift?, do: sort ++ added, else: added
+    case_result =
+      case Enum.find(sort, fn {k, _v} -> k == sort_key end) do
+        nil ->
+          added = [{sort_key, :asc}]
+          if shift?, do: sort ++ added, else: added
 
-      {_key, order} ->
-        if shift? && length(sort) > 1 do
-          sort
-          |> Enum.map(fn
-            {k, order} when sort_key == k ->
-              {k, toggle_sort_order(order, ctrl?, shift?)}
+        {_key, order} ->
+          if shift? && length(sort) > 1 do
+            sort
+            |> Enum.map(fn
+              {k, order} when sort_key == k ->
+                {k, toggle_sort_order(order, ctrl?, shift?)}
 
-            other ->
-              other
-          end)
-          |> Enum.filter(fn {_key, order} -> order != nil end)
-        else
-          [{sort_key, toggle_sort_order(order, ctrl?, false)}]
-        end
-    end
-    |> encode_sort()
+              other ->
+                other
+            end)
+            |> Enum.filter(fn {_key, order} -> order != nil end)
+          else
+            [{sort_key, toggle_sort_order(order, ctrl?, false)}]
+          end
+      end
+
+    encode_sort(case_result)
   end
 
   # args: column, change_nil_position?, multiple_columns?

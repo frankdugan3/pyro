@@ -1,4 +1,5 @@
 defmodule Example.Vendor do
+  @moduledoc false
   use Ash.Api
 
   authorization do

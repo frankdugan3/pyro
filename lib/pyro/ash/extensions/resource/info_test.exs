@@ -172,6 +172,7 @@ defmodule Pyro.Ash.Extensions.Resource.InfoTest do
   end
 
   defmodule Api do
+    @moduledoc false
     use Ash.Api
 
     resources do

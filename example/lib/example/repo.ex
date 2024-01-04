@@ -2,7 +2,7 @@ defmodule Example.Repo do
   use AshPostgres.Repo,
     otp_app: :example
 
-  def installed_extensions() do
+  def installed_extensions do
     [
       "pgcrypto",
       "uuid-ossp",

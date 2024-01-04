@@ -1,6 +1,7 @@
 defmodule ExampleWeb.Router do
   use ExampleWeb, :router
   use AshAuthentication.Phoenix.Router
+
   import Pyro.Ash.Extensions.Resource.SmartRouter
 
   pipeline :browser do

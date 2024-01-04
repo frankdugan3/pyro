@@ -1,6 +1,4 @@
 defmodule Pyro.Components.Core do
-  use Pyro.Component
-
   @moduledoc """
   A core set of functional `.heex` components for building web apps. It is similar to (and often API-compatible with) Phoenix's generated `core_components.ex`.
 
@@ -22,6 +20,8 @@ defmodule Pyro.Components.Core do
 
   There are more complex components outside the `Core` module, be sure to check those out as well.
   """
+
+  use Pyro.Component
 
   @doc """
   Renders a link. This basically wraps `Phoenix.Component.link/1` with some overridable attributes, in particular `class` for consistent, DRY link default styling.
@@ -70,8 +70,7 @@ defmodule Pyro.Components.Core do
   attr :replace, :boolean,
     overridable: true,
     required: true,
-    doc:
-      "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
+    doc: "when using `:patch` or `:navigate`, should the browser's history be replaced with `pushState`?"
 
   attr :class, :css_classes,
     overridable: true,
@@ -334,11 +333,13 @@ defmodule Pyro.Components.Core do
 
   if Code.ensure_loaded?(Makeup) do
     defp format_code(source, language) do
-      case language do
-        "none" -> source
-        lexer -> Makeup.highlight_inner_html(source, lexer: lexer)
-      end
-      |> Phoenix.HTML.raw()
+      case_result =
+        case language do
+          "none" -> source
+          lexer -> Makeup.highlight_inner_html(source, lexer: lexer)
+        end
+
+      Phoenix.HTML.raw(case_result)
     end
   else
     defp format_code(source, _), do: source
@@ -861,8 +862,7 @@ defmodule Pyro.Components.Core do
   attr :description, :string, default: nil
   attr :errors, :list, default: []
 
-  attr :field, Phoenix.HTML.FormField,
-    doc: "a form field struct retrieved from the form, for example: @form[:email]"
+  attr :field, Phoenix.HTML.FormField, doc: "a form field struct retrieved from the form, for example: @form[:email]"
 
   attr :id, :any, default: nil
 
@@ -913,8 +913,7 @@ defmodule Pyro.Components.Core do
     overridable: true,
     doc: "class of the field description"
 
-  attr :rest, :global,
-    include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
+  attr :rest, :global, include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                                  pattern placeholder readonly required rows size step)
 
   slot :inner_block
@@ -959,9 +958,7 @@ defmodule Pyro.Components.Core do
     """
   end
 
-  defp render_input(
-         %{type: "datetime-zoned", tz_options: nil, get_tz_options: get_tz_options} = assigns
-       ) do
+  defp render_input(%{type: "datetime-zoned", tz_options: nil, get_tz_options: get_tz_options} = assigns) do
     render_input(assign(assigns, :tz_options, apply(get_tz_options, [])))
   end
 
@@ -1390,8 +1387,7 @@ defmodule Pyro.Components.Core do
 
   attr :close_slide_over_target, :string,
     default: nil,
-    doc:
-      "the specific live component to target for the close event, e.g. close_slide_over_target={@myself}"
+    doc: "the specific live component to target for the close event, e.g. close_slide_over_target={@myself}"
 
   attr :class, :css_classes, overridable: true
   attr :overlay_class, :css_classes, overridable: true
@@ -1642,17 +1638,18 @@ defmodule Pyro.Components.Core do
         |> assign(:timezone_value, time_zone)
 
       date_time ->
-        with {:ok, shifted} <- DateTime.shift_zone(date_time, tz) do
-          year = shifted.year |> Integer.to_string() |> String.pad_leading(4, "0")
-          month = shifted.month |> Integer.to_string() |> String.pad_leading(2, "0")
-          day = shifted.day |> Integer.to_string() |> String.pad_leading(2, "0")
-          hour = shifted.hour |> Integer.to_string() |> String.pad_leading(2, "0")
-          minute = shifted.minute |> Integer.to_string() |> String.pad_leading(2, "0")
+        case DateTime.shift_zone(date_time, tz) do
+          {:ok, shifted} ->
+            year = shifted.year |> Integer.to_string() |> String.pad_leading(4, "0")
+            month = shifted.month |> Integer.to_string() |> String.pad_leading(2, "0")
+            day = shifted.day |> Integer.to_string() |> String.pad_leading(2, "0")
+            hour = shifted.hour |> Integer.to_string() |> String.pad_leading(2, "0")
+            minute = shifted.minute |> Integer.to_string() |> String.pad_leading(2, "0")
 
-          assigns
-          |> assign(:date_time_value, "#{year}-#{month}-#{day}T#{hour}:#{minute}")
-          |> assign(:timezone_value, tz)
-        else
+            assigns
+            |> assign(:date_time_value, "#{year}-#{month}-#{day}T#{hour}:#{minute}")
+            |> assign(:timezone_value, tz)
+
           _ ->
             assigns
             |> assign(:date_time_value, "")

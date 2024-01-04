@@ -13,8 +13,7 @@ Example.Vendor.bulk_create!(
     %{
       name: "Umbrella Corporation",
       code: "UMB",
-      description:
-        "Pharmaceutical company involved in genetic engineering and biohazard containment."
+      description: "Pharmaceutical company involved in genetic engineering and biohazard containment."
     },
     %{
       name: "Oscorp Industries",
@@ -209,8 +208,7 @@ Example.Vendor.bulk_create!(
     %{
       name: "NanoSynth Innovations",
       code: "NSI",
-      description:
-        "Pioneers in nanotechnology for medical advancements and materials engineering."
+      description: "Pioneers in nanotechnology for medical advancements and materials engineering."
     },
     %{
       name: "HoloTech Systems",
@@ -245,8 +243,7 @@ Example.Vendor.bulk_create!(
     %{
       name: "NeuralScape Innovations",
       code: "NSP",
-      description:
-        "Explorers of neural landscapes for consciousness exploration and augmentation."
+      description: "Explorers of neural landscapes for consciousness exploration and augmentation."
     },
     %{
       name: "VortexTech Solutions",
@@ -266,8 +263,7 @@ Example.Vendor.bulk_create!(
     %{
       name: "QuantumHarbor Innovations",
       code: "QHI",
-      description:
-        "Creators of quantum-entangled communication networks for secure data transfer."
+      description: "Creators of quantum-entangled communication networks for secure data transfer."
     },
     %{
       name: "EcoSphere Solutions",
@@ -287,20 +283,17 @@ Example.Vendor.bulk_create!(
     %{
       name: "QuantumQuill Innovations",
       code: "QQI",
-      description:
-        "Artists of quantum-inspired creations, from artworks to interactive experiences."
+      description: "Artists of quantum-inspired creations, from artworks to interactive experiences."
     },
     %{
       name: "AstroSynapse Dynamics",
       code: "ASD",
-      description:
-        "Innovators in creating interconnected neural networks for celestial exploration."
+      description: "Innovators in creating interconnected neural networks for celestial exploration."
     },
     %{
       name: "StellarMinds Technologies",
       code: "SMT",
-      description:
-        "Developers of AI with advanced problem-solving capabilities for space missions."
+      description: "Developers of AI with advanced problem-solving capabilities for space missions."
     }
   ],
   Example.Vendor.Company,

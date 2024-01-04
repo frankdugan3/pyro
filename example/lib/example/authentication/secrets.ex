@@ -1,4 +1,5 @@
 defmodule Example.Authentication.Secrets do
+  @moduledoc false
   use AshAuthentication.Secret
 
   def secret_for([:authentication, :tokens, :signing_secret], Example.Authentication.User, _) do

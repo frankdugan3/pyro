@@ -87,7 +87,7 @@ defmodule Pyro.MixProject do
     ]
   end
 
-  defp groups_for_modules() do
+  defp groups_for_modules do
     [
       Core: [
         Pyro,
@@ -126,11 +126,11 @@ defmodule Pyro.MixProject do
       {:credo, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
-      {:ex_check, "~> 0.15",
-       [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
+      {:ex_check, "~> 0.15", [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
       {:faker, "~> 0.17", only: [:test, :dev]},
       {:floki, ">= 0.30.0", only: :test},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
+      {:styler, "~> 0.11", only: [:dev, :test], runtime: false},
       # Build tooling
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},

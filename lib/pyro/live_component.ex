@@ -14,11 +14,13 @@ defmodule Pyro.LiveComponent do
   @doc false
   defmacro __using__(opts \\ []) do
     quote do
-      import Phoenix.LiveView
       @behaviour Phoenix.LiveComponent
-      @before_compile Phoenix.LiveView.Renderer
 
       use Pyro.Component, unquote(opts)
+
+      import Phoenix.LiveView
+
+      @before_compile Phoenix.LiveView.Renderer
 
       @doc false
       def __live__, do: %{kind: :component, module: __MODULE__, layout: false}
