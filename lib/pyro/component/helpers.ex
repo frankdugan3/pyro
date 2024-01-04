@@ -88,36 +88,59 @@ defmodule Pyro.Component.Helpers do
     end
   end
 
+  @doc """
+  Formats datetimes to localized format.
+
+  ## Examples
+      iex> format_datetime(DateTime.new!(~D[2016-05-24], ~T[13:26:08.003], "Etc/UTC"), default_timezone())
+      "2016-05-24 13:26 UTC"
+
+      iex> format_datetime(~N[2000-01-01 23:00:07], "Etc/UTC")
+      "2000-01-01 23:00 UTC"
+
+      iex> format_datetime(~N[2000-01-01 23:00:07], "Etc/UTC", :date_time_seconds_timezone)
+      "2000-01-01 23:00:07 UTC"
+
+      iex> format_datetime(nil, "Etc/UTC")
+      ""
+
+      iex> format_datetime("", "Etc/UTC")
+      ""
+  """
   def format_datetime(timestamp, tz, formatter \\ &simple_datetime_formatter/1)
 
   def format_datetime(timestamp, tz, format) when is_atom(format) do
     format_datetime(timestamp, tz, &simple_datetime_formatter(&1, format))
   end
 
-  def format_datetime(timestamp, tz, formatter) when is_function(formatter, 1) do
+  def format_datetime(%NaiveDateTime{} = naive, tz, formatter) when is_function(formatter, 1) do
+    case naive |> DateTime.from_naive(tz) |> dbg() do
+      {:ok, datetime} ->
+        apply(formatter, [datetime])
+
+      {:ambiguous, first_datetime, _second_datetime} ->
+        apply(formatter, [first_datetime])
+
+      {:gap, just_before, _just_after} ->
+        apply(formatter, [just_before])
+
+      _ ->
+        apply(formatter, [nil])
+    end
+  end
+
+  def format_datetime(%DateTime{} = timestamp, tz, formatter) when is_function(formatter, 1) do
     case DateTime.shift_zone(timestamp, tz) do
       {:ok, shifted} -> apply(formatter, [shifted])
       _ -> ""
     end
   end
 
-  defp simple_datetime_formatter(datetime, format \\ :date_time_timezone)
-
-  defp simple_datetime_formatter(%NaiveDateTime{} = ts, formatter) do
-    case DateTime.from_naive(ts, default_timezone()) do
-      {:ok, datetime} ->
-        simple_datetime_formatter(datetime, formatter)
-
-      {:ambiguous, first_datetime, _second_datetime} ->
-        simple_datetime_formatter(first_datetime, formatter)
-
-      {:gap, just_before, _just_after} ->
-        simple_datetime_formatter(just_before, formatter)
-
-      _ ->
-        ""
-    end
+  def format_datetime(other, _tz, formatter) when is_function(formatter, 1) do
+    apply(formatter, [other])
   end
+
+  defp simple_datetime_formatter(datetime, format \\ :date_time_timezone)
 
   defp simple_datetime_formatter(%DateTime{} = ts, :date_time_timezone) do
     year = ts.year |> Integer.to_string() |> String.pad_leading(4, "0")
