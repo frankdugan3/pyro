@@ -18,19 +18,19 @@ if Code.ensure_loaded?(AshPhoenix) do
       if connected?(socket) do
         case get_connect_params(socket) do
           %{"timezone" => timezone} -> timezone
-          _ -> session["timezone"] || local_tz()
+          _ -> session["timezone"] || default_timezone()
         end
       else
-        session["timezone"] || local_tz()
+        session["timezone"] || default_timezone()
       end
     end
 
+    def handle_tick(%{assigns: %{tz: tz}} = socket) when is_binary(tz) do
+      assign(socket, :now, local_now(tz))
+    end
+
     def handle_tick(socket) do
-      if socket.assigns.tz != nil do
-        assign(socket, :now, local_now(socket.assigns.tz))
-      else
-        assign(socket, :now, local_now())
-      end
+      assign(socket, :now, local_now())
     end
 
     @doc """
@@ -119,10 +119,10 @@ if Code.ensure_loaded?(AshPhoenix) do
               if connected?(socket) do
                 case get_connect_params(socket) do
                   %{"timezone" => timezone} -> timezone
-                  _ -> session["timezone"] || "Etc/UTC"
+                  _ -> session["timezone"] || default_timezone()
                 end
               else
-                session["timezone"] || "Etc/UTC"
+                session["timezone"] || default_timezone()
               end
 
             {:ok,

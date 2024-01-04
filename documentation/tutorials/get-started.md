@@ -57,6 +57,12 @@ These steps assume you are adding `Pyro` to an existing Phoenix LiveView app as 
    config :pyro, gettext: MyApp.Gettext # optional
    ```
 
+   3. Optionally configure some runtime options: `runtime.exs`:
+
+   ```elixir
+   config :pyro, default_timezone: "America/Chicago" # optional - requires a timezone database
+   ```
+
 3. Update your `tailwind.config.js`, this is a working example configuration:
 
    ```js

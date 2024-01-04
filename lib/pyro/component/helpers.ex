@@ -64,29 +64,62 @@ defmodule Pyro.Component.Helpers do
     end
   end
 
-  @default_tz "Etc/UTC"
+  @doc """
+  Provides a configurable fallback timezone. Defaults to `"Etc/UTC"`.
 
-  def local_tz(), do: @default_tz
-  def local_now(), do: DateTime.utc_now()
-  def local_now(tz), do: DateTime.now!(tz)
+  ```elixir
+  config :pyro, default_timezone: "America/Chicago"
+  ```
 
-  def format_timestamp(
-        timestamp,
-        tz,
-        formatter \\ &default_timestamp_formatter/1
-      ) do
+  > #### Note: {: .warning}
+  >
+  > Requires a timezone database to be properly installed and configured.
+  """
+  def default_timezone() do
+    Application.get_env(:pyro, :default_timezone, "Etc/UTC")
+  end
+
+  def local_now(), do: local_now(default_timezone())
+
+  def local_now(tz) do
+    case DateTime.now(tz) do
+      {:ok, datetime} -> datetime
+      _ -> DateTime.utc_now()
+    end
+  end
+
+  def format_datetime(timestamp, tz, formatter \\ &simple_datetime_formatter/1)
+
+  def format_datetime(timestamp, tz, format) when is_atom(format) do
+    format_datetime(timestamp, tz, &simple_datetime_formatter(&1, format))
+  end
+
+  def format_datetime(timestamp, tz, formatter) when is_function(formatter, 1) do
     case DateTime.shift_zone(timestamp, tz) do
-      {:ok, shifted} ->
-        apply(formatter, [shifted])
+      {:ok, shifted} -> apply(formatter, [shifted])
+      _ -> ""
+    end
+  end
+
+  defp simple_datetime_formatter(datetime, format \\ :date_time_timezone)
+
+  defp simple_datetime_formatter(%NaiveDateTime{} = ts, formatter) do
+    case DateTime.from_naive(ts, default_timezone()) do
+      {:ok, datetime} ->
+        simple_datetime_formatter(datetime, formatter)
+
+      {:ambiguous, first_datetime, _second_datetime} ->
+        simple_datetime_formatter(first_datetime, formatter)
+
+      {:gap, just_before, _just_after} ->
+        simple_datetime_formatter(just_before, formatter)
 
       _ ->
         ""
     end
   end
 
-  def default_timestamp_formatter(%NaiveDateTime{} = ts), do: NaiveDateTime.to_string(ts)
-
-  def default_timestamp_formatter(%DateTime{} = ts) do
+  defp simple_datetime_formatter(%DateTime{} = ts, :date_time_timezone) do
     year = ts.year |> Integer.to_string() |> String.pad_leading(4, "0")
     month = ts.month |> Integer.to_string() |> String.pad_leading(2, "0")
     day = ts.day |> Integer.to_string() |> String.pad_leading(2, "0")
@@ -96,7 +129,18 @@ defmodule Pyro.Component.Helpers do
     "#{year}-#{month}-#{day} #{hour}:#{minute} #{ts.zone_abbr}"
   end
 
-  def default_timestamp_formatter(_), do: ""
+  defp simple_datetime_formatter(%DateTime{} = ts, :date_time_seconds_timezone) do
+    year = ts.year |> Integer.to_string() |> String.pad_leading(4, "0")
+    month = ts.month |> Integer.to_string() |> String.pad_leading(2, "0")
+    day = ts.day |> Integer.to_string() |> String.pad_leading(2, "0")
+    hour = ts.hour |> Integer.to_string() |> String.pad_leading(2, "0")
+    minute = ts.minute |> Integer.to_string() |> String.pad_leading(2, "0")
+    second = ts.second |> Integer.to_string() |> String.pad_leading(2, "0")
+
+    "#{year}-#{month}-#{day} #{hour}:#{minute}:#{second} #{ts.zone_abbr}"
+  end
+
+  defp simple_datetime_formatter(_, _), do: ""
 
   cond do
     Code.ensure_loaded?(TzExtra) ->
@@ -106,7 +150,7 @@ defmodule Pyro.Component.Helpers do
       def all_timezones, do: Tzdata.zone_list()
 
     true ->
-      def all_timezones, do: [@default_tz]
+      def all_timezones, do: [default_timezone()]
   end
 
   @doc """
