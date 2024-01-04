@@ -43,7 +43,7 @@ defmodule Pyro.Component.Helpers do
 
   if @gettext_module do
     def gettext(text) do
-      apply(@gettext_module, :gettext, [text])
+      Gettext.gettext(@gettext_module, text)
     end
 
     @doc false

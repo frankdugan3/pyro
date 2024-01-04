@@ -22,7 +22,7 @@ defmodule Pyro.MixProject do
       source_url: @source_url,
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
-      compilers: Mix.compilers(),
+      compilers: [:yecc] ++ Mix.compilers(),
       dialyzer: [plt_add_apps: [:ash, :ash_phoenix, :spark, :ecto, :mix]]
     ]
   end
@@ -142,6 +142,7 @@ defmodule Pyro.MixProject do
       {:ash, "~> 2.4", optional: true},
       {:ash_authentication, "~> 3.12", optional: true},
       {:ash_authentication_phoenix, "~> 1.9", optional: true},
+      {:gettext, "~> 0.24", optional: true},
       {:makeup, "~> 1.1", optional: true},
       {:tzdata, "~> 1.1.0", optional: true},
       {:tz_extra, "~> 0.26", optional: true}
