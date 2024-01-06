@@ -1,12 +1,19 @@
 # About
 
-`Pyro` is a component library for `Phoenix` with (optional) declarative UI for [`Ash Framework`](`Ash`). Specifically, it provides five things:
+Pyro is a component library for Phoenix.
 
-1. Component tooling
-2. A component library for `Phoenix`
-3. A declarative UI DSL extension for [`Ash Framework`](`Ash`)
-4. "Smart components" for [`Ash Framework`](`Ash`)
-5. Overrides (Themes)
+It provides a few things:
+
+1. [Component tooling](Pyro.Component) for Phoenix LiveView
+2. A library of [pre-built components](Pyro.Components.Core)
+3. A set of [default](Pyro.Overrides.Default), [customizable](Pyro.Overrides) skins
+
+Additionally, the related package [AshPyro](https://hexdocs.pm/ash_pyro) extends Pyro with:
+
+1. An [Ash extension](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
+2. A [library of components](https://hexdocs.pm/ash_pyro/AshPyro.Components.html) that automatically render the UI DSL
+
+To install, follow the [Get Started](get-started.html) guide.
 
 ## What "problem" is it solving?
 
@@ -14,29 +21,23 @@ The default model of Phoenix is to generate, then customize. While this does pro
 
 The tricky part is handling all the bespoke features in each app while sharing as much as possible. The goal is to provide a wide array of helpers and components with sane defaults, while allowing _very_ granular overrides.
 
-[`Ash Framework`](`Ash`) provides an _excellent_ foundation for this on the backend. Its deep extensibility allows the DSL to be extended, and that's exactly where Pyro pours on the gas! By combining the flexible configuration of components with Ash's extensible DSL, Pyro can seamlessly add declarative UI config to Phoenix LiveView.
+[Ash Framework](https://hexdocs.pm/ash) provides an _excellent_ foundation for this on the backend. Its deep extensibility allows the DSL to be extended, and that's exactly where Pyro pours on the gas! By combining the flexible configuration of components with Ash's extensible DSL, Pyro & AshPyro can seamlessly add declarative UI config to Phoenix LiveView.
 
 ## General Principles
 
-There are some under-developed components that don't adhere to all these principles, but eventually these principles should prevail.
+Pyro is under-developed. Not all components adhere to every principles, but eventually these principles should prevail.
 
 - Maximal flexibility
   - Application defaults through presets & custom overrides
   - Bespoke configuration (via DSL in resources)
   - Components allow overriding defaults through props
 - Clean, standards-compliant HTML markup
-  - Avoid senseless `div`s
-  - Use the right tag(s) for the job
-  - Use native, semantic HTML where possible
+  - Favor semantic HTML elements
+  - Avoid excessive `div` tags
+  - Adhere to [accessibility guidelines](https://www.w3.org/WAI/ARIA/apg/)
 - Progressive enhancement
-  - Don't _require_ JS (where possible)
-  - Use JS to _enhance_ UX (where sensible)
   - No external JS dependencies
-  - Should be able to bundle with ESBuild (no Node/NPM).
-- Accessible
+  - No needless JS
+  - Sensibly enhance UX with JS
 - Responsive
-- Built-in `i18n` via `gettext` (internationalization)
-
-> #### Logo {: .info}
->
-> Pyro needs a good logo; if you're a designer get in touch!
+- Internationalization support via `gettext`

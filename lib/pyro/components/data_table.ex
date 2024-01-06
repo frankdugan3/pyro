@@ -1,5 +1,7 @@
 defmodule Pyro.Components.DataTable do
-  @moduledoc false
+  @moduledoc """
+  Tooling and components for rendering data tables.
+  """
   use Pyro.Component
 
   import Pyro.Components.Core

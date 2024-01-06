@@ -5,7 +5,7 @@ defmodule Pyro.MixProject do
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.2.0"
   @description """
-  Phoenix components and tooling with (optional) declarative UI for Ash Framework.
+  Phoenix components and tooling.
   """
   def project do
     [
@@ -23,7 +23,7 @@ defmodule Pyro.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
       compilers: [:yecc] ++ Mix.compilers(),
-      dialyzer: [plt_add_apps: [:ash, :ash_phoenix, :spark, :ecto, :mix]]
+      dialyzer: [plt_add_apps: [:ecto, :mix]]
     ]
   end
 
@@ -97,9 +97,6 @@ defmodule Pyro.MixProject do
         Pyro.Overrides,
         ~r/\.Overrides\./
       ],
-      "Ash Resource Extension": [
-        ~r/Pyro.Ash.Extensions.Resource/
-      ],
       Components: [~r/\.Components\./],
       "Component Tooling": [
         Pyro.Component,
@@ -132,16 +129,13 @@ defmodule Pyro.MixProject do
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
       {:styler, "~> 0.11", only: [:dev, :test], runtime: false},
       # Build tooling
+      {:ecto, "~> 3.11"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
       # Core dependencies
       {:phoenix_live_view, "~> 0.20"},
       {:phoenix, "~> 1.7"},
       # These dependencies add optional features if installed
-      {:ash_phoenix, "~> 1.2", optional: true},
-      {:ash, "~> 2.4", optional: true},
-      {:ash_authentication, "~> 3.12", optional: true},
-      {:ash_authentication_phoenix, "~> 1.9", optional: true},
       {:gettext, "~> 0.24", optional: true},
       {:makeup, "~> 1.1", optional: true},
       {:tzdata, "~> 1.1.0", optional: true},
@@ -151,10 +145,6 @@ defmodule Pyro.MixProject do
 
   defp aliases do
     [
-      build: [
-        "spark.formatter --extensions Pyro.Ash.Extensions.Resource",
-        "format"
-      ],
       setup: [
         "deps.get",
         "compile",

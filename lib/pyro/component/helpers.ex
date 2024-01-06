@@ -68,6 +68,7 @@ defmodule Pyro.Component.Helpers do
   Provides a configurable fallback timezone. Defaults to `"Etc/UTC"`.
 
   ```elixir
+  # runtime.exs
   config :pyro, default_timezone: "America/Chicago"
   ```
 

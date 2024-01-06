@@ -43,41 +43,27 @@ defmodule Pyro.Overrides do
   @doc false
   @spec __using__(any) :: Macro.t()
   defmacro __using__(_env) do
-    ash_phoenix =
-      quote do
-        alias Pyro.Components.SmartDataTable
-        alias Pyro.Components.SmartForm
-        alias Pyro.Components.SmartPage
-      end
+    quote do
+      import Pyro.Component.Helpers
+      import unquote(__MODULE__), only: :macros
 
-    phoenix =
-      quote do
-        import Pyro.Component.Helpers
-        import unquote(__MODULE__), only: :macros
+      alias Phoenix.LiveView.JS
+      alias Pyro.Components.Autocomplete
+      alias Pyro.Components.Core
 
-        alias Phoenix.LiveView.JS
-        alias Pyro.Components.Autocomplete
-        alias Pyro.Components.Core
+      require unquote(__MODULE__)
 
-        require unquote(__MODULE__)
+      Module.register_attribute(__MODULE__, :override, accumulate: true)
+      @component nil
+      @__pass_assigns_to__ %{}
 
-        Module.register_attribute(__MODULE__, :override, accumulate: true)
-        @component nil
-        @__pass_assigns_to__ %{}
+      @on_definition unquote(__MODULE__)
+      @before_compile unquote(__MODULE__)
 
-        @on_definition unquote(__MODULE__)
-        @before_compile unquote(__MODULE__)
-
-        @doc false
-        # Internally used for validation.
-        @spec __pass_assigns_to__ :: map()
-        def __pass_assigns_to__, do: @__pass_assigns_to__
-      end
-
-    if Code.ensure_loaded?(AshPhoenix) do
-      [phoenix, ash_phoenix]
-    else
-      phoenix
+      @doc false
+      # Internally used for validation.
+      @spec __pass_assigns_to__ :: map()
+      def __pass_assigns_to__, do: @__pass_assigns_to__
     end
   end
 
@@ -227,7 +213,7 @@ defmodule Pyro.Overrides do
                         |> Module.split()
                         |> List.last()
 
-                      "A #{name} override theme." <> "\n" <> unquote(override_docs)
+                      "A #{name} override skin." <> "\n" <> unquote(override_docs)
 
                     docs ->
                       docs <> "\n" <> unquote(override_docs)

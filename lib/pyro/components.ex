@@ -10,32 +10,21 @@ defmodule Pyro.Components do
        # ...
    ```
 
-   Comprehensive installation instructions can be found in [Get Started](get-started.md).
+  Comprehensive installation instructions can be found in [Get Started](get-started.md).
 
-   Pyro provides components that support deep customization through `Pyro.Overrides`, and also tooling to create your own via `Pyro.Component`.
+  Pyro provides components that support deep customization through `Pyro.Overrides`, and also tooling to create your own via `Pyro.Component`.
+
+  > #### Note: {: .warning}
+  >
+  > Pyro's component names conflict with the generated `CoreComponents`. You will need to remove `import MyAppWeb.CoreComponents`.
   """
 
   defmacro __using__(_) do
-    phoenix =
-      quote do
-        import Pyro.Components.Core
-        import Pyro.Components.DataTable
+    quote do
+      import Pyro.Components.Core
+      import Pyro.Components.DataTable
 
-        alias Pyro.Components.Autocomplete
-      end
-
-    ash_phoenix =
-      quote do
-        import Pyro.Components.SmartDataTable
-        import Pyro.Components.SmartForm
-
-        alias Pyro.Components.SmartPage
-      end
-
-    if Code.ensure_loaded?(AshPhoenix) do
-      [phoenix, ash_phoenix]
-    else
-      phoenix
+      alias Pyro.Components.Autocomplete
     end
   end
 end

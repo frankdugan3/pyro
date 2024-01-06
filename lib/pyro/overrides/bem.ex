@@ -62,7 +62,7 @@ defmodule Pyro.Overrides.BEM do
   @tailwind utilities;
   ```
 
-  Also, be sure to remove any Pyro-related files from your `content` list in `tailwind.config.js`, otherwise you will be including unused classes from other override themes.
+  Also, be sure to remove any Pyro-related files from your `content` list in `tailwind.config.js`, otherwise you will be including unused classes from other override skins.
   """
 
   ##############################################################################
@@ -70,8 +70,6 @@ defmodule Pyro.Overrides.BEM do
   ##############################################################################
 
   use Pyro.Overrides
-
-  import Pyro.Component.Helpers, only: [get_nested: 2]
 
   @prefix Application.compile_env(:pyro, :bem_prefix, "")
   @color_variants Application.compile_env(
@@ -455,44 +453,5 @@ defmodule Pyro.Overrides.BEM do
     set :option_label_key, :label
     set :option_value_key, :id
     set :prompt, "Search options"
-  end
-
-  if Code.ensure_loaded?(AshPhoenix) do
-    ##############################################################################
-    ####    S M A R T    C O M P O N E N T S
-    ##############################################################################
-
-    @prefixed_smart_data_table @prefix <> "smart_data_table"
-    override SmartDataTable, :smart_data_table do
-      set :class, &__MODULE__.smart_data_table_class/1
-    end
-
-    def smart_data_table_class(passed_assigns) do
-      [@prefixed_smart_data_table, get_nested(passed_assigns, [:pyro_data_table, :class])]
-    end
-
-    @prefixed_smart_form @prefix <> "smart_form"
-    override SmartForm, :smart_form do
-      set :class, &__MODULE__.smart_form_class/1
-      set :actions_class, @prefixed_smart_form <> "__actions"
-      set :autocomplete, "off"
-    end
-
-    def smart_form_class(passed_assigns) do
-      [@prefixed_smart_form, get_nested(passed_assigns, [:pyro_form, :class])]
-    end
-
-    @prefixed_smart_form_render_field @prefix <> "smart_form_render_field"
-    override SmartForm, :render_field do
-      set :field_group_class, &__MODULE__.smart_form_field_group_class/1
-      set :field_group_label_class, @prefixed_smart_form_render_field("__group_label")
-    end
-
-    def smart_form_field_group_class(passed_assigns) do
-      [
-        @prefixed_smart_form_render_field <> "__group",
-        get_nested(passed_assigns, [:field, :class])
-      ]
-    end
   end
 end

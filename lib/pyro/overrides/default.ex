@@ -12,8 +12,6 @@ defmodule Pyro.Overrides.Default do
 
   use Pyro.Overrides
 
-  import Pyro.Component.Helpers, only: [get_nested: 2]
-
   @variant_colors ~w[slate gray zinc neutral stone red orange amber yellow lime green emerald teal cyan sky blue indigo violet purple fuchsia pink rose]
   @invariant_colors ~w[transparent white black]
   @all_colors @variant_colors ++ @invariant_colors
@@ -601,38 +599,5 @@ defmodule Pyro.Overrides.Default do
 
   def autocomplete_listbox_option_class(passed_assigns) do
     ["pyro-autocomplete__listbox_option", "pyro--results": passed_assigns[:results] != []]
-  end
-
-  if Code.ensure_loaded?(AshPhoenix) do
-    ##############################################################################
-    ####    S M A R T    C O M P O N E N T S
-    ##############################################################################
-
-    override SmartDataTable, :smart_data_table do
-      set :class, &__MODULE__.smart_data_table_class/1
-    end
-
-    def smart_data_table_class(passed_assigns) do
-      get_nested(passed_assigns, [:pyro_data_table, :class])
-    end
-
-    override SmartForm, :smart_form do
-      set :class, &__MODULE__.smart_form_class/1
-      set :actions_class, "pyro-smart_form__actions"
-      set :autocomplete, "off"
-    end
-
-    def smart_form_class(passed_assigns) do
-      ["pyro-smart_form", get_nested(passed_assigns, [:pyro_form, :class])]
-    end
-
-    override SmartForm, :render_field do
-      set :field_group_class, &__MODULE__.smart_form_field_group_class/1
-      set :field_group_label_class, "pyro-smart_form__render_field__group_label"
-    end
-
-    def smart_form_field_group_class(passed_assigns) do
-      ["pyro-smart_form__render_field__group", get_nested(passed_assigns, [:field, :class])]
-    end
   end
 end

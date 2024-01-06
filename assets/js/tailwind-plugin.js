@@ -431,21 +431,6 @@ module.exports = plugin.withOptions(function (options = {}) {
           },
         },
       },
-
-      // SmartForm
-      '.pyro-smart_form': {
-        '@apply grid gap-2': {},
-        '&__actions': {
-          '@apply mt-2 flex items-center justify-between gap-6': {},
-        },
-        '&__render_field__group': {
-          '@apply grid col-span-full gap-2 p-2 border border-solid rounded-lg border-slate-300 dark:border-slate-700':
-            {},
-          '&_label': {
-            '@apply font-black text-center col-span-full': {},
-          },
-        },
-      },
     })
   }
 })

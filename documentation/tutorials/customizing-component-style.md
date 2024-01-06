@@ -11,7 +11,7 @@ This guide steps through some of the things to consider when it comes to choosin
 
 ## Goals
 
-Pyro aims to make it easy to do the following with the default theme:
+Pyro aims to make it easy to do the following with the default skin:
 
 - Cover 90% of what you want out of the box
 - Granularly tweak that custom 10%
@@ -39,7 +39,7 @@ We did not choose this system for Pyro's default style because:
 - Phoenix supports Tailwind by default
 - Tailwind provides a good base for familiar standard utilities
 
-Pyro does provide a BEM overrides file to help you get started using a BEM theme strategy. It provides no style by default, and adds BEM classes to each element of the components. This allows you to create a fully-custom theme with very little friction. Installation and configuration instructions can be found in the module docs for `Pyro.Overrides.BEM`.
+Pyro does provide a BEM overrides file to help you get started using a BEM skin strategy. It provides no style by default, and adds BEM classes to each element of the components. This allows you to create a fully-custom skin with very little friction. Installation and configuration instructions can be found in the module docs for `Pyro.Overrides.BEM`.
 
 Pros:
 
@@ -61,7 +61,7 @@ Cons:
 
 Tailwind encourages a [utility-first](https://tailwindcss.com/docs/utility-first) workflow, and gives a lot of tips on how to [apply that to components](https://tailwindcss.com/docs/reusing-styles). That approach does have its challenges from a library perspective.
 
-Utility classes have equal precedence, so overriding the theme ad-hoc can be tricky. Workarounds include:
+Utility classes have equal precedence, so overriding the skin ad-hoc can be tricky. Workarounds include:
 
 - Using the `!` modifier, e.g. `!bg-red0500`
 - Truncating/removing classes with `Pyro.Component.CSS.classes/1`
