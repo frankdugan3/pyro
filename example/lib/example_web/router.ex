@@ -25,6 +25,7 @@ defmodule ExampleWeb.Router do
     ash_authentication_live_session :authentication_optional,
       on_mount: {ExampleWeb.LiveUserAuth, :live_user_optional} do
       live_routes_for(Vendor.CompanyLive, Example.Vendor.Company, :companies)
+      live_routes_for(Vendor.EmployeeLive, Example.Vendor.Employee, :employees)
     end
 
     sign_in_route register_path: "/register", reset_path: "/reset"

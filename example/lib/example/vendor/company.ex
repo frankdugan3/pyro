@@ -12,7 +12,7 @@ defmodule Example.Vendor.Company do
 
   pyro do
     live_view do
-      page "/", :companies, Example.Vendor do
+      page "/companies", :companies, Example.Vendor do
         keep_live? true
 
         list "/", :index, :read do
@@ -33,7 +33,7 @@ defmodule Example.Vendor.Company do
       action :read do
         label "Du Hast"
         description "Du Hasst Mich"
-        exclude [:id]
+        exclude [:id, :employees]
 
         column :name
 
@@ -82,6 +82,10 @@ defmodule Example.Vendor.Company do
   identities do
     identity :unique_name, [:name]
     identity :unique_code, [:code]
+  end
+
+  relationships do
+    has_many :employees, Example.Vendor.Employee, destination_attribute: :employer_id
   end
 
   actions do

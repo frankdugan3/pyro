@@ -9,5 +9,6 @@ defmodule Example.Vendor do
 
   resources do
     resource Example.Vendor.Company
+    resource Example.Vendor.Employee
   end
 end
