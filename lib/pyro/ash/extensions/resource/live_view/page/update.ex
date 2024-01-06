@@ -47,17 +47,17 @@ if Code.ensure_loaded?(Ash) do
         doc: "How to display the action."
       ],
       label: [
-        type: inheritable_type(),
+        type: inheritable_schema_type(),
         required: false,
         doc: "The label for this action (defaults to humanized live_action)."
       ],
       description: [
-        type: inheritable_type(),
+        type: inheritable_schema_type(),
         required: false,
         doc: "The description for this action."
       ],
       class: [
-        type: css_class_type(),
+        type: css_class_schema_type(),
         required: false,
         doc: "Customize action classes."
       ],

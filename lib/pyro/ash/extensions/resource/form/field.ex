@@ -72,12 +72,12 @@ if Code.ensure_loaded?(Ash) do
         doc: "Override the default extracted description."
       ],
       class: [
-        type: css_class_type(),
+        type: css_class_schema_type(),
         required: false,
         doc: "Customize class."
       ],
       input_class: [
-        type: css_class_type(),
+        type: css_class_schema_type(),
         required: false,
         doc: "Customize input class."
       ],

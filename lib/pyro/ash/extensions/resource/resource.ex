@@ -172,11 +172,6 @@ if Code.ensure_loaded?(Ash) do
         type: :string,
         doc: "The proper label to use when this resource appears in the pyro."
       ],
-      default_sort: [
-        required: false,
-        type: :string,
-        doc: "The default sorting at page load."
-      ],
       default_foreign_label: [
         required: false,
         type: :atom,

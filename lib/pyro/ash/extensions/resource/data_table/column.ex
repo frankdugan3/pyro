@@ -24,74 +24,69 @@ if Code.ensure_loaded?(Ash) do
     use Pyro.Ash.Extensions.Resource.Schema
 
     defstruct [
-      :name,
-      :type,
-      :render_cell,
-      :label,
-      :description,
-      :path,
+      :cell_class,
       :class,
+      :description,
+      :label,
+      :name,
+      :path,
+      :render_cell,
       :sortable?,
-      :cell_class
+      :type,
+      :resource_field_type
     ]
 
     @type t :: %__MODULE__{
-            name: atom(),
-            type: :default,
-            render_cell: (map() -> binary()),
-            label: binary(),
-            description: binary(),
-            class: binary() | fun(),
             cell_class: binary() | fun(),
-            path: binary()
+            class: binary() | fun(),
+            description: binary(),
+            label: binary(),
+            name: atom(),
+            path: binary(),
+            render_cell: (map() -> binary()),
+            sortable?: boolean(),
+            type: :default,
+            resource_field_type:
+              :attribute
+              | :calculation
+              | :aggregate
+              | :has_one
+              | :belongs_to
+              | :has_many
+              | :many_to_many
           }
     @schema [
-      name: [
-        type: :atom,
-        required: true,
-        doc: "The name of the column."
-      ],
-      type: [
-        type: {:in, [:default]},
+      cell_class: [type: css_class_schema_type(), required: false, doc: "Customize cell class."],
+      class: [type: css_class_schema_type(), required: false, doc: "Customize header class."],
+      description: [
+        type: :string,
         required: false,
-        doc: "The type of the the column.",
-        default: :default
-      ],
-      render_cell: [
-        type: {:fun, 1},
-        default: &__MODULE__.render_cell/1
+        doc: "Override the default extracted description."
       ],
       label: [
         type: :string,
         required: false,
         doc: "The label of the column (defaults to capitalized name)."
       ],
-      description: [
-        type: :string,
-        required: false,
-        doc: "Override the default extracted description."
-      ],
-      class: [
-        type: css_class_type(),
-        required: false,
-        doc: "Customize header class."
-      ],
-      cell_class: [
-        type: css_class_type(),
-        required: false,
-        doc: "Customize cell class."
-      ],
-      sortable?: [
-        type: :boolean,
-        required: false,
-        # TODO: Need to check/validate this, hack defaulting to true for now.
-        default: true,
-        doc: "Allow this column to be sortable (defaults to true if it is technically sortable)."
-      ],
+      name: [type: :atom, required: true, doc: "The name of the column."],
       path: [
         type: {:list, :atom},
         required: false,
         doc: "Append to the root path (nested paths are appended)."
+      ],
+      render_cell: [type: {:fun, 1}, default: &__MODULE__.render_cell/1],
+      sortable?: [
+        type: :boolean,
+        required: false,
+        default: true,
+        doc:
+          "Set to false to disable sorting. Note: If it it is not technically sortable, it will automatically be set to false."
+      ],
+      type: [
+        type: {:in, [:default]},
+        required: false,
+        doc: "The type of the the column.",
+        default: :default
       ]
     ]
 

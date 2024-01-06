@@ -65,7 +65,7 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp reduce_data_table_entities(%DataTable.ActionType{name: names} = type, acc) when is_list(names) do
-      columns = merge_columns(type.columns)
+      columns = merge_columns(type.columns, acc)
 
       Enum.reduce(names, acc, fn name, acc ->
         merge_action_type(
@@ -78,12 +78,12 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp reduce_data_table_entities(%DataTable.ActionType{} = type, acc) do
-      columns = merge_columns(type.columns)
+      columns = merge_columns(type.columns, acc)
       merge_action_type(acc, Map.put(type, :columns, columns))
     end
 
     defp reduce_data_table_entities(%DataTable.Action{name: names} = action, acc) when is_list(names) do
-      columns = merge_columns(action.columns)
+      columns = merge_columns(action.columns, acc)
 
       Enum.reduce(names, acc, fn name, acc ->
         merge_action(
@@ -96,7 +96,7 @@ if Code.ensure_loaded?(Ash) do
     end
 
     defp reduce_data_table_entities(%DataTable.Action{} = action, acc) do
-      columns = merge_columns(action.columns)
+      columns = merge_columns(action.columns, acc)
       merge_action(acc, Map.put(action, :columns, columns))
     end
 
@@ -157,9 +157,18 @@ if Code.ensure_loaded?(Ash) do
 
             Map.put(acc, :errors, errors)
           else
+            default_display =
+              if data_table_action.default_display == [] do
+                Enum.map(data_table_action.columns, & &1.name)
+              else
+                data_table_action.default_display
+              end
+
             data_table_action =
               data_table_action
               |> Map.put(:label, data_table_action.label || default_label(name))
+              |> Map.put(:default_display, default_display)
+              |> Map.put(:default_sort, data_table_action.default_sort)
               |> Map.put(
                 :description,
                 data_table_action.description || Map.get(action, :description)
@@ -229,19 +238,32 @@ if Code.ensure_loaded?(Ash) do
             else
               merge_action(
                 acc,
-                Map.merge(%DataTable.Action{name: name}, Map.drop(type_default, [:__struct__, :name]))
+                Map.merge(
+                  %DataTable.Action{name: name},
+                  Map.drop(type_default, [:__struct__, :name])
+                )
               )
             end
         end
       end)
     end
 
-    defp merge_columns(columns, path \\ []) do
+    defp merge_columns(columns, acc, path \\ []) do
       Enum.map(columns, fn
         %DataTable.Column{} = column ->
+          sortable? =
+            if column.sortable? == true do
+              # TODO: Take :pagination_type into account
+              Ash.Resource.Info.sortable?(acc.dsl, column.name, include_private?: false)
+            else
+              column.sortable?
+            end
+
           column
           |> Map.put(:label, column.label || default_label(column))
           |> Map.put(:path, maybe_append_path(path, column.path))
+          |> Map.put(:resource_field_type, resource_field_type(acc.dsl, column.name))
+          |> Map.put(:sortable?, sortable?)
       end)
     end
 

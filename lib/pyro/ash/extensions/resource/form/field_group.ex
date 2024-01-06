@@ -28,7 +28,7 @@ if Code.ensure_loaded?(Ash) do
         doc: "The label of this group (defaults to capitalized name)."
       ],
       class: [
-        type: css_class_type(),
+        type: css_class_schema_type(),
         required: false,
         doc: "Customize class."
       ],

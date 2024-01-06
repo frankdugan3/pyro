@@ -5,6 +5,21 @@ if Code.ensure_loaded?(Ash) do
 
     alias Spark.Dsl.Transformer
 
+    def resource_field_type(dsl, field_name) do
+      [:attributes, :aggregates, :calculations, :relationships]
+      |> Enum.flat_map(&Transformer.get_entities(dsl, [&1]))
+      |> Enum.find(&(&1.name == field_name))
+      |> case do
+        %Ash.Resource.Attribute{} -> :attribute
+        %Ash.Resource.Aggregate{} -> :aggregate
+        %Ash.Resource.Calculation{} -> :calculation
+        %Ash.Resource.Relationships.HasOne{} -> :has_one
+        %Ash.Resource.Relationships.BelongsTo{} -> :belongs_to
+        %Ash.Resource.Relationships.HasMany{} -> :has_many
+        %Ash.Resource.Relationships.ManyToMany{} -> :many_to_many
+      end
+    end
+
     def filter_actions(dsl, filter) do
       dsl
       |> Transformer.get_entities([:actions])

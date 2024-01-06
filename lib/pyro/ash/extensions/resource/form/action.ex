@@ -25,7 +25,7 @@ if Code.ensure_loaded?(Ash) do
         doc: "The description for this form (defaults to action's description)."
       ],
       class: [
-        type: css_class_type(),
+        type: css_class_schema_type(),
         required: false,
         doc: "Customize form classes."
       ]
