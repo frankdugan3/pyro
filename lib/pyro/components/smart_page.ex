@@ -109,6 +109,8 @@ if Code.ensure_loaded?(AshPhoenix) do
               resource={@resource}
               pyro_data_table={@pyro_data_table}
               sort={@list_sort}
+              display={@list_display}
+              filter={@list_filter}
               rows={@records}
               actor={@current_user}
               tz={@tz}
@@ -188,10 +190,15 @@ if Code.ensure_loaded?(AshPhoenix) do
           end
 
           defp validate_sort_params(socket, params) do
-            component_params =
+            stored_component_params =
               get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
 
-            sort_params = Map.get(component_params, "sort", "")
+            sort_params =
+              Map.get(
+                get_nested(params, [unquote(list_component_id)], %{}),
+                "sort",
+                socket.assigns.pyro_data_table.default_sort
+              )
 
             case Ash.Sort.parse_input(unquote(resource), sort_params) do
               {:ok, sort} ->
@@ -199,7 +206,11 @@ if Code.ensure_loaded?(AshPhoenix) do
                   Map.put(
                     socket.assigns.params,
                     unquote(list_component_id),
-                    Map.put(component_params, "sort", sort_params)
+                    Map.put(
+                      stored_component_params,
+                      "sort",
+                      Pyro.Components.DataTable.encode_sort(sort_params)
+                    )
                   )
 
                 socket
@@ -207,31 +218,87 @@ if Code.ensure_loaded?(AshPhoenix) do
                 |> assign(:list_sort, sort)
 
               _ ->
+                list_sort =
+                  unquote(resource)
+                  |> Ash.Sort.parse_input!(socket.assigns.pyro_data_table.default_sort)
+                  |> dbg()
+
                 params =
                   Map.put(
                     socket.assigns.params,
                     unquote(list_component_id),
-                    Map.put(component_params, "sort", "")
+                    Pyro.Components.DataTable.encode_sort(list_sort)
                   )
 
                 socket
                 |> assign(:params, params)
-                |> assign(:list_sort, [])
+                |> assign(:list_sort, list_sort)
             end
           end
 
-          # TODO:
-          defp validate_filter_params(socket, _params), do: socket
-          defp validate_display_params(socket, _params), do: socket
+          # TODO:Actually validate filter params
+          defp validate_filter_params(socket, _params), do: assign(socket, :list_filter, [])
+
+          defp validate_display_params(socket, params) do
+            stored_component_params =
+              get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
+
+            display_params =
+              Map.get(get_nested(params, [unquote(list_component_id)], %{}), "display", "")
+
+            display_fields = String.split(display_params, ",", trim: true)
+
+            known_fields =
+              Enum.map(socket.assigns.pyro_data_table.columns, &Atom.to_string(&1.name))
+
+            if length(display_fields) > 0 && Enum.all?(display_fields, &(&1 in known_fields)) do
+              # TODO: Add any missing sorted fields
+              params =
+                Map.put(
+                  socket.assigns.params,
+                  unquote(list_component_id),
+                  Map.put(stored_component_params, "display", display_params)
+                )
+
+              socket
+              |> assign(:params, params)
+              |> assign(:list_display, Enum.map(display_fields, &String.to_existing_atom/1))
+            else
+              list_display = socket.assigns.pyro_data_table.default_display
+
+              params =
+                Map.put(
+                  socket.assigns.params,
+                  unquote(list_component_id),
+                  Map.put(
+                    stored_component_params,
+                    "display",
+                    Pyro.Components.DataTable.encode_display(list_display)
+                  )
+                )
+
+              socket
+              |> assign(:params, params)
+              |> assign(:list_display, list_display)
+            end
+          end
 
           defp maybe_patch_params(%{assigns: %{params: valid_params}} = socket, params) when valid_params == params do
+            {attributes, fields} =
+              socket.assigns.pyro_data_table.columns
+              |> Enum.filter(&(&1.name in socket.assigns.list_display))
+              |> Enum.split_with(&(&1.resource_field_type == :attribute))
+
             query =
-              Ash.Query.sort(unquote(resource), socket.assigns.list_sort)
+              unquote(resource)
+              |> Ash.Query.sort(socket.assigns.list_sort)
+              |> Ash.Query.select(Enum.map(attributes, & &1.name))
+              |> Ash.Query.load(Enum.map(fields, & &1.name))
 
             assign(
               socket,
               :records,
-              apply(@pyro_page.api, :read!, [
+              apply(unquote(pyro_page.api), :read!, [
                 query,
                 [
                   actor: socket.assigns.current_user,
@@ -241,7 +308,6 @@ if Code.ensure_loaded?(AshPhoenix) do
             )
           end
 
-          #  TODO: This will need to handle different action types besides list
           defp maybe_patch_params(%{assigns: %{params: valid_params, live_action: live_action}} = socket, _params),
             do: push_patch(socket, to: route_for(socket, live_action, valid_params), replace: true)
         end

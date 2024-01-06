@@ -17,6 +17,8 @@ if Code.ensure_loaded?(AshPhoenix) do
     attr :pyro_data_table, Pyro.Ash.Extensions.Resource.DataTable.Action, required: true
     attr :rows, :list, required: true
     attr :sort, :list, required: true
+    attr :display, :list, required: true
+    attr :filter, :list, required: true
     attr :resource, :atom, required: true, doc: "the resource of the data table"
     attr :actor, :map, default: nil, doc: "the actor to be passed to actions"
     attr :tz, :string, default: "Etc/UTC", doc: "timezone"
@@ -29,7 +31,7 @@ if Code.ensure_loaded?(AshPhoenix) do
       <.data_table id={@id} rows={@rows} sort={@sort} class={smart_class(@class, assigns)}>
         <:col
           :let={row}
-          :for={col <- @pyro_data_table.columns}
+          :for={col <- display_columns(@pyro_data_table.columns, @display)}
           label={col.label}
           sort_key={if col.sortable?, do: col.name}
           class={smart_class(col.class, col)}
@@ -39,6 +41,10 @@ if Code.ensure_loaded?(AshPhoenix) do
         </:col>
       </.data_table>
       """
+    end
+
+    defp display_columns(columns, display) do
+      Enum.map(display, fn name -> Enum.find(columns, fn column -> column.name == name end) end)
     end
   end
 end

@@ -366,8 +366,17 @@ defmodule Pyro.Components.DataTable do
 
   defp delimit_integer(number), do: floor(number)
 
+  def encode_display(display) do
+    Enum.map_join(display, ",", fn k -> "#{k}" end)
+  end
+
   def encode_sort(sort) do
-    Enum.map_join(sort, ",", fn
+    sort
+    |> List.wrap()
+    |> Enum.map_join(",", fn
+      nil -> ""
+      k when is_atom(k) -> "#{k}"
+      k when is_binary(k) -> k
       {k, :asc} -> "#{k}"
       {k, :asc_nils_last} -> "#{k}"
       {k, :asc_nils_first} -> "++#{k}"
