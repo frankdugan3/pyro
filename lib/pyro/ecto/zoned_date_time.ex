@@ -1,4 +1,4 @@
-defmodule EctoZonedDateTime do
+defmodule Pyro.Ecto.ZonedDateTime do
   @moduledoc false
   @behaviour Ecto.Type
 
