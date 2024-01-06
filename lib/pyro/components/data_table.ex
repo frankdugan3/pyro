@@ -357,10 +357,16 @@ defmodule Pyro.Components.DataTable do
 
   defp delimit_integer(number), do: floor(number)
 
+  @doc """
+  Stringifies the columns to display for storage in a url param.
+  """
   def encode_display(display) do
     Enum.map_join(display, ",", fn k -> "#{k}" end)
   end
 
+  @doc """
+  Stringifies the column sorting for storage in a url param.
+  """
   def encode_sort(sort) do
     sort
     |> List.wrap()
@@ -377,6 +383,9 @@ defmodule Pyro.Components.DataTable do
     end)
   end
 
+  @doc """
+  Toggles the column sorting.
+  """
   def toggle_sort(sort, sort_key, ctrl?, shift?) do
     sort
     |> sanitize_sort()
