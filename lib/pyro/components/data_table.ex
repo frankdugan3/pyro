@@ -250,6 +250,7 @@ defmodule Pyro.Components.DataTable do
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
   attr :direction, :atom, required: true
   attr :position, :integer, required: true
+  attr :sort_icon_name, :string, overridable: true, required: true
   attr :class, :css_classes, overridable: true
   attr :index_class, :css_classes, overridable: true
 
@@ -262,7 +263,7 @@ defmodule Pyro.Components.DataTable do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <.icon name={sort_icon_name(@direction)} class={@class} />
+    <.icon name={@sort_icon_name} class={@class} />
     """
   end
 
@@ -270,23 +271,11 @@ defmodule Pyro.Components.DataTable do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <.icon name={sort_icon_name(@direction)} class={@class} />
+    <.icon name={@sort_icon_name} class={@class} />
     <span class={@index_class}>
       <%= @position %>
     </span>
     """
-  end
-
-  # TODO: Move this into overrides
-  defp sort_icon_name(direction) do
-    case direction do
-      :asc -> "hero-chevron-up-solid"
-      :asc_nils_last -> "hero-chevron-up-solid"
-      :asc_nils_first -> "hero-chevron-double-up-solid"
-      :desc -> "hero-chevron-down-solid"
-      :desc_nils_first -> "hero-chevron-down-solid"
-      :desc_nils_last -> "hero-chevron-double-down-solid"
-    end
   end
 
   defp prev_page?(%{offset: 0}), do: false
@@ -389,35 +378,43 @@ defmodule Pyro.Components.DataTable do
   end
 
   def toggle_sort(sort, sort_key, ctrl?, shift?) do
-    sort =
-      Enum.map(sort, fn
-        {k, v} when is_atom(k) -> {Atom.to_string(k), v}
-        {k, v} -> {k, v}
-      end)
+    sort
+    |> sanitize_sort()
+    |> find_sort_key(sort_key)
+    |> toggle_sort_key(sort_key, ctrl?, shift?)
+    |> encode_sort()
+  end
 
-    case_result =
-      case Enum.find(sort, fn {k, _v} -> k == sort_key end) do
-        nil ->
-          added = [{sort_key, :asc}]
-          if shift?, do: sort ++ added, else: added
+  defp sanitize_sort(sort) do
+    Enum.map(sort, fn
+      {k, v} when is_atom(k) -> {Atom.to_string(k), v}
+      {k, v} -> {k, v}
+    end)
+  end
 
-        {_key, order} ->
-          if shift? && length(sort) > 1 do
-            sort
-            |> Enum.map(fn
-              {k, order} when sort_key == k ->
-                {k, toggle_sort_order(order, ctrl?, shift?)}
+  defp find_sort_key(sort, sort_key) do
+    {sort, Enum.find(sort, fn {k, _v} -> k == sort_key end)}
+  end
 
-              other ->
-                other
-            end)
-            |> Enum.filter(fn {_key, order} -> order != nil end)
-          else
-            [{sort_key, toggle_sort_order(order, ctrl?, false)}]
-          end
-      end
+  defp toggle_sort_key({sort, nil}, sort_key, _ctrl?, shift?) do
+    added = [{sort_key, :asc}]
+    if shift?, do: sort ++ added, else: added
+  end
 
-    encode_sort(case_result)
+  defp toggle_sort_key({sort, {_key, _order}}, sort_key, ctrl?, shift?) when length(sort) > 1 and shift? do
+    sort
+    |> Enum.map(fn
+      {k, order} when sort_key == k ->
+        {k, toggle_sort_order(order, ctrl?, shift?)}
+
+      other ->
+        other
+    end)
+    |> Enum.filter(fn {_key, order} -> order != nil end)
+  end
+
+  defp toggle_sort_key({_sort, {_key, order}}, sort_key, ctrl?, _shift?) do
+    [{sort_key, toggle_sort_order(order, ctrl?, false)}]
   end
 
   # args: column, change_nil_position?, multiple_columns?

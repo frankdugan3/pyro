@@ -81,9 +81,6 @@ defmodule Pyro.Components.Autocomplete do
   def render(assigns) do
     assigns = assign_overridables(assigns)
 
-    # TODO: Follow guidance here: https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
-    # TODO: Rename to combobox -- there may not be a good reason to have two separate components.
-
     ~H"""
     <div
       id={@id}

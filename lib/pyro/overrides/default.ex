@@ -452,6 +452,18 @@ defmodule Pyro.Overrides.Default do
   override Pyro.Components.DataTable, :sort_icon do
     set :class, "pdt-s-i"
     set :index_class, "pdt-s-i-c"
+    set :sort_icon_name, &__MODULE__.data_table_sort_icon_name/1
+  end
+
+  def data_table_sort_icon_name(passed_assigns) do
+    case passed_assigns[:direction] do
+      :asc -> "hero-chevron-up-solid"
+      :asc_nils_last -> "hero-chevron-up-solid"
+      :asc_nils_first -> "hero-chevron-double-up-solid"
+      :desc -> "hero-chevron-down-solid"
+      :desc_nils_first -> "hero-chevron-down-solid"
+      :desc_nils_last -> "hero-chevron-double-down-solid"
+    end
   end
 
   # override Pyro.Components.DataTable, :sort do

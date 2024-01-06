@@ -226,7 +226,6 @@ defmodule Pyro.Component do
     module = __CALLER__.module
     {component_name, 1} = __CALLER__.function
 
-    # TODO: Check that it isn't already defined, implying it got called twice in the same component
     Module.put_attribute(module, :__assign_overridables_calls__, component_name)
 
     quote bind_quoted: [assigns: assigns, module: module, component_name: component_name] do
@@ -269,8 +268,6 @@ defmodule Pyro.Component do
                 end
             end
       end)
-
-      # TODO: Validate values at runtime; load overridable values if atom instead of list.
     end
   end
 

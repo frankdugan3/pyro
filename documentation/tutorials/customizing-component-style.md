@@ -104,9 +104,3 @@ Cons:
 - Class names can become quite long
 - Unless you add conditional variants, dynamic style can be tricky
 - No default styles, more work to get started
-
-### Components & Variants
-
-Tailwind offers a [component layer](https://tailwindcss.com/docs/reusing-styles#extracting-classes-with-apply) and [custom variants](https://tailwindcss.com/docs/plugins#adding-variants).
-
-TODO: Finish documenting this.

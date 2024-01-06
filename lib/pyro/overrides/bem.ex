@@ -273,12 +273,10 @@ defmodule Pyro.Overrides.BEM do
 
   override Core, :modal do
     set :class, @prefix <> "modal"
-    # TODO: Add other classes
     set :show_js, &__MODULE__.modal_show_js/2
     set :hide_js, &__MODULE__.modal_hide_js/2
   end
 
-  # TODO: Add animation classes, document at top.
   def modal_show_js(js, id) do
     js
     |> JS.show(to: "##{id}")
@@ -436,6 +434,18 @@ defmodule Pyro.Overrides.BEM do
   override Pyro.Components.DataTable, :sort_icon do
     set :class, @prefixed_data_table_sort_icon
     set :index_class, @prefixed_data_table_sort_icon <> "__index"
+    set :sort_icon_name, &__MODULE__.data_table_sort_icon_name/1
+  end
+
+  def data_table_sort_icon_name(passed_assigns) do
+    case passed_assigns[:direction] do
+      :asc -> "hero-chevron-up-solid"
+      :asc_nils_last -> "hero-chevron-up-solid"
+      :asc_nils_first -> "hero-chevron-double-up-solid"
+      :desc -> "hero-chevron-down-solid"
+      :desc_nils_first -> "hero-chevron-down-solid"
+      :desc_nils_last -> "hero-chevron-double-down-solid"
+    end
   end
 
   ##############################################################################

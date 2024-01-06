@@ -328,8 +328,6 @@ function nudge(el) {
   hOffset = el.dataset?.horizontalOffset || 0
   vOffset = el.dataset?.verticalOffset || 0
 
-  // TODO: The 24 padding is arbitrary -- look into a better way to figure out extra padding.
-
   // Nudge left if offscreen
   if (rect.right + 24 > width) {
     el.style.right = hOffset

@@ -1146,7 +1146,6 @@ defmodule Pyro.Components.Core do
   end
 
   @doc """
-  TODO: This component is not fully converted to use overrides/properly styled.
   Renders a modal.
 
   ## Examples
@@ -1183,7 +1182,7 @@ defmodule Pyro.Components.Core do
 
   def modal(assigns) do
     assigns = assign_overridables(assigns)
-    # TODO: Style sucks
+
     ~H"""
     <div
       id={@id}

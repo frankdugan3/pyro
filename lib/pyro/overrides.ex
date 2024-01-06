@@ -183,23 +183,7 @@ defmodule Pyro.Overrides do
 
     ## Overrides
 
-    #{overrides |> Enum.group_by(fn {{component, _}, _} -> component end) |> Enum.map_join("\n", fn {{module, component}, overrides} ->
-      label = case :functions |> module.__info__() |> Enum.find(&(&1 == {component, 1})) do
-        nil -> "#{module}.#{component}/1 (private)"
-        _ -> "`#{module}.#{component}/1`"
-      end
-      """
-      - #{label}
-      #{Enum.map_join(overrides, "\n", fn {{_, selector}, value} ->
-        value = case value do
-          {:pass_assigns_to, value} -> value |> inspect() |> String.replace("&", "")
-          value when is_function(value) -> value |> inspect() |> String.replace("&", "")
-          value -> inspect(value)
-        end
-        "  - `:#{selector}` `#{value}`"
-      end)}
-      """
-    end)}
+    #{overrides |> Enum.group_by(fn {{component, _}, _} -> component end) |> Enum.map_join("\n", fn {{module, component}, overrides} -> document_override(module, component, overrides) end)}
     """
 
     quote do
@@ -227,25 +211,54 @@ defmodule Pyro.Overrides do
     end
   end
 
+  defp document_override(module, component, overrides) do
+    label =
+      case :functions |> module.__info__() |> Enum.find(&(&1 == {component, 1})) do
+        nil -> "#{module}.#{component}/1 (private)"
+        _ -> "`#{module}.#{component}/1`"
+      end
+
+    body =
+      Enum.map_join(overrides, "\n", fn {{_, selector}, value} ->
+        value =
+          case value do
+            {:pass_assigns_to, value} -> value |> inspect() |> String.replace("&", "")
+            value when is_function(value) -> value |> inspect() |> String.replace("&", "")
+            value -> inspect(value)
+          end
+
+        "  - `:#{selector}` `#{value}`"
+      end)
+
+    """
+    - #{label}
+    #{body}
+    """
+  end
+
   @doc """
   Get an override value for a given component prop.
   """
   @spec override_for(module, atom, atom) :: any
   def override_for(module, component, prop) do
     Enum.reduce_while(configured_overrides(), nil, fn override_module, _ ->
-      case Code.ensure_compiled(module) do
-        {:module, _} ->
-          override_module.overrides()
-          |> Map.fetch({{module, component}, prop})
-          |> case do
-            {:ok, value} -> {:halt, value}
-            :error -> {:cont, nil}
-          end
-
-        {:error, _} ->
-          {:cont, nil}
-      end
+      reduce_override(override_module, module, component, prop)
     end)
+  end
+
+  defp reduce_override(override_module, module, component, prop) do
+    case Code.ensure_compiled(module) do
+      {:module, _} ->
+        override_module.overrides()
+        |> Map.fetch({{module, component}, prop})
+        |> case do
+          {:ok, value} -> {:halt, value}
+          :error -> {:cont, nil}
+        end
+
+      {:error, _} ->
+        {:cont, nil}
+    end
   end
 
   @doc """

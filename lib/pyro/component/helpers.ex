@@ -115,7 +115,7 @@ defmodule Pyro.Component.Helpers do
   end
 
   def format_datetime(%NaiveDateTime{} = naive, tz, formatter) when is_function(formatter, 1) do
-    case naive |> DateTime.from_naive(tz) |> dbg() do
+    case DateTime.from_naive(naive, tz) do
       {:ok, datetime} ->
         apply(formatter, [datetime])
 
