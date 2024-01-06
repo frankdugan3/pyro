@@ -16,6 +16,7 @@ spark_locals_without_parens = [
   create: 3,
   create: 4,
   default_card_fields: 1,
+  default_display: 1,
   default_display_mode: 1,
   default_foreign_label: 1,
   default_sort: 1,
