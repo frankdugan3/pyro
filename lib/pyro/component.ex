@@ -233,7 +233,8 @@ defmodule Pyro.Component do
       Enum.reduce(__overridable_components__()[component_name][:overridable_attrs], assigns, fn %{
                                                                                                   name: name,
                                                                                                   required: required
-                                                                                                } = opts,
+                                                                                                } =
+                                                                                                  opts,
                                                                                                 assigns ->
         override =
           Map.get(assigns, :overrides) ||
