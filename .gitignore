@@ -27,22 +27,5 @@ pyro-*.tar
 
 /.elixir_ls/
 
-# Generated files
+# Secret files
 *.env
-
-# EXAMPLE PROJECT
-
-/example/_build/
-/example/cover/
-/example/deps/
-/example/doc/
-/example/.fetch
-/example/tmp/
-/example/priv/static/assets/
-/example/priv/static/cache_manifest.json
-/example/assets/node_modules/
-
-# We don't want to track migrations or snapshots for the example app
-
-/example/priv/repo/migrations
-/example/priv/resource_snapshots
