@@ -12,7 +12,7 @@ defmodule Pyro.MixProject do
       app: :pyro,
       version: @version,
       description: @description,
-      elixir: "~> 1.15",
+      elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
