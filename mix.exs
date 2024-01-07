@@ -135,6 +135,7 @@ defmodule Pyro.MixProject do
       # Core dependencies
       {:phoenix_live_view, "~> 0.20"},
       {:phoenix, "~> 1.7"},
+      {:jason, "~> 1.4"},
       # These dependencies add optional features if installed
       {:gettext, "~> 0.24", optional: true},
       {:makeup, "~> 1.1", optional: true},
