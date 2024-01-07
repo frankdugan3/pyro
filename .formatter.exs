@@ -11,5 +11,10 @@ pyro_locals_without_parens = [
     locals_without_parens: pyro_locals_without_parens
   ],
   plugins: [Phoenix.LiveView.HTMLFormatter, Styler],
-  inputs: ["*.{heex,ex,exs}", "{config,lib}/**/*.{heex,ex,exs}"]
+  inputs: [
+    "*.{heex,ex,exs}",
+    "{config,lib}/**/*.{heex,ex,exs}",
+    "storybook/*.{heex,ex,exs}",
+    "storybook/{config,lib,storybook}/**/*.{heex,ex,exs}"
+  ]
 ]
