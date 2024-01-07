@@ -20,16 +20,12 @@ defmodule Pyro.MixProject do
       test_paths: ["lib"],
       name: "Pyro",
       source_url: @source_url,
-      elixirc_paths: elixirc_paths(Mix.env()),
+      elixirc_paths: ["lib"],
       aliases: aliases(),
       compilers: [:yecc] ++ Mix.compilers(),
       dialyzer: [plt_add_apps: [:ecto, :mix]]
     ]
   end
-
-  defp elixirc_paths(:test), do: ["lib"]
-  defp elixirc_paths(:dev), do: ["lib", "dev"]
-  defp elixirc_paths(_), do: ["lib"]
 
   defp extras do
     "documentation/**/*.md"
@@ -103,7 +99,6 @@ defmodule Pyro.MixProject do
         Pyro.Component.CSS,
         Pyro.LiveComponent,
         Pyro.LiveView,
-        Pyro.Component.Overridable,
         Pyro.Component.Helpers
       ]
     ]
