@@ -78,8 +78,8 @@ defmodule Pyro.MixProject do
       licenses: ["MIT"],
       links: %{GitHub: @source_url},
       files:
-        ~w(assets lib documentation) ++
-          ~w(README* CHANGELOG* LICENSE* mix.exs package.json .formatter.exs)
+        ~w(lib documentation) ++
+          ~w(README* CHANGELOG* LICENSE* mix.exs .formatter.exs)
     ]
   end
 
@@ -87,13 +87,9 @@ defmodule Pyro.MixProject do
     [
       Core: [
         Pyro,
-        Pyro.Components
+        Pyro.Components,
+        Pyro.Overrides
       ],
-      Overrides: [
-        Pyro.Overrides,
-        ~r/\.Overrides\./
-      ],
-      Components: [~r/\.Components\./],
       "Component Tooling": [
         Pyro.Component,
         Pyro.Component.CSS,
