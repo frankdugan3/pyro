@@ -1,6 +1,6 @@
 defmodule Pyro do
   @moduledoc """
-  `Pyro` is a component library for `Phoenix`.
+  `Pyro` is a component tooling library for `Phoenix`.
 
   To learn more, check out the [About](about.html) page.
 

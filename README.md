@@ -19,27 +19,27 @@ Installation is covered in the [Get Started](https://hexdocs.pm/pyro/get-started
 
 ## What is Pyro?
 
-Pyro provides a few things:
+Pyro is a suite of libraries for building UI in Phoenix.
 
-1. [Component tooling](https://hexdocs.pm/pyro/Pyro.Component.html) for Phoenix LiveView
-2. A library of [pre-built components](https://hexdocs.pm/pyro/Pyro.Components.Core.html)
-3. A set of [default](https://hexdocs.pm/pyro/Pyro.Overrides.Default.html), [customizable](https://hexdocs.pm/pyro/Pyro.Overrides.html) skins
+[Pyro](https://hexdocs.pm/pyro)
+
+- [Component tooling](https://hexdocs.pm/pyro/Pyro.Component.html) for Phoenix LiveView
+- [Customizable](https://hexdocs.pm/pyro/Pyro.Overrides.html) overrides (skins/themes)
+
+[PyroComponents](https://hexdocs.pm/pyro_components)
+
+- A library of [pre-built components](https://hexdocs.pm/pyro_components)
+- A set of [default](https://hexdocs.pm/pyro_components/PyroComponents.Overrides.BEM) overrides (skin/theme) to get started while allowing deep customization
+
+[AshPyro](https://hexdocs.pm/ash_pyro)
+
+- An [Ash extension](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
+
+[AshPyroComponents](https://hexdocs.pm/ash_pyro_components)
+
+- A [library of components](https://hexdocs.pm/ash_pyro_components/AshPyroComponents.html) that automatically render the UI DSL
 
 For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page.
-
-Additionally, the related package [AshPyro](https://hexdocs.pm/ash_pyro) extends `Pyro` with:
-
-1. An [Ash extension](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
-2. A [library of components](https://hexdocs.pm/ash_pyro/AshPyro.Components.html) that automatically render the UI DSL
-
-## Roadmap to 1.0
-
-- Complete implementation of key components/features
-- Add `pyro.new` generator
-- Reasonable test coverage
-- Write adequate guides
-- Dogfood website
-- Collect feedback/stabilize API
 
 ## Development
 

@@ -1,30 +1,24 @@
 defmodule Pyro.Overrides do
   @moduledoc """
-  The overrides system provides out-of-the-box presets while also enabling deep customization of Pyro components.
+  The overrides system allows defining component defaults while also enabling deep customization and ad-hoc overrides of Pyro component props. This allows consumers of your component library to trivially and granularly modify your presets.
 
-  The `Pyro.Overrides.Default` preset is a great example to dig in and see how the override system works. A `Pyro.Component` flags attrs with `overridable`, then leverages [`assign_overridables/1`](`Pyro.Component.assign_overridables/1`) to reference overrides set in these presets/custom override modules and load them as defaults.
+  A `Pyro.Component` flags attrs with `overridable`, then leverages [`assign_overridables/1`](`Pyro.Component.assign_overridables/1`) to reference overrides set in these presets/custom override modules and load them as defaults.
 
-  Pyro defaults to the following overrides:
-
-  ```
-  [Pyro.Overrides.Default]
-  ```
-
-  But you probably want to customize at least a few overrides. To do so, configure your app with:
+  Configure your app with:
 
   ```
   config :pyro, :overrides,
-    [MyApp.CustomOverrides, Pyro.Overrides.Default]
+    [MyApp.Overrides]
   ```
 
   Then, define your overrides in your custom module:
 
   ```
-  defmodule MyApp.CustomOverrides do
+  defmodule MyApp.Overrides do
     @moduledoc false
     use Pyro.Overrides
 
-    override Core, :back do
+    override MyAppWeb.CoreComponents, :back do
       set :class, "text-lg font-black"
       set :icon_kind, :outline
       set :icon_name, :arrow_left
@@ -32,7 +26,7 @@ defmodule Pyro.Overrides do
   end
   ```
 
-  The overrides will be merged left-to-right, returning the value in the *first* module that sets a given key. So in the above example, the `<Core.back>` component will have an `icon_name` default of `:arrow_left`, since the `MyApp.CustomOverrides` was the first module in the list to provide that key. But the `icon_class` was unspecified in the custom module, so it will return the value from `Pyro.Overrides.Default` since it is provided there:
+  The overrides will be merged left-to-right, returning the value in the *first* module that sets a given key. So in the above example, the `<Core.back>` component will have an `icon_name` default of `:arrow_left`, since the `MyApp.Overrides` was the first module in the list to provide that key:
 
   - You only need to define what you want to override from the other defaults
   - You can use any number of `:overrides` modules, though it is probably best to only use only 1-3 to keep things simple/efficient
@@ -96,7 +90,7 @@ defmodule Pyro.Overrides do
   * A function capture of arity 1 with the argument `passed_assigns`, which is executed at runtime and is passed the component's `assigns`
   * Any other function capture, which will simply be passed along as a literal
 
-  The `passed_assigns` function capture allows for complex conditionals. For examples of this, please view the source of `Pyro.Overrides.Default`.
+  The `passed_assigns` function capture allows for complex conditionals.
 
   > #### Tip: {: .info}
   >
@@ -262,10 +256,10 @@ defmodule Pyro.Overrides do
   end
 
   @doc """
-  Get the configured or default override modules.
+  Get the configured override modules.
   """
   @spec configured_overrides() :: [module]
   def configured_overrides do
-    Application.get_env(:pyro, :overrides, [__MODULE__.Default])
+    Application.get_env(:pyro, :overrides, [])
   end
 end

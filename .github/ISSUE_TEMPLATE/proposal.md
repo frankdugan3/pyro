@@ -15,13 +15,13 @@ A clear and concise description of what you want to happen.
 **Describe alternatives you've considered**
 A clear and concise description of any alternative solutions or features you've considered.
 
-**Express the proposal either with a change to resource syntax, or with a change to the pyro interface**
+**Express the proposal either with a change to syntax, or with a change to the pyro interface**
 
 For example
 
 ```elixir
-form do
-  field :foo, bar: 10 # <- Adding `bar` here would cause <x>
+override MyAppWeb.CoreComponents, :else do
+  set :foo, bar: 10 # <- Adding `bar` here would cause <x>
 end
 ```
 

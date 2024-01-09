@@ -23,7 +23,7 @@ defmodule Pyro.MixProject do
       elixirc_paths: ["lib"],
       aliases: aliases(),
       compilers: [:yecc] ++ Mix.compilers(),
-      dialyzer: [plt_add_apps: [:ecto, :mix]]
+      dialyzer: [plt_add_apps: [:mix]]
     ]
   end
 
@@ -124,7 +124,6 @@ defmodule Pyro.MixProject do
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
       {:styler, "~> 0.11", only: [:dev, :test], runtime: false},
       # Build tooling
-      {:ecto, "~> 3.11"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
       # Core dependencies
