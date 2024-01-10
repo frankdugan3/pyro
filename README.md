@@ -6,40 +6,31 @@
 
 # Pyro
 
-Phoenix components and tooling.
-
-**NOTICE:** This library is under heavy development. Expect frequent breaking
-changes until the first stable v1.0 release is out.
-
-Pyro's documentation is housed on [hexdocs](https://hexdocs.pm/pyro), which includes detailed [installation instructions](https://hexdocs.pm/pyro/get-started.html) and other guides.
-
-## Installation
-
-Installation is covered in the [Get Started](https://hexdocs.pm/pyro/get-started.html) guide.
-
-## What is Pyro?
-
 Pyro is a suite of libraries for building UI in Phoenix.
 
 [Pyro](https://hexdocs.pm/pyro)
 
 - [Component tooling](https://hexdocs.pm/pyro/Pyro.Component.html) for Phoenix LiveView
-- [Customizable](https://hexdocs.pm/pyro/Pyro.Overrides.html) overrides (skins/themes)
+- [Customizable](https://hexdocs.pm/pyro/Pyro.Overrides.html) override system (skins/themes)
 
 [PyroComponents](https://hexdocs.pm/pyro_components)
 
 - A library of [pre-built components](https://hexdocs.pm/pyro_components)
-- A set of [default](https://hexdocs.pm/pyro_components/PyroComponents.Overrides.BEM) overrides (skin/theme) to get started while allowing deep customization
+- A set of [preset overrides](https://hexdocs.pm/pyro_components/PyroComponents.Overrides.BEM) to get started quickly while allowing deep customization
 
 [AshPyro](https://hexdocs.pm/ash_pyro)
 
-- An [Ash extension](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
+- [Ash extensions](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
 
 [AshPyroComponents](https://hexdocs.pm/ash_pyro_components)
 
-- A [library of components](https://hexdocs.pm/ash_pyro_components/AshPyroComponents.html) that automatically render the UI DSL
+- A [library of components](https://hexdocs.pm/ash_pyro_components/AshPyroComponents.html) that automatically render AshPyro DSL with PyroComponents
 
 For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page.
+
+## Installation
+
+Installation is covered in the [Get Started](https://hexdocs.pm/pyro/get-started.html) guide of each library.
 
 ## Development
 
