@@ -30,7 +30,7 @@ For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page
 
 ## Installation
 
-Installation is covered in the [Get Started](https://hexdocs.pm/pyro/get-started.html) guide of each library.
+To install `Pyro` and write your own components, follow the [Get Started](https://hexdocs.pm/pyro/get-started.html) guide. For the other features, please see the "Get Started" guide for the appropriate library instead.
 
 ## Development
 

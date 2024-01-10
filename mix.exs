@@ -5,7 +5,7 @@ defmodule Pyro.MixProject do
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.2.0"
   @description """
-  Phoenix components and tooling.
+  Component tooling for Phoenix.
   """
   def project do
     [
