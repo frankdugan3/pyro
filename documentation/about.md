@@ -14,7 +14,7 @@ Pyro is a suite of libraries for building UI in Phoenix.
 
 [AshPyro](https://hexdocs.pm/ash_pyro)
 
-- An [Ash extensions](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
+- [Ash extensions](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
 
 [AshPyroComponents](https://hexdocs.pm/ash_pyro_components)
 
