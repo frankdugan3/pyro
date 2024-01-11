@@ -1,6 +1,6 @@
 # Get Started
 
-This guide steps through the installation process for `Pyro`.
+This guide steps through the installation process for Pyro.
 
 ## Installation
 
@@ -8,7 +8,7 @@ The installation process is pretty straightforward.
 
 ### Steps
 
-These steps assume you are adding `Pyro` to an existing Phoenix LiveView app, as generated from the most recent version of `phx.new`.
+These steps assume you are adding Pyro to an existing Phoenix LiveView app, as generated from the most recent version of `phx.new`.
 
 1. Add `:pyro` to your dependencies:
 

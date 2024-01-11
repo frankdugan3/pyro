@@ -26,7 +26,7 @@ Pyro is a suite of libraries for building UI in Phoenix.
 
   Components that automatically render PyroComponents declaratively via AshPyro.
 
-To install `Pyro` and write your own components, follow the [Get Started](get-started.html) guide. For the other features, please see the "Get Started" guide for the appropriate library instead.
+To install Pyro and write your own components, follow the [Get Started](get-started.html) guide. For the other features, please see the "Get Started" guide for the appropriate library instead.
 
 ## What "problem" is it solving?
 
