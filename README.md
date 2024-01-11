@@ -8,33 +8,33 @@
 
 Pyro is a suite of libraries for building UI in Phoenix.
 
-[Pyro](https://hexdocs.pm/pyro)
+- [Pyro](https://hexdocs.pm/pyro)
 
-Component tooling for Phoenix.
+  Component tooling for Phoenix.
 
-- [Component tooling](https://hexdocs.pm/pyro/Pyro.Component.html) for Phoenix LiveView
-- [Customizable](https://hexdocs.pm/pyro/Pyro.Overrides.html) override system (skins/themes)
+  - Customizable "overrides" system for granularly customizable themes
+  - Extended component attributes, e.g. CSS merging
 
-[PyroComponents](https://hexdocs.pm/pyro_components)
+- [PyroComponents](https://hexdocs.pm/pyro_components)
 
-Ready-made Phoenix components, built with pyro.
+  Ready-made Phoenix components, built with pyro.
 
-- A library of [pre-built components](https://hexdocs.pm/pyro_components)
-- A set of [preset overrides](https://hexdocs.pm/pyro_components/PyroComponents.Overrides.BEM) to get started quickly while allowing deep customization
+  - Heex component library
+  - Overrides presets to get started quickly while allowing deep customization
 
-[AshPyro](https://hexdocs.pm/ash_pyro)
+- [AshPyro](https://hexdocs.pm/ash_pyro)
 
-Declarative UI for Ash Framework.
+  Declarative UI for Ash Framework.
 
-- [Ash extensions](https://hexdocs.pm/ash_pyro/AshPyro.Extensions.Resource.html) providing a declarative UI DSL
+  - Ash extensions providing a declarative UI DSL
 
-[AshPyroComponents](https://hexdocs.pm/ash_pyro_components)
+- [AshPyroComponents](https://hexdocs.pm/ash_pyro_components)
 
-Components that automatically render PyroComponents declaratively via AshPyro.
+  Components that automatically render PyroComponents declaratively via AshPyro.
 
-- A [library of components](https://hexdocs.pm/ash_pyro_components/AshPyroComponents.html) that automatically render AshPyro DSL with PyroComponents
+## About
 
-For more details, check out the [About](https://hexdocs.pm/pyro/about.html) page.
+For more details on Pyro, check out the [About](https://hexdocs.pm/pyro/about.html) page.
 
 ## Installation
 
