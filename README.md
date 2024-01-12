@@ -54,6 +54,5 @@ For writing docs, there is a handy watcher script that automatically rebuilds/re
 
 ## Prior Art
 
-- [petal](https://petal.build/): Petal is an established project with a robust set of components, and served as a substantial inspiration for this project.
 - [Surface UI](https://surface-ui.org/): Surface changed the game for LiveView. Many of its improvements have made it upstream.
 - [AshAuthenticationPhoenix](https://github.com/team-alembic/ash_authentication_phoenix): The component override system is pretty awesome, and directly inspired Pyro's override system.
