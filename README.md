@@ -8,27 +8,27 @@
 
 Pyro is a suite of libraries for building UI in Phoenix.
 
-- [Pyro](https://hexdocs.pm/pyro)
+- [Pyro](https://github.com/frankdugan3/pyro)
 
   Component tooling for Phoenix.
 
   - Customizable "overrides" system for granularly customizable themes
   - Extended component attributes, e.g. CSS merging
 
-- [PyroComponents](https://hexdocs.pm/pyro_components)
+- [PyroComponents](https://github.com/frankdugan3/pyro_components)
 
   Ready-made Phoenix components, built with pyro.
 
   - Heex component library
   - Overrides presets to get started quickly while allowing deep customization
 
-- [AshPyro](https://hexdocs.pm/ash_pyro)
+- [AshPyro](https://github.com/frankdugan3/ash_pyro)
 
   Declarative UI for Ash Framework.
 
   - Ash extensions providing a declarative UI DSL
 
-- [AshPyroComponents](https://hexdocs.pm/ash_pyro_components)
+- [AshPyroComponents](https://github.com/frankdugan3/ash_pyro_components)
 
   Components that automatically render PyroComponents declaratively via AshPyro.
 
