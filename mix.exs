@@ -144,6 +144,9 @@ defmodule Pyro.MixProject do
       # until we hit 1.0, we will ensure no major release!
       release: [
         "git_ops.release --no-major"
+      ],
+      publish: [
+        "hex.publish"
       ]
     ]
   end
