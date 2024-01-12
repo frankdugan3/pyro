@@ -15,7 +15,7 @@ These steps assume you are adding Pyro to an existing Phoenix LiveView app, as g
    ```elixir
    def deps do
      [
-      {:pyro, "~> 0.2.0"},
+      {:pyro, "~> 0.3.0"},
 
       ### OPTIONAL DEPS BELOW ###
 
