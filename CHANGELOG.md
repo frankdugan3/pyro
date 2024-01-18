@@ -5,6 +5,11 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.4](https://github.com/frankdugan3/pyro/compare/v0.3.3...v0.3.4) (2024-01-18)
+
+
+
+
 ## [v0.3.3](https://github.com/frankdugan3/pyro/compare/v0.3.2...v0.3.3) (2024-01-18)
 
 
