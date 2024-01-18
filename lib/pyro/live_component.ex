@@ -19,7 +19,7 @@ defmodule Pyro.LiveComponent do
       @before_compile Phoenix.LiveView.Renderer
 
       # Pyro.Component must come last so its @before_compile runs last
-      use Pyro.Component, unquote(opts)
+      use Pyro.Component, opts
 
       @doc false
       def __live__, do: %{kind: :component, module: __MODULE__, layout: false}
