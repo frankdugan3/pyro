@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.1](https://github.com/frankdugan3/pyro/compare/v0.3.0...v0.3.1) (2024-01-18)
+
+
+
+
+### Bug Fixes:
+
+* formatter exceptions
+
 ## [v0.3.0](https://github.com/frankdugan3/pyro/compare/v0.2.0...v0.3.0) (2024-01-12)
 
 This release represents major restructuring, and it comes with lots of breaking changes.
