@@ -100,9 +100,7 @@ defmodule Pyro.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      extra_applications: [:logger]
-    ]
+    [extra_applications: [:logger]]
   end
 
   # Run "mix help deps" to learn about dependencies.
@@ -134,18 +132,10 @@ defmodule Pyro.MixProject do
 
   defp aliases do
     [
-      setup: [
-        "deps.get",
-        "compile",
-        "docs"
-      ],
+      setup: ["deps.get", "compile", "docs"],
       # until we hit 1.0, we will ensure no major release!
-      release: [
-        "git_ops.release --no-major"
-      ],
-      publish: [
-        "hex.publish"
-      ]
+      release: ["git_ops.release --no-major"],
+      publish: ["hex.publish"]
     ]
   end
 end
