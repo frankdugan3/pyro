@@ -32,7 +32,7 @@ defmodule Pyro.LiveView do
       @before_compile Phoenix.LiveView
 
       # Pyro.Component must come last so its @before_compile runs last
-      use Pyro.Component, opts
+      use Pyro.Component, Keyword.take(opts, [:global_prefixes])
     end
   end
 end
