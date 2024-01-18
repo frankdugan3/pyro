@@ -42,8 +42,6 @@ defmodule Pyro.Overrides do
       import unquote(__MODULE__), only: :macros
 
       alias Phoenix.LiveView.JS
-      alias Pyro.Components.Autocomplete
-      alias Pyro.Components.Core
 
       require unquote(__MODULE__)
 

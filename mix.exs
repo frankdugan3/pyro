@@ -65,7 +65,6 @@ defmodule Pyro.MixProject do
       groups_for_extras: groups_for_extras(),
       groups_for_modules: groups_for_modules(),
       groups_for_functions: [
-        Components: &(&1[:type] == :component),
         Macros: &(&1[:type] == :macro)
       ]
     ]
@@ -87,7 +86,6 @@ defmodule Pyro.MixProject do
     [
       Core: [
         Pyro,
-        Pyro.Components,
         Pyro.Overrides
       ],
       "Component Tooling": [
