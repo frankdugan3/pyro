@@ -47,39 +47,43 @@ defmodule Pyro.Component do
         quote do: import(Phoenix.LiveView.Helpers)
       end
 
-    component =
+    pyro = [
       quote bind_quoted: [opts: opts] do
         import Kernel, except: [def: 2, defp: 2]
         import Phoenix.Component, except: [attr: 2, attr: 3]
         import Phoenix.Component.Declarative
+
         require Phoenix.Template
 
         for {prefix_match, value} <- Phoenix.Component.Declarative.__setup__(__MODULE__, opts) do
           @doc false
           def __global__?(unquote(prefix_match)), do: unquote(value)
         end
-      end
-
-    pyro =
+      end,
       quote do
         @overrides_attr_doc unquote(@overrides_attr_doc)
-
+      end,
+      quote do
         Module.register_attribute(__MODULE__, :__overridable_attrs__, accumulate: true)
         Module.register_attribute(__MODULE__, :__assign_overridables_calls__, accumulate: true)
         Module.put_attribute(__MODULE__, :__overridable_components__, %{})
-
+      end,
+      quote do
         import unquote(__MODULE__)
         import unquote(__MODULE__).Helpers
-        alias Phoenix.LiveView.JS
 
+        alias Phoenix.LiveView.JS
+      end,
+      quote do
         @on_definition unquote(__MODULE__)
         @before_compile unquote(__MODULE__)
 
         Module.delete_attribute(__MODULE__, :__overridable_attrs__)
         Module.delete_attribute(__MODULE__, :__assign_overridables_calls__)
       end
+    ]
 
-    [conditional, component, pyro]
+    [conditional, pyro]
   end
 
   @doc """

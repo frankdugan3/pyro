@@ -13,16 +13,20 @@ defmodule Pyro.LiveComponent do
 
   @doc false
   defmacro __using__(opts \\ []) do
-    quote do
-      import Phoenix.LiveView
-      @behaviour Phoenix.LiveComponent
-      @before_compile Phoenix.LiveView.Renderer
+    [
+      quote do
+        import Phoenix.LiveView
+      end,
+      quote do
+        @behaviour Phoenix.LiveComponent
+        @before_compile Phoenix.LiveView.Renderer
+      end,
+      quote do
+        use Pyro.Component, Keyword.take(unquote(opts), [:global_prefixes])
 
-      # Pyro.Component must come last so its @before_compile runs last
-      use Pyro.Component, Keyword.take(unquote(opts), [:global_prefixes])
-
-      @doc false
-      def __live__, do: %{kind: :component, module: __MODULE__, layout: false}
-    end
+        @doc false
+        def __live__, do: %{kind: :component, module: __MODULE__, layout: false}
+      end
+    ]
   end
 end

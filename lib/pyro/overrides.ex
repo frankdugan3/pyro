@@ -37,26 +37,30 @@ defmodule Pyro.Overrides do
   @doc false
   @spec __using__(any) :: Macro.t()
   defmacro __using__(_env) do
-    quote do
-      import Pyro.Component.Helpers
-      import unquote(__MODULE__), only: :macros
+    [
+      quote do
+        import Pyro.Component.Helpers
+        import unquote(__MODULE__), only: :macros
 
-      alias Phoenix.LiveView.JS
+        alias Phoenix.LiveView.JS
 
-      require unquote(__MODULE__)
+        require unquote(__MODULE__)
 
-      Module.register_attribute(__MODULE__, :override, accumulate: true)
-      @component nil
-      @__pass_assigns_to__ %{}
+        Module.register_attribute(__MODULE__, :override, accumulate: true)
+      end,
+      quote do
+        @component nil
+        @__pass_assigns_to__ %{}
 
-      @on_definition unquote(__MODULE__)
-      @before_compile unquote(__MODULE__)
+        @on_definition unquote(__MODULE__)
+        @before_compile unquote(__MODULE__)
 
-      @doc false
-      # Internally used for validation.
-      @spec __pass_assigns_to__ :: map()
-      def __pass_assigns_to__, do: @__pass_assigns_to__
-    end
+        @doc false
+        # Internally used for validation.
+        @spec __pass_assigns_to__ :: map()
+        def __pass_assigns_to__, do: @__pass_assigns_to__
+      end
+    ]
   end
 
   @doc """
