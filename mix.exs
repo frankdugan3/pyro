@@ -3,7 +3,7 @@ defmodule Pyro.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/frankdugan3/pyro"
-  @version "0.3.4"
+  @version "0.3.5"
   @description """
   Component tooling for Phoenix.
   """
