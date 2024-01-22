@@ -114,7 +114,8 @@ defmodule Pyro.MixProject do
       {:faker, "~> 0.17", only: [:test, :dev]},
       {:floki, ">= 0.30.0", only: :test},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
-      {:styler, "~> 0.11", only: [:dev, :test], runtime: false},
+      # {:styler, "~> 0.11", only: [:dev, :test], runtime: false},
+      {:styler, github: "adobe/elixir-styler", branch: "me/group-callbacks-with-uses"},
       # Build tooling
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
