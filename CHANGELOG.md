@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.7](https://github.com/frankdugan3/pyro/compare/v0.3.6...v0.3.7) (2024-01-26)
+
+
+
+
+### Bug Fixes:
+
+* clean up macro bugs
+
 ## [v0.3.6](https://github.com/frankdugan3/pyro/compare/v0.3.5...v0.3.6) (2024-01-22)
 
 
