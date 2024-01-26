@@ -42,12 +42,10 @@ defmodule Pyro.Component do
   @overrides_attr_doc "Manually set the overrides for this component (instead of config/default)"
 
   defmacro __using__(opts \\ []) do
-    conditional =
+    [
       if __CALLER__.module != Phoenix.LiveView.Helpers do
         quote do: import(Phoenix.LiveView.Helpers)
-      end
-
-    pyro = [
+      end,
       quote bind_quoted: [opts: opts] do
         import Kernel, except: [def: 2, defp: 2]
         import Phoenix.Component, except: [attr: 2, attr: 3]
@@ -82,8 +80,6 @@ defmodule Pyro.Component do
         Module.delete_attribute(__MODULE__, :__assign_overridables_calls__)
       end
     ]
-
-    [conditional, pyro]
   end
 
   @doc """

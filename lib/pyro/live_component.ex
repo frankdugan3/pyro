@@ -25,7 +25,7 @@ defmodule Pyro.LiveComponent do
         use Pyro.Component, Keyword.take(unquote(opts), [:global_prefixes])
 
         @doc false
-        def __live__, do: %{kind: :component, module: __MODULE__, layout: false}
+        def __live__, do: %{kind: :component, layout: false}
       end
     ]
   end
