@@ -17,7 +17,7 @@ defmodule Pyro.Component.Helpers do
   """
   @spec toggle_class(js :: map(), classes :: String.t(), opts :: keyword()) :: map()
   def toggle_class(js \\ %JS{}, classes, opts) when is_binary(classes) do
-    if not Keyword.has_key?(opts, :to) do
+    unless Keyword.has_key?(opts, :to) do
       raise ArgumentError, "Missing option `:to`"
     end
 
