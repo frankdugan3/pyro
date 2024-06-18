@@ -5,29 +5,101 @@ defmodule Pyro.Component.Helpers do
 
   require Logger
 
-  @gettext_module Application.compile_env(:pyro, :gettext)
+  @doc ~S'''
+  Encode a flash message as a JSON binary with extra metadata options. This is necessary because Phoenix only allows binary messages.
 
-  if @gettext_module do
-    def gettext(text) do
-      Gettext.gettext(@gettext_module, text)
-    end
+  This allows you to override the defaults for:
 
-    @doc false
-    def translate_error({msg, opts}) do
-      if count = opts[:count] do
-        Gettext.dngettext(@gettext_module, "errors", msg, msg, count, opts)
-      else
-        Gettext.dgettext(@gettext_module, "errors", msg, opts)
-      end
-    end
-  else
-    def gettext(text), do: text
+  * `:title` - The title above the message
+  * `:close` - Auto-close the flash after `:ttl`
+  * `:ttl` - The time-to-live in milliseconds
+  * `:icon_name` - Name of the icon displayed in the title
+  * `:kind` - Override which kind of style this flash should have
 
-    def translate_error({msg, opts}) do
-      Enum.reduce(opts, msg, fn {key, value}, acc ->
-        String.replace(acc, "%{#{key}}", fn _ -> to_string(value) end)
-      end)
+  ## Examples
+
+  ```elixir
+  socket
+  |> put_flash(
+    encode_flash(
+      :success,
+      """
+      This flash closes when it *wants to*.
+      And has a custom title and icon.
+      """,
+      title: "TOTALLY CUSTOM",
+      ttl: 6_000,
+      icon_name: "hero-beaker"
+    )
+  )
+  ```
+  '''
+  @type encode_flash_opts ::
+          {:ttl, pos_integer()}
+          | {:title, binary()}
+          | {:icon_name, binary()}
+          | {:close, boolean()}
+          | {:kind, binary()}
+  @spec encode_flash(binary() | atom(), binary(), [encode_flash_opts()]) :: {binary(), binary()}
+  def encode_flash(kind, message, opts) when is_atom(kind) do
+    encode_flash(Atom.to_string(kind), message, opts)
+  end
+
+  def encode_flash(kind, message, opts) do
+    {kind,
+     Jason.encode!(%{
+       "ttl" => opts[:ttl],
+       "title" => opts[:title],
+       "icon_name" => opts[:icon_name],
+       "close" => opts[:close],
+       "kind" => opts[:kind],
+       "message" => message
+     })}
+  end
+
+  @spec decode_flash(map(), atom() | binary()) :: keyword()
+  def decode_flash(flash, kind) when is_atom(kind) do
+    decode_flash(flash, Atom.to_string(kind))
+  end
+
+  def decode_flash(flash, kind) do
+    message = Phoenix.Flash.get(flash, kind)
+
+    message
+    |> Jason.decode()
+    |> case do
+      {:ok, %{"message" => _message} = parsed} ->
+        Enum.reduce(parsed, defaults_for_flash(kind), fn
+          {"message", _}, acc ->
+            acc
+
+          {_key, nil}, acc ->
+            acc
+
+          {"icon_name", value}, acc ->
+            Keyword.put(acc, :icon_name, value)
+
+          {"ttl", value}, acc ->
+            Keyword.put(acc, :ttl, value)
+
+          {"title", value}, acc ->
+            Keyword.put(acc, :title, value)
+
+          {"close", value}, acc ->
+            Keyword.put(acc, :close, value)
+
+          {"kind", value}, acc ->
+            Keyword.put(acc, :kind, value)
+        end)
+
+      _ ->
+        [{:message, message} | defaults_for_flash(kind)]
     end
+  end
+
+  defp defaults_for_flash(kind) do
+    title = kind |> String.split(" ") |> Enum.map_join(" ", &String.capitalize/1)
+    [key: kind, kind: kind, ttl: 0, title: title]
   end
 
   @doc """
@@ -141,13 +213,6 @@ defmodule Pyro.Component.Helpers do
 
     true ->
       def all_timezones, do: [default_timezone()]
-  end
-
-  @doc """
-  Translates the errors for a field from a keyword list of errors.
-  """
-  def translate_errors(errors, field) when is_list(errors) do
-    for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
   @doc """

@@ -2,7 +2,19 @@ import Config
 
 config :logger, level: :warning
 
+if Mix.env() == :test do
+  config :mix_test_watch, tasks: ["test", "credo"]
+end
+
 if Mix.env() == :dev do
+  config :spark, :formatter,
+    remove_parens?: true,
+    "Pyro.Component": [
+      section_order: [
+        :components
+      ]
+    ]
+
   config :git_ops,
     mix_project: Mix.Project.get!(),
     changelog_file: "CHANGELOG.md",
