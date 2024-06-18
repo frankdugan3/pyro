@@ -4,11 +4,13 @@ This guide steps through the installation process for Pyro.
 
 ## Installation
 
-The installation process is pretty straightforward.
+Would you believe you can install Pyro in three easy steps? It's true.
 
 ### Steps
 
-These steps assume you are adding Pyro to an existing Phoenix LiveView app, as generated from the most recent version of `phx.new`.
+> #### Note: {: .info}
+>
+> We assume you are adding Pyro to an existing Phoenix LiveView app, as generated from the most recent version of `phx.new`.
 
 1. Add `:pyro` to your dependencies:
 
@@ -19,11 +21,10 @@ These steps assume you are adding Pyro to an existing Phoenix LiveView app, as g
 
       ### OPTIONAL DEPS BELOW ###
 
-      # Date/Time/Zone components & tooling
-      {:tz, "~> 0.26"},
+      # Enables Timezone tooling
       {:tz_extra, "~> 0.26"},
-      #   or
-      {:tzdata, "~> 1.1"},
+      # or
+      {:tzdata, "~> 1.0"},
      ]
    end
    ```
@@ -32,32 +33,21 @@ These steps assume you are adding Pyro to an existing Phoenix LiveView app, as g
 
    ```elixir
    [
-     import_deps: [:ecto, :ecto_sql, :phoenix, :pyro],
-     subdirectories: ["priv/*/migrations"],
-     plugins: [Phoenix.LiveView.HTMLFormatter],
-     inputs: ["*.{heex,ex,exs}", "{config,lib,test}/**/*.{heex,ex,exs}", "priv/*/seeds.exs"]
+     import_deps: [:ecto, :ecto_sql, :phoenix, :pyro], # <-- Add :pyro here
+     # ...
    ]
    ```
 
-3. Add the following to your `config.exs`:
+3. Create a component module `lib/my_app_web/components/my_components.ex`:
 
    ```elixir
-   config :pyro, :overrides, [MyApp.Overrides]
-   config :pyro, gettext: MyApp.Gettext # optional
+   defmodule MyAppWeb.MyComponents do
+     @moduledoc false
+     use Pyro, component_libraries: [] # <-- Import other component modules here
+   end
    ```
+That's it! You're ready to rock.
 
-   See `Pyro.Overrides` to learn how to create your own overrides file.
+## Next Steps
 
-4. Edit your `my_app_web.ex` file, replacing:
-
-   - `Phoenix.Component` with `Pyro.Component`
-   - `Phoenix.LiveComponent` with `Pyro.LiveComponent`
-   - `Phoenix.LiveView` with `Pyro.LiveView`
-
-   **Note:** _Only_ replace those top-level modules, _do not_ replace submodules, e.g. `Phoenix.LiveView.Router`.
-
-5. (Optional) configure some runtime options in `runtime.exs`:
-
-   ```elixir
-   config :pyro, default_timezone: "America/Chicago"
-   ```
+The tutorials are sorted in a way to step you through how everything fits together, so go ahead and mash that "Next Page" link below.

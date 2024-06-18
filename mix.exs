@@ -5,69 +5,112 @@ defmodule Pyro.MixProject do
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.3.7"
   @description """
-  Component tooling for Phoenix.
+  Compose extensible components for Phoenix.
   """
+  @elixir_requirement "~> 1.16"
   def project do
     [
       app: :pyro,
       version: @version,
       description: @description,
-      elixir: "~> 1.16",
+      elixir: @elixir_requirement,
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
       docs: docs(),
-      test_paths: ["lib"],
+      test_paths: ["test"],
       name: "Pyro",
       source_url: @source_url,
-      elixirc_paths: ["lib"],
+      elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
       compilers: [:yecc] ++ Mix.compilers(),
-      dialyzer: [plt_add_apps: [:mix]]
-    ]
-  end
-
-  defp extras do
-    "documentation/**/*.md"
-    |> Path.wildcard()
-    |> Enum.map(fn path ->
-      title =
-        path
-        |> Path.basename(".md")
-        |> String.split(~r/[-_]/)
-        |> Enum.map_join(" ", &String.capitalize/1)
-
-      {String.to_atom(path),
-       [
-         title: title,
-         default: title == "Get Started"
-       ]}
-    end)
-  end
-
-  defp groups_for_extras do
-    [
-      Tutorials: [
-        "documentation/tutorials/get-started.md",
-        ~r'documentation/tutorials'
+      dialyzer: [plt_add_apps: [:mix]],
+      preferred_cli_env: [
+        "test.watch": :test,
+        docs: :docs
       ]
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp docs do
     [
       main: "about",
+      assets: %{"vhs/output" => "vhs", "documentation/memes" => "memes"},
       source_ref: "v#{@version}",
       output: "doc",
       source_url: @source_url,
-      extra_section: "GUIDES",
+      before_closing_head_tag: fn type ->
+        if type == :html do
+          """
+          <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+          <script>mermaid.initialize({startOnLoad: true})</script>
+          """
+        end
+      end,
+      extra_section: "Guides",
       extras: extras(),
-      groups_for_extras: groups_for_extras(),
-      groups_for_modules: groups_for_modules(),
-      groups_for_functions: [
-        Macros: &(&1[:type] == :macro)
+      groups_for_extras: [
+        Tutorials: [~r'documentation/tutorials'],
+        Reference: [~r'documentation/dsls'],
+        Cheatsheets: [~r'documentation/cheatsheets'],
+        LiveBooks: [~r'documentation/livebooks'],
+        Fun: ["documentation/memes.md"]
+      ],
+      groups_for_modules: [
+        Extension: [
+          Pyro,
+          Pyro.Info
+        ],
+        "Component Bundles": [
+          PyroComponents,
+          ~r/(^PyroComponents.Defaults)/
+        ],
+        "Individual Components": [
+          ~r/(^PyroComponents)/
+        ],
+        "Component Tooling": [
+          Pyro.Component.Helpers,
+          Pyro.Component.Template
+        ],
+        Schema: [~r/(^Pyro.Schema)/],
+        Transformer: [~r/(^Pyro.Transformer)/],
+        Verifier: [~r/(^Pyro.Verifier)/]
+      ],
+      nest_modules_by_prefix: [
+        Pyro.Schema,
+        Pyro.Transformer,
+        Pyro.Verifier,
+        PyroComponents,
+        PyroComponents.Defaults
+      ],
+      groups_for_docs: [
+        Components: &(&1[:type] == :component),
+        Macros: &(&1[:type] == :macro),
+        "DSL Schemas": &(&1[:type] == :dsl_schema)
       ]
     ]
+  end
+
+  defp extras do
+    ordered =
+      [
+        {"documentation/about.md", [default: true]},
+        "documentation/suite.md",
+        "CHANGELOG.md",
+        "documentation/tutorials/get-started.md",
+        "documentation/tutorials/extending-components.md",
+        "documentation/tutorials/class-variants.md"
+      ]
+
+    unordered = Path.wildcard("documentation/**/*.{md,cheatmd,livemd}")
+
+    Enum.uniq_by(ordered ++ unordered, fn
+      {file, _opts} -> file
+      file -> file
+    end)
   end
 
   defp package do
@@ -76,25 +119,12 @@ defmodule Pyro.MixProject do
       maintainers: ["Frank Dugan III"],
       licenses: ["MIT"],
       links: %{GitHub: @source_url},
-      files:
-        ~w(lib documentation) ++
-          ~w(README* CHANGELOG* LICENSE* mix.exs .formatter.exs)
-    ]
-  end
-
-  defp groups_for_modules do
-    [
-      Core: [
-        Pyro,
-        Pyro.Overrides
-      ],
-      "Component Tooling": [
-        Pyro.Component,
-        Pyro.Component.CSS,
-        Pyro.LiveComponent,
-        Pyro.LiveView,
-        Pyro.Component.Helpers
-      ]
+      files: ~w(
+        lib documentation
+        README* CHANGELOG* LICENSE*
+        mix.exs .formatter.exs
+        package.json
+      )
     ]
   end
 
@@ -107,35 +137,63 @@ defmodule Pyro.MixProject do
   defp deps do
     [
       # Code quality tooling
-      {:credo, ">= 0.0.0", only: :dev, runtime: false},
+      # {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.7-rc.0", only: [:dev, :test], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, "~> 0.15", [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
       {:faker, "~> 0.17", only: [:test, :dev]},
       {:floki, ">= 0.30.0", only: :test},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
-      {:styler, "~> 0.11", only: [:dev, :test], runtime: false},
+      {:styler, "~> 0.11", only: [:dev, :test, :docs], runtime: false},
+      {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
       # Build tooling
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :docs, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
+      {:file_system, "~> 1.0", only: [:test, :dev]},
+      {:makeup_eex, ">= 0.1.2", only: :docs},
+      # {:makeup_elixir, "~> 0.16", only: :docs},
+      # {:makeup_diff, "~> 0.1", only: :docs},
       # Core dependencies
-      {:phoenix_live_view, "~> 0.20"},
+      {:phoenix_live_view, "~> 1.0.0-rc.0"},
       {:phoenix, "~> 1.7"},
       {:jason, "~> 1.4"},
       # These dependencies add optional features if installed
       {:gettext, "~> 0.24", optional: true},
       {:makeup, "~> 1.1", optional: true},
-      {:tzdata, "~> 1.1.0", optional: true},
+      {:spark, "~> 2.1"},
+      {:tzdata, "~> 1.1", optional: true},
       {:tz_extra, "~> 0.26", optional: true}
     ]
   end
 
   defp aliases do
     [
+      build: [
+        "spark.formatter",
+        "format"
+      ],
       setup: ["deps.get", "compile", "docs"],
       # until we hit 1.0, we will ensure no major release!
       release: ["git_ops.release --no-major"],
-      publish: ["hex.publish"]
+      publish: ["hex.publish"],
+      docs: [
+        "spark.cheat_sheets",
+        "docs",
+        "spark.replace_doc_links",
+        "spark.cheat_sheets_in_search"
+      ],
+      "spark.cheat_sheets_in_search": "spark.cheat_sheets_in_search --extensions Pyro.Component",
+      "spark.formatter": "spark.formatter --extensions Pyro.Component",
+      "spark.cheat_sheets": "spark.cheat_sheets --extensions Pyro.Component",
+      "archive.build": &raise_on_archive_build/1
     ]
+  end
+
+  defp raise_on_archive_build(_) do
+    Mix.raise("""
+    You are trying to install "pyro" as an archive, which is not supported. \
+    You probably meant to install "pyro_cli" instead
+    """)
   end
 end

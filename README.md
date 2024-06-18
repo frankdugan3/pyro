@@ -6,31 +6,17 @@
 
 # Pyro
 
+> Compose extensible components for Phoenix.
+
+> [!WARNING]
+> Pyro is in early development, expect breaking changes.
+
 Pyro is a suite of libraries for building UI in Phoenix.
 
-- [Pyro](https://github.com/frankdugan3/pyro)
-
-  Component tooling for Phoenix.
-
-  - Customizable "overrides" system for granularly customizable themes
-  - Extended component attributes, e.g. CSS merging
-
-- [PyroComponents](https://github.com/frankdugan3/pyro_components)
-
-  Ready-made Phoenix components, built with pyro.
-
-  - Heex component library
-  - Overrides presets to get started quickly while allowing deep customization
-
-- [AshPyro](https://github.com/frankdugan3/ash_pyro)
-
-  Declarative UI for Ash Framework.
-
-  - Ash extensions providing a declarative UI DSL
-
-- [AshPyroComponents](https://github.com/frankdugan3/ash_pyro_components)
-
-  Components that automatically render PyroComponents declaratively via AshPyro.
+- [Pyro](https://github.com/frankdugan3/pyro) - Compose extensible components for Phoenix.
+- [PyroComponents](https://github.com/frankdugan3/pyro_components) - Extensible Phoenix components, built with Pyro.
+- [AshPyro](https://github.com/frankdugan3/ash_pyro) - Declarative UI for Ash Framework.
+- [AshPyroComponents](https://github.com/frankdugan3/ash_pyro_components) - Automatic rendering of AshPryo DSL.
 
 ## About
 
@@ -38,7 +24,7 @@ For more details on Pyro, check out the [About](https://hexdocs.pm/pyro/about.ht
 
 ## Installation
 
-To install Pyro and write your own components, follow the [Get Started](https://hexdocs.pm/pyro/get-started.html) guide. For the other features, please see the "Get Started" guide for the appropriate library instead.
+To install Pyro and learn how it works, start at the [Get Started](get-started.html) guide and work your way through the tutorials. They are ordered in a sensible way to explain the various features Pyro offers, and point toward other tools in the Pyro suite when appropriate.
 
 ## Development
 
