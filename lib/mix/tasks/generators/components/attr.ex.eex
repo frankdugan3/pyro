@@ -1,0 +1,3 @@
+attr <%= i @attr.name %>, <%= i @attr.type %><%=
+  if @attr.default do %>, default: <%= i @attr.default %><% end %><%=
+  if @attr.required do %>, required: true<% end %>
