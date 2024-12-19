@@ -15,7 +15,8 @@ defmodule Mix.Tasks.Pyro.Generators.Css do
   end
 
   defp gen_module(module) do
-    classes = Pyro.Info.all_classes_for_strategy(module)
+    # classes = Pyro.Info.all_classes_for_strategy(module)
+    classes = []
     source_file = Path.relative_to_cwd(module.__info__(:compile)[:source])
 
     render_module(source_file: source_file, classes: classes)

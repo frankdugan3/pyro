@@ -38,7 +38,7 @@ defmodule Pyro.MixProject do
   defp docs do
     [
       main: "about",
-      assets: %{"vhs/output" => "vhs", "documentation/memes" => "memes"},
+      assets: %{"vhs/output" => "vhs"},
       source_ref: "v#{@version}",
       output: "doc",
       source_url: @source_url,
@@ -56,8 +56,7 @@ defmodule Pyro.MixProject do
         Tutorials: [~r'documentation/tutorials'],
         Reference: [~r'documentation/dsls'],
         Cheatsheets: [~r'documentation/cheatsheets'],
-        LiveBooks: [~r'documentation/livebooks'],
-        Fun: ["documentation/memes.md"]
+        LiveBooks: [~r'documentation/livebooks']
       ],
       groups_for_modules: [
         Extension: [
@@ -141,11 +140,11 @@ defmodule Pyro.MixProject do
       {:credo, "~> 1.7.7-rc.0", only: [:dev, :test], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
-      {:ex_check, "~> 0.15", [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
+      {:ex_check, "~> 0.15",
+       [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
       {:faker, "~> 0.17", only: [:test, :dev]},
       {:floki, ">= 0.30.0", only: :test},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
-      {:styler, "~> 0.11", only: [:dev, :test, :docs], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
       # Build tooling
       {:ex_doc, ">= 0.0.0", only: :docs, runtime: false},

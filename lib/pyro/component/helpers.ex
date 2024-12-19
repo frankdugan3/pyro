@@ -182,31 +182,35 @@ defmodule Pyro.Component.Helpers do
   defp simple_datetime_formatter(datetime, format \\ :date_time_timezone)
 
   defp simple_datetime_formatter(%DateTime{} = ts, :date_time_timezone) do
-    year = ts.year |> Integer.to_string() |> String.pad_leading(4, "0")
-    month = ts.month |> Integer.to_string() |> String.pad_leading(2, "0")
-    day = ts.day |> Integer.to_string() |> String.pad_leading(2, "0")
-    hour = ts.hour |> Integer.to_string() |> String.pad_leading(2, "0")
-    minute = ts.minute |> Integer.to_string() |> String.pad_leading(2, "0")
+    year = ts.year |> pad_int(4)
+    month = ts.month |> pad_int()
+    day = ts.day |> pad_int()
+    hour = ts.hour |> pad_int()
+    minute = ts.minute |> pad_int()
 
     "#{year}-#{month}-#{day} #{hour}:#{minute} #{ts.zone_abbr}"
   end
 
   defp simple_datetime_formatter(%DateTime{} = ts, :date_time_seconds_timezone) do
-    year = ts.year |> Integer.to_string() |> String.pad_leading(4, "0")
-    month = ts.month |> Integer.to_string() |> String.pad_leading(2, "0")
-    day = ts.day |> Integer.to_string() |> String.pad_leading(2, "0")
-    hour = ts.hour |> Integer.to_string() |> String.pad_leading(2, "0")
-    minute = ts.minute |> Integer.to_string() |> String.pad_leading(2, "0")
-    second = ts.second |> Integer.to_string() |> String.pad_leading(2, "0")
+    year = ts.year |> pad_int(4)
+    month = ts.month |> pad_int()
+    day = ts.day |> pad_int()
+    hour = ts.hour |> pad_int()
+    minute = ts.minute |> pad_int()
+    second = ts.second |> pad_int()
 
     "#{year}-#{month}-#{day} #{hour}:#{minute}:#{second} #{ts.zone_abbr}"
   end
 
   defp simple_datetime_formatter(_, _), do: ""
 
+  defp pad_int(int, width \\ 2) when is_integer(int) do
+    int |> Integer.to_string() |> String.pad_leading(width, "0")
+  end
+
   cond do
     Code.ensure_loaded?(TzExtra) ->
-      def all_timezones, do: TzExtra.time_zone_identifiers(include_alias: true)
+      def all_timezones, do: TzExtra.time_zone_ids(include_alias: true)
 
     Code.ensure_loaded?(TzData) ->
       def all_timezones, do: Tzdata.zone_list()
@@ -242,11 +246,13 @@ defmodule Pyro.Component.Helpers do
   def get_nested(value, [], _), do: value
   def get_nested(%{} = map, [key], default), do: Map.get(map, key, default)
 
-  def get_nested(%{} = map, [key | keys], default), do: get_nested(Map.get(map, key), keys, default)
+  def get_nested(%{} = map, [key | keys], default),
+    do: get_nested(Map.get(map, key), keys, default)
 
   def get_nested([_ | _] = keyword, [key], default), do: Keyword.get(keyword, key, default)
 
-  def get_nested([_ | _] = keyword, [key | keys], default), do: get_nested(Keyword.get(keyword, key), keys, default)
+  def get_nested([_ | _] = keyword, [key | keys], default),
+    do: get_nested(Keyword.get(keyword, key), keys, default)
 
   def get_nested(_, _, default), do: default
 end

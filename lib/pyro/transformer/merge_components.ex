@@ -70,7 +70,6 @@ defmodule Pyro.Transformer.MergeComponents do
       |> merge_doc(live_component)
       |> Map.update!(:hooks, &merge_hooks(&1, live_component.hooks, scope))
       |> Map.update!(:attrs, &merge_attrs(&1, live_component.attrs, scope))
-      |> Map.update!(:classes, &merge_classes(&1, live_component.classes, scope))
       |> Map.update!(:slots, &merge_slots(&1, live_component.slots, scope))
       |> Map.update!(:components, fn old_components ->
         (old_components ++ live_component.components)
@@ -96,7 +95,6 @@ defmodule Pyro.Transformer.MergeComponents do
       |> merge_doc(component)
       |> Map.update!(:hooks, &merge_hooks(&1, component.hooks, scope))
       |> Map.update!(:attrs, &merge_attrs(&1, component.attrs, scope))
-      |> Map.update!(:classes, &merge_classes(&1, component.classes, scope))
       |> Map.update!(:slots, &merge_slots(&1, component.slots, scope))
     end)
   end
@@ -143,66 +141,66 @@ defmodule Pyro.Transformer.MergeComponents do
     |> Map.values()
   end
 
-  defp merge_classes(old_classes, new_classes, scope) do
-    (old_classes ++
-       new_classes)
-    |> Enum.reduce(%{}, fn class, classes ->
-      classes
-      |> Map.put_new(class.name, class)
-      |> Map.update!(class.name, &merge_class(&1, class, scope))
-    end)
-    |> Map.values()
-  end
-
-  defp merge_class(old_class, class, scope) do
-    scope = merge_scope(scope, old_class, class)
-
-    merged_class =
-      old_class
-      |> Map.put(:variables, scope.variables)
-      |> maybe_override(:base_class, class)
-      |> maybe_override(:template, class)
-      |> maybe_override(:normalizer, class)
-      |> merge_doc(class)
-
-    Map.update!(merged_class, :strategies, fn old_strategies ->
-      scope =
-        scope
-        |> Map.put(:base_class, merged_class.base_class)
-        |> Map.put(:template, merged_class.template)
-        |> Map.put(:normalizer, merged_class.normalizer)
-        |> Map.put(:variants, merged_class.variants)
-
-      merge_class_strategies(old_strategies, class.strategies, scope)
-    end)
-  end
-
-  defp merge_class_strategies(old_class_strategies, new_class_strategies, scope) do
-    (old_class_strategies ++
-       new_class_strategies)
-    |> Enum.reduce(%{}, fn strategy, class_strategies ->
-      class_strategies
-      |> Map.put_new(strategy.name, strategy)
-      |> Map.update!(strategy.name, &merge_class_strategy(&1, strategy, scope))
-    end)
-    |> Map.values()
-  end
-
-  defp merge_class_strategy(old_strategy, strategy, scope) do
-    scope = merge_scope(scope, old_strategy, strategy)
-
-    old_strategy
-    |> Map.put(:variables, scope.variables)
-    |> maybe_override(:base_class, strategy)
-    |> maybe_fallback_scope(:base_class, scope)
-    |> maybe_override(:template, strategy)
-    |> maybe_fallback_scope(:template, scope)
-    |> maybe_override(:normalizer, strategy)
-    |> maybe_fallback_scope(:normalizer, scope)
-    |> maybe_override(:variants, strategy)
-    |> maybe_fallback_scope(:variants, scope)
-    |> merge_doc(strategy)
-  end
+  # defp merge_classes(old_classes, new_classes, scope) do
+  #   (old_classes ++
+  #      new_classes)
+  #   |> Enum.reduce(%{}, fn class, classes ->
+  #     classes
+  #     |> Map.put_new(class.name, class)
+  #     |> Map.update!(class.name, &merge_class(&1, class, scope))
+  #   end)
+  #   |> Map.values()
+  # end
+  #
+  # defp merge_class(old_class, class, scope) do
+  #   scope = merge_scope(scope, old_class, class)
+  #
+  #   merged_class =
+  #     old_class
+  #     |> Map.put(:variables, scope.variables)
+  #     |> maybe_override(:base_class, class)
+  #     |> maybe_override(:template, class)
+  #     |> maybe_override(:normalizer, class)
+  #     |> merge_doc(class)
+  #
+  #   Map.update!(merged_class, :strategies, fn old_strategies ->
+  #     scope =
+  #       scope
+  #       |> Map.put(:base_class, merged_class.base_class)
+  #       |> Map.put(:template, merged_class.template)
+  #       |> Map.put(:normalizer, merged_class.normalizer)
+  #       |> Map.put(:variants, merged_class.variants)
+  #
+  #     merge_class_strategies(old_strategies, class.strategies, scope)
+  #   end)
+  # end
+  #
+  # defp merge_class_strategies(old_class_strategies, new_class_strategies, scope) do
+  #   (old_class_strategies ++
+  #      new_class_strategies)
+  #   |> Enum.reduce(%{}, fn strategy, class_strategies ->
+  #     class_strategies
+  #     |> Map.put_new(strategy.name, strategy)
+  #     |> Map.update!(strategy.name, &merge_class_strategy(&1, strategy, scope))
+  #   end)
+  #   |> Map.values()
+  # end
+  #
+  # defp merge_class_strategy(old_strategy, strategy, scope) do
+  #   scope = merge_scope(scope, old_strategy, strategy)
+  #
+  #   old_strategy
+  #   |> Map.put(:variables, scope.variables)
+  #   |> maybe_override(:base_class, strategy)
+  #   |> maybe_fallback_scope(:base_class, scope)
+  #   |> maybe_override(:template, strategy)
+  #   |> maybe_fallback_scope(:template, scope)
+  #   |> maybe_override(:normalizer, strategy)
+  #   |> maybe_fallback_scope(:normalizer, scope)
+  #   |> maybe_override(:variants, strategy)
+  #   |> maybe_fallback_scope(:variants, scope)
+  #   |> merge_doc(strategy)
+  # end
 
   defp merge_slots(old_slots, new_slots, scope) do
     (old_slots ++

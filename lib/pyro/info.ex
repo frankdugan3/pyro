@@ -53,39 +53,6 @@ defmodule Pyro.Info do
   end
 
   @doc """
-  Get all the CSS classes that implement the given CSS strategy for components and live components (defaults to configured).
-  """
-  def all_classes_for_strategy(pyro, opts \\ []) do
-    strategy_name = Keyword.get(opts, :strategy, css_strategy(pyro))
-
-    Enum.reduce(Spark.Dsl.Extension.get_entities(pyro, [:components]), [], fn
-      %Pyro.Schema.Component{classes: classes}, acc ->
-        reduce_classes(classes, acc, strategy_name)
-
-      %Pyro.Schema.LiveComponent{classes: classes, components: components}, acc ->
-        Enum.reduce(
-          components,
-          reduce_classes(classes, acc, strategy_name)
-        )
-
-      _, acc ->
-        acc
-    end)
-  end
-
-  defp reduce_classes(classes, acc, strategy_name) do
-    Enum.reduce(classes, acc, fn %Pyro.Schema.Class{} = class, acc ->
-      case Enum.find(class.strategies, &(&1.name == strategy_name)) do
-        %Pyro.Schema.ClassStrategy{} = strategy ->
-          [strategy | acc]
-
-        _ ->
-          acc
-      end
-    end)
-  end
-
-  @doc """
   Get all the hooks in components and live components.
   """
   def hooks(pyro) do

@@ -10,8 +10,6 @@ defmodule Pyro.Schema.Component do
           hooks: list(Pyro.Schema.Hook.t()),
           attrs: list(Pyro.Schema.Attr.t()),
           slots: list(Pyro.Schema.Slot.t()),
-          classes: list(Pyro.Schema.Class.t()),
-          template: Pyro.Component.Template.t(),
           doc: String.t() | nil
         }
 
@@ -19,12 +17,10 @@ defmodule Pyro.Schema.Component do
     :name,
     :private?,
     :doc,
-    :template,
     variables: %{},
     hooks: [],
     attrs: [],
     slots: [],
-    classes: []
   ]
 
   @schema [
@@ -38,7 +34,6 @@ defmodule Pyro.Schema.Component do
       type: :boolean,
       doc: "mark the component as private (default: `false`)"
     ],
-    template: Pyro.Component.Template.sigilh_schema(),
     doc: [
       type: :string,
       doc: "documentation for the component"

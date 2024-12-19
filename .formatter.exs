@@ -35,7 +35,7 @@ spark_locals_without_parens = [
   import_deps: [:phoenix],
   locals_without_parens: spark_locals_without_parens,
   export: [locals_without_parens: spark_locals_without_parens],
-  plugins: [Phoenix.LiveView.HTMLFormatter, Spark.Formatter, Styler],
+  plugins: [Phoenix.LiveView.HTMLFormatter, Spark.Formatter],
   inputs: [
     "*.{heex,ex,exs}",
     "{config,lib,vhs,test}/**/*.{heex,ex,exs}",
