@@ -4,11 +4,11 @@ defmodule Pyro.Component.Template do
 
   > #### Warning: {: .warning}
   >
-  > These sigils/types/functions/schemas exist specifically to enable deferring compilation of templates until a later time. This exables Pyro to merge component DSLs and do custom validation. They should not be used outside `Pyro` DSL.
+  > These sigils/types/functions/schemas exist specifically to enable deferring compilation of templates until a later time. This enables Pyro to merge component DSLs and do custom validation. They should not be used outside `Pyro` DSL.
   """
 
   @type t :: %__MODULE__{
-          kind: :heex | :eex,
+          kind: :eex,
           file: String.t(),
           module: atom(),
           line: non_neg_integer(),
@@ -27,49 +27,6 @@ defmodule Pyro.Component.Template do
     :rendered
   ]
 
-  defmacro sigil_EEX({:<<>>, meta, [source]}, tag) do
-    # Multi-line sigils have indentation key, offset by 1
-    line = __CALLER__.line + if(meta[:indentation], do: 1, else: 0)
-    # Single-line sigils have no indentation, offset by column + sigil characters
-    indentation = meta[:indentation] || Keyword.get(meta, :column, 0) + 2
-    kind = tag |> String.Chars.to_string() |> String.to_atom()
-
-    Macro.escape(%__MODULE__{
-      kind: kind,
-      file: Path.relative_to_cwd(__CALLER__.file),
-      module: __CALLER__.module,
-      line: line,
-      indentation: indentation,
-      source: source
-    })
-  end
-
-  @doc """
-  A Heex template string. It will be passed `assigns`.
-
-  Differences between this and `Phoenix.Component.sigil_H/2`:
-
-  - Not immediately compiled in the macro
-  - Does not check for `assigns`
-
-  """
-  @doc type: :macro
-  defmacro sigil_H({:<<>>, meta, [source]}, []) do
-    # Multi-line sigils have indentation key, offset by 1
-    line = __CALLER__.line + if(meta[:indentation], do: 1, else: 0)
-    # Single-line sigils have no indentation, offset by column + sigil characters
-    indentation = meta[:indentation] || meta[:column] + 2
-
-    Macro.escape(%__MODULE__{
-      kind: :heex,
-      file: Path.relative_to_cwd(__CALLER__.file),
-      module: __CALLER__.module,
-      line: line,
-      indentation: indentation,
-      source: source
-    })
-  end
-
   @doc type: :macro
   defmacro sigil_E({:<<>>, meta, [source]}, []) do
     # Multi-line sigils have indentation key, offset by 1
@@ -87,38 +44,7 @@ defmodule Pyro.Component.Template do
     })
   end
 
-  defmacro sigil_CSSX({:<<>>, meta, [source]}, []) do
-    # Multi-line sigils have indentation key, offset by 1
-    line = __CALLER__.line + if(meta[:indentation], do: 1, else: 0)
-    # Single-line sigils have no indentation, offset by column + sigil characters
-    indentation = meta[:indentation] || Keyword.get(meta, :column, 0) + 2
-
-    Macro.escape(%__MODULE__{
-      kind: :css_eex,
-      file: Path.relative_to_cwd(__CALLER__.file),
-      module: __CALLER__.module,
-      line: line,
-      indentation: indentation,
-      source: source
-    })
-  end
-
   @template_schema {:struct, __MODULE__}
-
-  def sigilh_schema(opts \\ []) do
-    Keyword.merge(
-      [
-        type: @template_schema,
-        snippet: ~S'''
-        ~H"""
-        ${0}
-        """
-        ''',
-        doc: "Heex template for component body."
-      ],
-      opts
-    )
-  end
 
   @doc """
   Schema for `sigil_E/2`. It accepts `opts` to allow building more specialized schemas without boilerplate.
@@ -179,20 +105,5 @@ defmodule Pyro.Component.Template do
       format_properties(vars, [:headless_bem, "#{key}:#{value}"])
     %>}<% end %><% end %>
     """
-  end
-
-  def format_properties(vars, path) do
-    properties =
-      vars
-      |> Pyro.Component.Helpers.get_nested(path, "")
-      |> String.split("\n")
-      |> Enum.filter(&(&1 != ""))
-      |> Enum.map_join("\n", &("  " <> &1))
-
-    if properties != "" do
-      "\n" <> properties <> "\n"
-    else
-      ""
-    end
   end
 end

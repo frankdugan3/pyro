@@ -34,17 +34,20 @@ defmodule Pyro do
     opt_schema: [
       component_output_path: [
         type: :string,
-        doc: "The path to use for storing generated component files. It is relative to the current working directory."
+        doc:
+          "The path to use for storing generated component files. It is relative to the current working directory."
       ],
       js_output_path: [
         type: :string,
         default: "assets/js",
-        doc: "The path to use for storing the generated JS file. It is relative to the current working directory."
+        doc:
+          "The path to use for storing the generated JS file. It is relative to the current working directory."
       ],
       css_output_path: [
         type: :string,
         default: "assets/css",
-        doc: "The path to use for storing generated CSS files. It is relative to the current working directory."
+        doc:
+          "The path to use for storing generated CSS files. It is relative to the current working directory."
       ],
       css_strategy: [
         type: :atom,

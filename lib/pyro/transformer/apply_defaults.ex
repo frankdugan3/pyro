@@ -62,27 +62,12 @@ defmodule Pyro.Transformer.ApplyDefaults do
   defp apply_component_defaults(%Pyro.Schema.Component{} = component, scope) do
     component
     |> maybe_default(:private?, false)
-    |> Map.update!(:classes, fn classes ->
-      Enum.map(classes, &apply_class_defaults(&1, scope))
-    end)
     |> Map.update!(:attrs, fn attrs ->
       Enum.map(attrs, &apply_attr_defaults(&1, scope))
     end)
     |> Map.update!(:slots, fn slots ->
       Enum.map(slots, &apply_slot_defaults(&1, scope))
     end)
-  end
-
-  defp apply_class_defaults(%Pyro.Schema.Class{} = class, scope) do
-    class
-    |> maybe_default(:normalizer, scope.normalizer)
-    |> Map.update!(:strategies, fn strategies ->
-      Enum.map(strategies, &apply_class_strategy_defaults(&1, scope))
-    end)
-  end
-
-  defp apply_class_strategy_defaults(%Pyro.Schema.ClassStrategy{} = strategy, scope) do
-    maybe_default(strategy, :normalizer, scope.normalizer)
   end
 
   defp apply_attr_defaults(%Pyro.Schema.Attr{} = attr, _scope) do

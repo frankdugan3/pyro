@@ -10,20 +10,16 @@ defmodule Pyro.Schema.LiveComponent do
           hooks: list(Pyro.Schema.Hook.t()),
           attrs: list(Pyro.Schema.Attr.t()),
           slots: list(Pyro.Schema.Slot.t()),
-          classes: list(Pyro.Schema.Class.t()),
-          template: Pyro.Component.Template.t(),
           components: list(Pyro.Schema.Component.t())
         }
 
   defstruct [
     :name,
     :doc,
-    :template,
     variables: %{},
     hooks: [],
     attrs: [],
     slots: [],
-    classes: [],
     components: []
   ]
 
@@ -34,7 +30,6 @@ defmodule Pyro.Schema.LiveComponent do
       doc: "name of the live component"
     ],
     variables: Pyro.Schema.Variable.schema(),
-    template: Pyro.Component.Template.sigilh_schema(),
     doc: [
       type: :string,
       required: false,

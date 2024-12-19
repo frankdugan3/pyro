@@ -47,9 +47,9 @@ defmodule Pyro.Transformer.ApplyVariables do
     scope = Map.put(scope, :live_component, live_component.name)
 
     live_component
-    |> Map.update!(:classes, fn classes ->
-      Enum.map(classes, &apply_class_variables(&1, scope))
-    end)
+    # |> Map.update!(:classes, fn classes ->
+    #   Enum.map(classes, &apply_class_variables(&1, scope))
+    # end)
     |> Map.update!(:hooks, fn hooks ->
       Enum.map(hooks, &apply_hook_variables(&1, scope))
     end)
@@ -68,9 +68,9 @@ defmodule Pyro.Transformer.ApplyVariables do
     scope = Map.put(scope, :component, component.name)
 
     component
-    |> Map.update!(:classes, fn classes ->
-      Enum.map(classes, &apply_class_variables(&1, scope))
-    end)
+    # |> Map.update!(:classes, fn classes ->
+    #   Enum.map(classes, &apply_class_variables(&1, scope))
+    # end)
     |> Map.update!(:hooks, fn hooks ->
       Enum.map(hooks, &apply_hook_variables(&1, scope))
     end)

@@ -9,30 +9,30 @@ hook = %Spark.Dsl.Entity{
   args: [:name, :template]
 }
 
-strategy = %Spark.Dsl.Entity{
-  describe: """
-  Declare/extend a CSS class strategy.
-  """,
-  name: :strategy,
-  schema: Pyro.Schema.ClassStrategy.schema(),
-  target: Pyro.Schema.ClassStrategy,
-  imports: [Pyro.Component.Template],
-  args: [:name, {:optional, :base_class}]
-}
-
-class = %Spark.Dsl.Entity{
-  describe: """
-  Declare/extend a component CSS class attribute.
-  """,
-  name: :class,
-  schema: Pyro.Schema.Class.schema(),
-  target: Pyro.Schema.Class,
-  args: [:name, {:optional, :base_class}],
-  imports: [Pyro.Component.Template],
-  entities: [
-    strategies: [strategy]
-  ]
-}
+# strategy = %Spark.Dsl.Entity{
+#   describe: """
+#   Declare/extend a CSS class strategy.
+#   """,
+#   name: :strategy,
+#   schema: Pyro.Schema.ClassStrategy.schema(),
+#   target: Pyro.Schema.ClassStrategy,
+#   imports: [Pyro.Component.Template],
+#   args: [:name, {:optional, :base_class}]
+# }
+#
+# class = %Spark.Dsl.Entity{
+#   describe: """
+#   Declare/extend a component CSS class attribute.
+#   """,
+#   name: :class,
+#   schema: Pyro.Schema.Class.schema(),
+#   target: Pyro.Schema.Class,
+#   args: [:name, {:optional, :base_class}],
+#   imports: [Pyro.Component.Template],
+#   entities: [
+#     strategies: [strategy]
+#   ]
+# }
 
 attr = %Spark.Dsl.Entity{
   describe: """
@@ -54,7 +54,6 @@ slot = %Spark.Dsl.Entity{
   args: [:name],
   entities: [
     attrs: [attr],
-    classes: [class]
   ]
 }
 
@@ -70,7 +69,6 @@ component = %Spark.Dsl.Entity{
   entities: [
     hooks: [hook],
     attrs: [attr],
-    classes: [class],
     slots: [slot]
   ]
 }
@@ -87,7 +85,6 @@ live_component = %Spark.Dsl.Entity{
   entities: [
     hooks: [hook],
     attrs: [attr],
-    classes: [class],
     slots: [slot],
     components: [component]
     # handle_async: [handle_async],
