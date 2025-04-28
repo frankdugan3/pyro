@@ -15,6 +15,7 @@ defmodule Pyro.MixProject do
       description: @description,
       elixir: @elixir_requirement,
       start_permanent: Mix.env() == :prod,
+      consolidate_protocols: Mix.env() != :dev,
       package: package(),
       deps: deps(),
       docs: docs(),
@@ -136,8 +137,7 @@ defmodule Pyro.MixProject do
   defp deps do
     [
       # Code quality tooling
-      # {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.7.7-rc.0", only: [:dev, :test], runtime: false},
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, "~> 0.15",
@@ -150,17 +150,17 @@ defmodule Pyro.MixProject do
       {:ex_doc, ">= 0.0.0", only: :docs, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
       {:file_system, "~> 1.0", only: [:test, :dev]},
-      {:makeup_eex, ">= 0.1.2", only: :docs},
-      # {:makeup_elixir, "~> 0.16", only: :docs},
-      # {:makeup_diff, "~> 0.1", only: :docs},
+      {:makeup, ">= 0.0.0", only: :docs},
+      {:makeup_eex, ">= 0.0.0", only: :docs},
+      {:makeup_html, ">= 0.0.0", only: :docs},
+      {:makeup_elixir, ">= 0.0.0", only: :docs},
       # Core dependencies
+      {:igniter, "~> 0.5"},
+      {:sourceror, "~> 1.7"},
       {:phoenix_live_view, "~> 1.0.0-rc.0"},
       {:phoenix, "~> 1.7"},
-      {:jason, "~> 1.4"},
-      # These dependencies add optional features if installed
-      {:gettext, "~> 0.24", optional: true},
-      {:makeup, "~> 1.1", optional: true},
       {:spark, "~> 2.1"},
+      # These dependencies add optional features if installed
       {:tzdata, "~> 1.1", optional: true},
       {:tz_extra, "~> 0.26", optional: true}
     ]
@@ -179,12 +179,14 @@ defmodule Pyro.MixProject do
       docs: [
         "spark.cheat_sheets",
         "docs",
-        "spark.replace_doc_links",
-        "spark.cheat_sheets_in_search"
+        "spark.replace_doc_links"
+        # "spark.cheat_sheets_in_search"
       ],
       "spark.cheat_sheets_in_search": "spark.cheat_sheets_in_search --extensions Pyro.Component",
-      "spark.formatter": "spark.formatter --extensions Pyro.Component",
-      "spark.cheat_sheets": "spark.cheat_sheets --extensions Pyro.Component",
+      "spark.formatter":
+        "spark.formatter --extensions Pyro.ComponentLibrary.Dsl,Pyro.ThemeBackend.Tailwind",
+      "spark.cheat_sheets":
+        "spark.cheat_sheets --extensions Pyro.ComponentLibrary.Dsl,Pyro.ThemeBackend.Tailwind",
       "archive.build": &raise_on_archive_build/1
     ]
   end
