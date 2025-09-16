@@ -2,16 +2,23 @@ import Config
 
 config :logger, level: :warning
 
-if Mix.env() == :test do
-  config :mix_test_watch, tasks: ["test", "credo"]
-end
+# if Mix.env() == :test do
+#   config :mix_test_watch, tasks: ["test", "credo"]
+# end
 
 if Mix.env() == :dev do
+  config :mix_test_interactive,
+    timestamp: true,
+    clear: true,
+    task: "test_and_lint"
+
   config :spark, :formatter,
     remove_parens?: true,
-    "Pyro.Component": [
+    "Pyro.ComponentLibrary": [
       section_order: [
-        :components
+        :theme,
+        :tailwind,
+        :component
       ]
     ]
 
