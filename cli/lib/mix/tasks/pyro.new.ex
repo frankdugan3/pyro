@@ -7,9 +7,11 @@ defmodule Mix.Tasks.Pyro.New do
 
   use Mix.Task
 
+  alias Logger.Backends.Console
+
   require Logger
 
-  Logger.configure_backend(Logger.Backends.Console, device: Owl.LiveScreen)
+  Logger.configure_backend(Console, device: Owl.LiveScreen)
 
   @impl true
   @doc false

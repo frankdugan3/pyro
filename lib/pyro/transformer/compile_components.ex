@@ -2,21 +2,22 @@ defmodule Pyro.Transformer.CompileComponents do
   @moduledoc false
   use Pyro.Transformer
 
+  alias Pyro.Transformer.MergeComponents
+
   @impl true
   def after?(module) do
-    module in [Pyro.Transformer.MergeComponents]
+    module in [MergeComponents]
   end
 
   @impl true
   def transform(dsl_state) do
-    if not Transformer.get_persisted(dsl_state, :component_library?, false) do
+    if Transformer.get_persisted(dsl_state, :component_library?, false) do
+      {:ok, dsl_state}
       # components = Pyro.Info.components(dsl_state)
       # live_components = Pyro.Info.live_components(dsl_state)
-
+    else
       dsl_state = dsl_state
 
-      {:ok, dsl_state}
-    else
       {:ok, dsl_state}
     end
   end

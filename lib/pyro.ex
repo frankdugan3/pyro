@@ -22,8 +22,7 @@ defmodule Pyro do
     ],
     many_extension_kinds: [:component_libraries, :theme_backends],
     extension_kind_types: [
-      component_libraries: {:wrap_list, {:spark, Pyro.ComponentLibrary}},
-      theme_backends: {:wrap_list, {:behaviour, Pyro.ThemeBackend}}
+      component_libraries: {:wrap_list, {:spark, Pyro.ComponentLibrary}}
     ],
     opt_schema: [
       component_output_path: [

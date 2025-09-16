@@ -45,14 +45,18 @@ defmodule Pyro.Info do
   #     Spark.Dsl.Extension.get_opt(pyro, [:components], :template_paths)
   #   end
 
+  alias Pyro.ComponentLibrary.Dsl.Component
+  alias Pyro.ComponentLibrary.Dsl.LiveComponent
+  alias Spark.Dsl.Extension
+
   @doc """
   Get a function component by name.
   """
   def component(pyro, name) do
     pyro
-    |> Spark.Dsl.Extension.get_entities([:components])
+    |> Extension.get_entities([:components])
     |> Enum.find(fn
-      %Pyro.ComponentLibrary.Dsl.Component{name: n} when name == n -> true
+      %Component{name: n} when name == n -> true
       _ -> false
     end)
   end
@@ -62,9 +66,9 @@ defmodule Pyro.Info do
   """
   def components(pyro) do
     pyro
-    |> Spark.Dsl.Extension.get_entities([:components])
+    |> Extension.get_entities([:components])
     |> Enum.filter(fn
-      %Pyro.ComponentLibrary.Dsl.Component{} -> true
+      %Component{} -> true
       _ -> false
     end)
   end
@@ -74,9 +78,9 @@ defmodule Pyro.Info do
   """
   def live_component(pyro, name) do
     pyro
-    |> Spark.Dsl.Extension.get_entities([:components])
+    |> Extension.get_entities([:components])
     |> Enum.find(fn
-      %Pyro.ComponentLibrary.Dsl.LiveComponent{name: n} when name == n -> true
+      %LiveComponent{name: n} when name == n -> true
       _ -> false
     end)
   end
@@ -86,9 +90,9 @@ defmodule Pyro.Info do
   """
   def live_components(pyro) do
     pyro
-    |> Spark.Dsl.Extension.get_entities([:components])
+    |> Extension.get_entities([:components])
     |> Enum.filter(fn
-      %Pyro.ComponentLibrary.Dsl.LiveComponent{} -> true
+      %LiveComponent{} -> true
       _ -> false
     end)
   end

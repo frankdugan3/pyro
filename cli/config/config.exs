@@ -1,3 +1,5 @@
 import Config
 
-config :logger, :backends, [Logger.Backends.Console]
+alias Logger.Backends.Console
+
+config :logger, :backends, [Console]

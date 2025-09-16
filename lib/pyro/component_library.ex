@@ -6,9 +6,7 @@ defmodule Pyro.ComponentLibrary do
   ```
   """
   use Spark.Dsl,
-    default_extensions: [extensions: [__MODULE__.Dsl]],
-    many_extension_kinds: [:theme_backends],
-    extension_kind_types: [theme_backends: {:wrap_list, {:behaviour, Pyro.ThemeBackend}}]
+    default_extensions: [extensions: [__MODULE__.Dsl]]
 
   @doc false
   @impl Spark.Dsl

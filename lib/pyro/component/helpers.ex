@@ -48,12 +48,12 @@ defmodule Pyro.Component.Helpers do
   def encode_flash(kind, message, opts) do
     {kind,
      Jason.encode!(%{
-       "ttl" => opts[:ttl],
-       "title" => opts[:title],
-       "icon_name" => opts[:icon_name],
        "close" => opts[:close],
+       "icon_name" => opts[:icon_name],
        "kind" => opts[:kind],
-       "message" => message
+       "message" => message,
+       "title" => opts[:title],
+       "ttl" => opts[:ttl]
      })}
   end
 
