@@ -31,12 +31,10 @@ defmodule Pyro.HeexParser do
   """
   @spec parse(String.t()) :: {:ok, [ast_node()]} | {:error, String.t()}
   def parse(template) when is_binary(template) do
-    try do
-      ast = parse_template(template, [])
-      {:ok, ast}
-    rescue
-      e -> {:error, Exception.message(e)}
-    end
+    ast = parse_template(template, [])
+    {:ok, ast}
+  rescue
+    e -> {:error, Exception.message(e)}
   end
 
   @doc """
@@ -282,9 +280,7 @@ defmodule Pyro.HeexParser do
   defp parse_text_content(template) do
     {text_content, remaining} = extract_text_content(template)
 
-    if text_content != "" do
-      {{:text, text_content}, remaining}
-    else
+    if text_content == "" do
       case template do
         <<char::utf8, rest::binary>> ->
           {{:text, <<char::utf8>>}, rest}
@@ -292,6 +288,8 @@ defmodule Pyro.HeexParser do
         "" ->
           {{:text, ""}, ""}
       end
+    else
+      {{:text, text_content}, remaining}
     end
   end
 

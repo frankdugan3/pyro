@@ -2,6 +2,9 @@ defmodule Pyro.MixProject do
   @moduledoc false
   use Mix.Project
 
+  alias Pyro.Component.Helpers
+  alias Pyro.Component.Template
+
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.3.7"
   @description """
@@ -26,10 +29,7 @@ defmodule Pyro.MixProject do
       aliases: aliases(),
       compilers: [:yecc] ++ Mix.compilers(),
       dialyzer: [plt_add_apps: [:mix]],
-      preferred_cli_env: [
-        "test.watch": :test,
-        docs: :docs
-      ]
+      preferred_cli_env: [docs: :docs]
     ]
   end
 
@@ -72,8 +72,8 @@ defmodule Pyro.MixProject do
           ~r/(^PyroComponents)/
         ],
         "Component Tooling": [
-          Pyro.Component.Helpers,
-          Pyro.Component.Template
+          Helpers,
+          Template
         ],
         Schema: [~r/(^Pyro.Schema)/],
         Transformer: [~r/(^Pyro.Transformer)/],
@@ -100,9 +100,7 @@ defmodule Pyro.MixProject do
         {"documentation/about.md", [default: true]},
         "documentation/suite.md",
         "CHANGELOG.md",
-        "documentation/tutorials/get-started.md",
-        "documentation/tutorials/extending-components.md",
-        "documentation/tutorials/class-variants.md"
+        "documentation/tutorials/get-started.md"
       ]
 
     unordered = Path.wildcard("documentation/**/*.{md,cheatmd,livemd}")
@@ -138,6 +136,7 @@ defmodule Pyro.MixProject do
     [
       # Code quality tooling
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:quokka, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, "~> 0.15",
@@ -145,7 +144,7 @@ defmodule Pyro.MixProject do
       {:faker, "~> 0.17", only: [:test, :dev]},
       {:floki, ">= 0.30.0", only: :test},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
-      {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
+      {:mix_test_interactive, ">= 0.0.0", only: :dev, runtime: false},
       # Build tooling
       {:ex_doc, ">= 0.0.0", only: :docs, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
@@ -157,8 +156,8 @@ defmodule Pyro.MixProject do
       # Core dependencies
       {:igniter, "~> 0.5"},
       {:sourceror, "~> 1.7"},
-      {:phoenix_live_view, "~> 1.0.0-rc.0"},
-      {:phoenix, "~> 1.7"},
+      {:phoenix_live_view, "~> 1.0"},
+      {:phoenix, "~> 1.8-rc.0", override: true},
       {:spark, "~> 2.1"},
       # These dependencies add optional features if installed
       {:tzdata, "~> 1.1", optional: true},
@@ -168,6 +167,7 @@ defmodule Pyro.MixProject do
 
   defp aliases do
     [
+      test_and_lint: ["test", "credo"],
       build: [
         "spark.formatter",
         "format"
@@ -182,11 +182,10 @@ defmodule Pyro.MixProject do
         "spark.replace_doc_links"
         # "spark.cheat_sheets_in_search"
       ],
-      "spark.cheat_sheets_in_search": "spark.cheat_sheets_in_search --extensions Pyro.Component",
-      "spark.formatter":
-        "spark.formatter --extensions Pyro.ComponentLibrary.Dsl,Pyro.ThemeBackend.Tailwind",
-      "spark.cheat_sheets":
-        "spark.cheat_sheets --extensions Pyro.ComponentLibrary.Dsl,Pyro.ThemeBackend.Tailwind",
+      "spark.cheat_sheets_in_search":
+        "spark.cheat_sheets_in_search --extensions Pyro.ComponentLibrary.Dsl",
+      "spark.formatter": "spark.formatter --extensions Pyro.ComponentLibrary.Dsl",
+      "spark.cheat_sheets": "spark.cheat_sheets --extensions Pyro.ComponentLibrary.Dsl",
       "archive.build": &raise_on_archive_build/1
     ]
   end

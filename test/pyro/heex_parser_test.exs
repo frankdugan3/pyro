@@ -1,5 +1,6 @@
 defmodule Pyro.HeexParserTest do
   use ExUnit.Case, async: true
+
   alias Pyro.HeexParser
 
   doctest Pyro.HeexParser, import: true
@@ -253,7 +254,7 @@ defmodule Pyro.HeexParserTest do
 
       assert HeexParser.encode(ast2) == template2
 
-      template3 = "<input type=\"text\" required value=\"test\" />"
+      template3 = ~s(<input type="text" required value="test" />)
       assert {:ok, ast3} = HeexParser.parse(template3)
 
       assert ast3 == [
@@ -321,15 +322,15 @@ defmodule Pyro.HeexParserTest do
       result = HeexParser.tally_attributes(ast, "pyro-*")
 
       assert result == %{
-               "pyro-test" => %{
-                 "value1" => 2,
-                 "value3" => 1
+               "pyro-component" => %{
+                 "button" => 1
                },
                "pyro-other" => %{
                  "value2" => 1
                },
-               "pyro-component" => %{
-                 "button" => 1
+               "pyro-test" => %{
+                 "value1" => 2,
+                 "value3" => 1
                }
              }
     end
@@ -363,8 +364,8 @@ defmodule Pyro.HeexParserTest do
 
       assert result == %{
                "pyro-value" => %{
-                 "@dynamic_value" => 1,
                  "@another_value" => 1,
+                 "@dynamic_value" => 1,
                  "static" => 1
                }
              }
@@ -381,17 +382,17 @@ defmodule Pyro.HeexParserTest do
       result = HeexParser.tally_attributes(ast, "pyro-*")
 
       assert result == %{
-               "pyro-type" => %{
-                 "static" => 2
+               "pyro-dynamic" => %{
+                 "@value" => 1
                },
                "pyro-flag" => %{
                  true => 1
                },
-               "pyro-dynamic" => %{
-                 "@value" => 1
-               },
                "pyro-other" => %{
                  "test" => 1
+               },
+               "pyro-type" => %{
+                 "static" => 2
                }
              }
     end
@@ -457,23 +458,23 @@ defmodule Pyro.HeexParserTest do
       result = HeexParser.tally_attributes(ast, "pyro-*")
 
       expected = %{
-        "pyro-component" => %{
-          "post" => 1,
-          "post-header" => 1,
-          "post-body" => 1,
-          "actions" => 1
-        },
-        "pyro-element" => %{
-          "title" => 1,
-          "timestamp" => 1,
-          "content" => 1
-        },
-        "pyro-enhanced" => %{
-          true => 2
-        },
         "pyro-action" => %{
           "like" => 1,
           "share" => 1
+        },
+        "pyro-component" => %{
+          "actions" => 1,
+          "post" => 1,
+          "post-body" => 1,
+          "post-header" => 1
+        },
+        "pyro-element" => %{
+          "content" => 1,
+          "timestamp" => 1,
+          "title" => 1
+        },
+        "pyro-enhanced" => %{
+          true => 2
         }
       }
 

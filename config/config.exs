@@ -5,23 +5,7 @@ config :logger, level: :warning
 # if Mix.env() == :test do
 #   config :mix_test_watch, tasks: ["test", "credo"]
 # end
-
 if Mix.env() == :dev do
-  config :mix_test_interactive,
-    timestamp: true,
-    clear: true,
-    task: "test_and_lint"
-
-  config :spark, :formatter,
-    remove_parens?: true,
-    "Pyro.ComponentLibrary": [
-      section_order: [
-        :theme,
-        :tailwind,
-        :component
-      ]
-    ]
-
   config :git_ops,
     mix_project: Mix.Project.get!(),
     changelog_file: "CHANGELOG.md",
@@ -45,4 +29,19 @@ if Mix.env() == :dev do
     # Pass in `true` to use `"README.md"` or a string to customize
     manage_readme_version: ["README.md", "documentation/tutorials/get-started.md"],
     version_tag_prefix: "v"
+
+  config :mix_test_interactive,
+    timestamp: true,
+    clear: true,
+    task: "test_and_lint"
+
+  config :spark, :formatter,
+    remove_parens?: true,
+    "Pyro.ComponentLibrary": [
+      section_order: [
+        :theme,
+        :tailwind,
+        :component
+      ]
+    ]
 end

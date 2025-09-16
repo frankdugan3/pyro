@@ -1,3 +1,4 @@
+# quokka:skip-module-reordering
 defmodule Pyro.ComponentLibrary.Dsl do
   @moduledoc false
 
@@ -23,6 +24,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
             values: list() | nil
           }
 
+    # quokka:sort
     defstruct [
       :default,
       :doc,
@@ -37,12 +39,14 @@ defmodule Pyro.ComponentLibrary.Dsl do
   end
 
   @prop %Spark.Dsl.Entity{
+    args: [:name, :type],
     describe: """
     Declare/extend a component prop.
     """,
     name: :prop,
+    # quokka:sort
     schema: [
-      default: [type: :any, doc: "default value for the prop"],
+      default: [doc: "default value for the prop", type: :any],
       doc: [type: :string, doc: "documentation for the prop"],
       examples: [
         type: {:wrap_list, :any},
@@ -66,98 +70,89 @@ defmodule Pyro.ComponentLibrary.Dsl do
       ],
       values: [type: {:list, :any}, doc: "exhaustive list of accepted values"]
     ],
-    target: __MODULE__.Prop,
-    args: [:name, :type]
+    target: __MODULE__.Prop
   }
 
   defmodule Global do
     @moduledoc false
-    @type t :: %__MODULE__{
-            name: atom(),
-            doc: String.t() | nil,
-            include: list(String.t()) | nil
-          }
+    @type t :: %__MODULE__{doc: String.t() | nil, include: list(String.t()) | nil, name: atom()}
 
-    defstruct [:include, :name, :doc]
+    # quokka:sort
+    defstruct [:doc, :include, :name]
   end
 
   @global %Spark.Dsl.Entity{
+    args: [:name],
     describe: """
     Declare/extend a global attribute prop.
     """,
     name: :global,
+    # quokka:sort
     schema: [
-      doc: [type: :string, doc: "documentation for the prop"],
+      doc: [doc: "documentation for the prop", type: :string],
       include: [type: {:wrap_list, :string}, doc: "extra global attributes to include"],
       name: [type: :atom, required: true, doc: "name of the prop"]
     ],
-    target: __MODULE__.Global,
-    args: [:name]
+    target: __MODULE__.Global
   }
 
   defmodule Variant do
     @moduledoc false
-    @type t :: %__MODULE__{
-            name: atom()
-          }
+    @type t :: %__MODULE__{name: atom()}
 
-    defstruct [
-      :name
-    ]
+    # quokka:sort
+    defstruct [:name]
   end
 
   @variant %Spark.Dsl.Entity{
+    args: [:name],
     describe: """
     Declare a prop constrained to a theme variant.
     """,
     name: :variant,
+    # quokka:sort
     schema: [
       name: [
-        type: :atom,
+        doc: "name of the prop",
         required: true,
-        doc: "name of the prop"
+        type: :atom
       ]
     ],
-    target: __MODULE__.Variant,
-    args: [:name]
+    target: __MODULE__.Variant
   }
 
   defmodule Calc do
     @moduledoc false
-    @type t :: %__MODULE__{
-            calculation: (map() -> any()),
-            name: atom()
-          }
+    @type t :: %__MODULE__{calculation: (map() -> any()), name: atom()}
 
-    defstruct [
-      :calculation,
-      :name
-    ]
+    # quokka:sort
+    defstruct [:calculation, :name]
   end
 
   @calc %Spark.Dsl.Entity{
+    args: [:name, :calculation],
     describe: """
     Declare a calculation.
     """,
     name: :calc,
+    # quokka:sort
     schema: [
+      calculation: [
+        doc: "arity-1 function that recieves `assigns`, setting the value on render",
+        type: {:fun, [:map], :any}
+      ],
       name: [
         type: :atom,
         required: true,
         doc: "name of the assign"
-      ],
-      calculation: [
-        type: {:fun, [:map], :any},
-        doc: "arity-1 function that recieves `assigns`, setting the value on render"
       ]
     ],
-    target: __MODULE__.Calc,
-    args: [:name, :calculation],
     snippet: """
     calc :${1}, fn assigns ->
       ${0}
     end
-    """
+    """,
+    target: __MODULE__.Calc
   }
 
   defmodule Slot do
@@ -166,28 +161,38 @@ defmodule Pyro.ComponentLibrary.Dsl do
     alias Pyro.ComponentLibrary.Dsl
 
     @type t :: %__MODULE__{
+            attrs: list(Dsl.Prop.t()),
             doc: String.t() | nil,
             name: atom(),
-            attrs: list(Dsl.Prop.t()),
             required: boolean(),
             validate_attrs: boolean()
           }
 
+    # quokka:sort
     defstruct [
+      :attrs,
       :doc,
       :name,
-      :attrs,
       :required,
       :validate_attrs
     ]
   end
 
   @slot %Spark.Dsl.Entity{
+    args: [:name],
     describe: """
     Declare/extend a component slot.
     """,
+    entities: [
+      attrs: [@prop]
+    ],
     name: :slot,
+    # quokka:sort
     schema: [
+      doc: [
+        doc: "documentation for the slot",
+        type: :string
+      ],
       name: [
         type: :atom,
         required: true,
@@ -200,17 +205,9 @@ defmodule Pyro.ComponentLibrary.Dsl do
       validate_attrs: [
         type: :boolean,
         doc: "validate attributes passed to slot (default: `true`)"
-      ],
-      doc: [
-        type: :string,
-        doc: "documentation for the slot"
       ]
     ],
-    target: __MODULE__.Slot,
-    args: [:name],
-    entities: [
-      attrs: [@prop]
-    ]
+    target: __MODULE__.Slot
   }
 
   defmodule Render do
@@ -218,31 +215,23 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
     alias Pyro.ComponentLibrary.Dsl
 
-    @type t :: %__MODULE__{
-            args: any(),
-            expr: any(),
-            template: String.t()
-          }
+    @type t :: %__MODULE__{args: any(), expr: any(), template: String.t()}
 
-    defstruct [
-      :args,
-      :expr,
-      :template
-    ]
+    # quokka:sort
+    defstruct [:args, :expr, :template]
   end
 
   @render %Spark.Dsl.Entity{
+    args: [:args, :expr],
     describe: """
     """,
+    imports: [Pyro.ComponentLibrary.TemplateHelpers],
     name: :render,
+    # quokka:sort
     schema: [
-      args: [type: :quoted, required: true],
+      args: [required: true, type: :quoted],
       expr: [type: :quoted, required: true]
     ],
-    target: __MODULE__.Render,
-    args: [:args, :expr],
-    imports: [Pyro.ComponentLibrary.TemplateHelpers],
-    transform: {Pyro.ComponentLibrary.TemplateHelpers, :transform_component_render, []},
     snippet: ~S[
       render assigns do
         ~H"""
@@ -251,7 +240,9 @@ defmodule Pyro.ComponentLibrary.Dsl do
         </div>
         """
       end
-      ]
+      ],
+    target: __MODULE__.Render,
+    transform: {Pyro.ComponentLibrary.TemplateHelpers, :transform_component_render, []}
   }
 
   defmodule Component do
@@ -260,49 +251,54 @@ defmodule Pyro.ComponentLibrary.Dsl do
     alias Pyro.ComponentLibrary.Dsl
 
     @type t :: %__MODULE__{
+            assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
             classes: list(atom()),
             doc: String.t() | nil,
             name: atom(),
             private?: boolean(),
-            assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
-            slots: list(Dsl.Slot.t()),
-            render: list(Dsl.Render.t())
+            render: list(Dsl.Render.t()),
+            slots: list(Dsl.Slot.t())
           }
 
+    # quokka:sort
     defstruct [
+      :assigns,
       :classes,
       :doc,
       :name,
       :private?,
-      :assigns,
-      :slots,
-      :render
+      :render,
+      :slots
     ]
   end
 
+  # quokka:sort
   @shared_component_schema [
     classes: [type: {:wrap_list, :atom}, doc: "list of class props", default: [:class]],
+    doc: [
+      type: :string,
+      doc: "documentation for the component"
+    ],
     name: [
       type: :atom,
       required: true,
       doc: "name of the component"
-    ],
-    doc: [
-      type: :string,
-      doc: "documentation for the component"
     ]
   ]
 
+  # quokka:sort
   @shared_component_entities [
-    assigns: [@prop, @global, @variant, @calc],
-    slots: [@slot],
-    render: [@render]
+    assigns: [@calc, @global, @prop, @variant],
+    render: [@render],
+    slots: [@slot]
   ]
 
   @component %Spark.Dsl.Entity{
+    args: [:name],
     describe: """
     Declare/extend a component.
     """,
+    entities: @shared_component_entities,
     name: :component,
     schema:
       @shared_component_schema ++
@@ -312,9 +308,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
             doc: "mark the component as private (default: `false`)"
           ]
         ],
-    target: __MODULE__.Component,
-    args: [:name],
-    entities: @shared_component_entities
+    target: __MODULE__.Component
   }
 
   defmodule LiveComponent do
@@ -323,14 +317,15 @@ defmodule Pyro.ComponentLibrary.Dsl do
     alias Pyro.ComponentLibrary.Dsl
 
     @type t :: %__MODULE__{
+            assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
             classes: list(atom()),
             components: list(Dsl.Component.t()),
             doc: binary() | nil,
             name: atom(),
-            assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
             slots: list(Dsl.Slot.t())
           }
 
+    # quokka:sort
     defstruct [
       :assigns,
       :classes,
@@ -343,54 +338,67 @@ defmodule Pyro.ComponentLibrary.Dsl do
   end
 
   live_component = %Spark.Dsl.Entity{
+    args: [:name],
     describe: """
     Declare/extend a live component.
     """,
-    name: :live_component,
-    schema: @shared_component_schema,
-    target: __MODULE__.LiveComponent,
-    args: [:name],
     entities:
       @shared_component_entities ++
         [
           components: [@component]
-          # template: [@template]
-          # handle_async: [handle_async],
-          # handle_event: [handle_event],
-          # mount: [mount],
-          # update: [update],
-          # update_many: [update_many]
-        ]
+        ],
+    name: :live_component,
+    schema: @shared_component_schema,
+    target: __MODULE__.LiveComponent
+    # template: [@template]
+    # handle_async: [handle_async],
+    # handle_event: [handle_event],
+    # mount: [mount],
+    # update: [update],
+    # update_many: [update_many]
   }
 
   @components %Spark.Dsl.Section{
-    name: :components,
-    top_level?: true,
     describe: """
     List of components to declare/extend.
     """,
-    entities: [
-      @component
-      # live_component
-    ]
+    entities: [@component],
+    name: :components,
+    top_level?: true
+    # live_component
   }
 
   defmodule ThemeProperty do
     @moduledoc false
-    defstruct [:name, :default, :variants, :tokens, :doc]
+    # quokka:sort
+    defstruct [:default, :doc, :name, :tokens, :variants]
   end
 
   @token_type {:one_of, ~w[color size]a}
   @theme_property %Spark.Dsl.Entity{
-    name: :theme,
+    args: [:name, {:optional, :type}],
     describe: """
     Declare/extend a theme property.
     """,
+    name: :theme,
+    # quokka:sort
     schema: [
+      default: [
+        doc: "default variant",
+        type: :atom
+      ],
+      doc: [
+        type: :string,
+        doc: "documentation for the component"
+      ],
       name: [
         type: :atom,
         required: true,
         doc: "name of the property"
+      ],
+      tokens: [
+        type: {:list, {:or, [:atom, {:tuple, [:atom, @token_type]}]}},
+        doc: "tokens of this property"
       ],
       type: [
         type: @token_type,
@@ -400,31 +408,18 @@ defmodule Pyro.ComponentLibrary.Dsl do
       variants: [
         type: {:list, :atom},
         doc: "variants of this property"
-      ],
-      tokens: [
-        type: {:list, {:or, [:atom, {:tuple, [:atom, @token_type]}]}},
-        doc: "tokens of this property"
-      ],
-      default: [
-        type: :atom,
-        doc: "default variant"
-      ],
-      doc: [
-        type: :string,
-        doc: "documentation for the component"
       ]
     ],
-    target: __MODULE__.ThemeProperty,
-    args: [:name, {:optional, :type}]
+    target: __MODULE__.ThemeProperty
   }
 
   @theme_properties %Spark.Dsl.Section{
-    top_level?: true,
     describe: """
     List of theme properties to declare/extend.
     """,
+    entities: [@theme_property],
     name: :theme_properties,
-    entities: [@theme_property]
+    top_level?: true
   }
 
   @transformers [
@@ -432,7 +427,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Pyro.Transformer.CompileComponents
   ]
 
-  # verifiers = [Pyro.Verifier.ImplementsCssStrategies]
   @verifiers []
 
   @sections [@theme_properties, @components]

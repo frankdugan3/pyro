@@ -2,6 +2,12 @@ defmodule Pyro.Transformer.MergeComponents do
   @moduledoc false
   use Pyro.Transformer
 
+  alias Pyro.ComponentLibrary.Dsl.Calc
+  alias Pyro.ComponentLibrary.Dsl.Component
+  alias Pyro.ComponentLibrary.Dsl.Global
+  alias Pyro.ComponentLibrary.Dsl.LiveComponent
+  alias Pyro.ComponentLibrary.Dsl.Prop
+
   @impl true
   def transform(dsl_state) do
     if Transformer.get_persisted(dsl_state, :component_library?, false) do
@@ -43,11 +49,7 @@ defmodule Pyro.Transformer.MergeComponents do
     end
   end
 
-  defp merge_live_component(
-         %Pyro.ComponentLibrary.Dsl.LiveComponent{} = live_component,
-         acc,
-         scope
-       ) do
+  defp merge_live_component(%LiveComponent{} = live_component, acc, scope) do
     acc
     |> Map.put_new(live_component.name, live_component)
     |> Map.update!(live_component.name, fn old_live_component ->
@@ -65,7 +67,7 @@ defmodule Pyro.Transformer.MergeComponents do
     end)
   end
 
-  defp merge_component(%Pyro.ComponentLibrary.Dsl.Component{} = component, acc, scope) do
+  defp merge_component(%Component{} = component, acc, scope) do
     acc
     |> Map.put_new(component.name, component)
     |> Map.update!(component.name, fn old_component ->
@@ -83,7 +85,7 @@ defmodule Pyro.Transformer.MergeComponents do
     (old_assigns ++
        new_assigns)
     |> Enum.reduce(%{}, fn
-      %Pyro.ComponentLibrary.Dsl.Global{} = global, assigns ->
+      %Global{} = global, assigns ->
         assigns
         |> Map.put_new(global.name, global)
         |> Map.update!(global.name, fn old_global ->
@@ -92,14 +94,14 @@ defmodule Pyro.Transformer.MergeComponents do
           |> merge_doc(global)
         end)
 
-      %Pyro.ComponentLibrary.Dsl.Calc{} = calc, assigns ->
+      %Calc{} = calc, assigns ->
         assigns
         |> Map.put_new(calc.name, calc)
         |> Map.update!(calc.name, fn old_calc ->
           maybe_override(old_calc, :calculation, calc)
         end)
 
-      %Pyro.ComponentLibrary.Dsl.Prop{} = prop, assigns ->
+      %Prop{} = prop, assigns ->
         assigns
         |> Map.put_new(prop.name, prop)
         |> Map.update!(prop.name, fn old_prop ->

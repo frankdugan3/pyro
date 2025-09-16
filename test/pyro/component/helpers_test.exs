@@ -2,5 +2,7 @@ defmodule Pyro.Component.HelpersTest do
   @moduledoc false
   use ExUnit.Case, async: true
 
-  doctest Pyro.Component.Helpers, import: true
+  alias Pyro.Component.Helpers
+
+  doctest Helpers, import: true
 end
