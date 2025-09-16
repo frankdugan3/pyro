@@ -2,8 +2,8 @@ defmodule Pyro.Transformer do
   @moduledoc """
   Shared tooling for transforming Pyro DSL.
   """
-  alias Pyro.Schema.Component
-  alias Pyro.Schema.LiveComponent
+  alias Pyro.ComponentLibrary.Dsl.Component
+  alias Pyro.ComponentLibrary.Dsl.LiveComponent
   alias Spark.Dsl.Transformer
 
   @doc """
