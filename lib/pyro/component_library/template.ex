@@ -8,12 +8,17 @@ defmodule Pyro.ComponentLibrary.TemplateHelpers do
   end
 
   def transform_component_render(%Render{args: args, expr: expr} = entity) do
+    dbg(expr)
+
     cond do
+      not has_var?(args, :assigns) ->
+        {:error, "~H requires a variable named \"assigns\" to exist and be set to a map"}
+
       not has_sigil?(expr, :sigil_H) ->
         {:error, "A Pyro component is expected to use ~H in the render function"}
 
-      not has_var?(args, :assigns) ->
-        {:error, "~H requires a variable named \"assigns\" to exist and be set to a map"}
+      not has_attribute?(expr, :"pyro-component") ->
+        {:error, "A Pyro component requires the `pyro-component` attrbute"}
 
       true ->
         {:ok, entity}
@@ -40,5 +45,27 @@ defmodule Pyro.ComponentLibrary.TemplateHelpers do
         {node, acc}
     end)
     |> elem(1)
+  end
+
+  defp has_attribute?(ast, attr_name) when is_atom(attr_name) do
+    attr_string = Atom.to_string(attr_name)
+    sigils = collect_sigil_h(ast)
+    sigils != [] and Enum.all?(sigils, &sigil_has_attribute?(&1, attr_string))
+  end
+
+  defp collect_sigil_h(ast) do
+    Macro.prewalk(ast, [], fn
+      {:sigil_H, _meta, [{:<<>>, _string_meta, [content]}, _opts]} = node, acc ->
+        {node, [content | acc]}
+
+      node, acc ->
+        {node, acc}
+    end)
+    |> elem(1)
+    |> Enum.reverse()
+  end
+
+  defp sigil_has_attribute?(content, attr_string) when is_binary(content) do
+    String.contains?(content, attr_string)
   end
 end
