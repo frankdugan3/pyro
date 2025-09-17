@@ -143,6 +143,7 @@ defmodule Pyro.MixProject do
        [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
       {:faker, "~> 0.17", only: [:test, :dev]},
       {:floki, ">= 0.30.0", only: :test},
+      {:usage_rules, ">= 0.0.0", only: :dev},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
       {:mix_test_interactive, ">= 0.0.0", only: :dev, runtime: false},
       # Build tooling
@@ -167,6 +168,16 @@ defmodule Pyro.MixProject do
 
   defp aliases do
     [
+      usage: """
+      usage_rules.sync CLAUDE.md --all \
+        --yes --remove-missing \
+        --link-style at \
+        --link-to-folder deps \
+      """,
+      update: [
+        "deps.update --all",
+        "usage"
+      ],
       test_and_lint: ["test", "credo"],
       build: [
         "spark.formatter",
