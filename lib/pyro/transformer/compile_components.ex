@@ -13,11 +13,11 @@ defmodule Pyro.Transformer.CompileComponents do
   def transform(dsl_state) do
     if Transformer.get_persisted(dsl_state, :component_library?, false) do
       {:ok, dsl_state}
-      # components = Pyro.Info.components(dsl_state)
-      # live_components = Pyro.Info.live_components(dsl_state)
     else
       dsl_state = dsl_state
 
+      # components = Pyro.Info.components(dsl_state)
+      # live_components = Pyro.Info.live_components(dsl_state)
       {:ok, dsl_state}
     end
   end

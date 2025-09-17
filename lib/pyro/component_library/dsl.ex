@@ -350,12 +350,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     name: :live_component,
     schema: @shared_component_schema,
     target: __MODULE__.LiveComponent
-    # template: [@template]
-    # handle_async: [handle_async],
-    # handle_event: [handle_event],
-    # mount: [mount],
-    # update: [update],
-    # update_many: [update_many]
   }
 
   @components %Spark.Dsl.Section{
@@ -365,7 +359,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     entities: [@component],
     name: :components,
     top_level?: true
-    # live_component
   }
 
   defmodule ThemeProperty do
