@@ -8,8 +8,6 @@ defmodule Pyro.ComponentLibrary.TemplateHelpers do
   end
 
   def transform_component_render(%Render{args: args, expr: expr} = entity) do
-    dbg(expr)
-
     cond do
       not has_var?(args, :assigns) ->
         {:error, "~H requires a variable named \"assigns\" to exist and be set to a map"}
