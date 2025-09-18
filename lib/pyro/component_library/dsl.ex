@@ -75,10 +75,15 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
   defmodule Global do
     @moduledoc false
-    @type t :: %__MODULE__{doc: String.t() | nil, include: list(String.t()) | nil, name: atom()}
+    @type t :: %__MODULE__{
+            skip_template_validation?: boolean(),
+            doc: String.t() | nil,
+            include: list(String.t()) | nil,
+            name: atom()
+          }
 
     # quokka:sort
-    defstruct [:doc, :include, :name]
+    defstruct [:doc, :include, :name, :skip_template_validation?]
   end
 
   @global %Spark.Dsl.Entity{
@@ -91,7 +96,8 @@ defmodule Pyro.ComponentLibrary.Dsl do
     schema: [
       doc: [doc: "documentation for the prop", type: :string],
       include: [type: {:wrap_list, :string}, doc: "extra global attributes to include"],
-      name: [type: :atom, required: true, doc: "name of the prop"]
+      name: [type: :atom, required: true, doc: "name of the prop"],
+      skip_template_validation?: [doc: "skip validating exists in ~H template", type: :boolean]
     ],
     target: __MODULE__.Global
   }

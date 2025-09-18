@@ -91,6 +91,7 @@ defmodule Pyro.Transformer.MergeComponents do
         |> Map.update!(global.name, fn old_global ->
           old_global
           |> maybe_override(:include, global)
+          |> maybe_override(:skip_template_validation?, global)
           |> merge_doc(global)
         end)
 
