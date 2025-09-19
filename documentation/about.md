@@ -19,7 +19,7 @@ To install Pyro and learn how it works, start at the [Get Started](get-started.h
 
 Component libraries generally suffer from a lack of extensibility. Because of this, there tends to be a substantial churn to add features and configuration options that leads to bloat and maintenance pain. On the other hand, minimalist libraries tend to leave a lot of boilerplate work for the consumer. Symptoms like this are why `phx.new` opts to generate a `core_components.ex` file for you customize. It's a great start, but requires a ton of customization to do much of anything.
 
-Pyro aims to provide a middle ground: Components that can be *extended*. It leverages a DSL to describe how a component should be built (it's a superset of `Phoenix.Component`'s DSL), and wraps it with "transformers" that merge component libraries together with your customizations to produce a bespoke component library.
+Pyro aims to provide a middle ground: Components that can be _extended_. It leverages a DSL to describe how a component should be built (it's a superset of `Phoenix.Component`'s DSL), and wraps it with "transformers" that merge component libraries together with your customizations to produce a bespoke component library.
 
 Here's a quick example.
 
@@ -66,19 +66,17 @@ end
 
 That should look really familiar if you've written a `Phoenix.Component` before, aside from a few interesting additions. But why bother with creating a DSL to write components that are already declarative?
 
-*Extensibility.* We won't get into the details here, but you may have noticed:
+_Extensibility._ We won't get into the details here, but you may have noticed:
 
 - This button library gave several "strategies" for generating CSS
-- There were *variables* and *templates*.
+- There were _variables_ and _templates_.
 
 So let's go ahead and use this component, changing up a few things:
 
 ```elixir
 defmodule MyAppWeb.CoreComponents do
   use Pyro,
-    component_libraries: [SimpleButton],
-    # That :tailwind strategy looks good
-    css_strategy: :tailwind
+    component_libraries: [SimpleButton]
 
   # We don't want a prefix
   variables %{prefix: ""}

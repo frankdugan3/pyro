@@ -20,6 +20,5 @@ defmodule Pyro.OptionTest do
   # end
   #
   # test "default options are propagated from libraries" do
-  #   assert :tailwind = Pyro.Info.css_strategy(Custom)
   # end
 end
