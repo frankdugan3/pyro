@@ -83,7 +83,8 @@ defmodule Pyro.HeexParser do
   @spec tally_attributes([ast_node()] | ast_node(), String.t()) :: %{
           String.t() => %{any() => non_neg_integer()}
         }
-  def tally_attributes(ast, attribute_pattern) when is_binary(attribute_pattern) do
+  def tally_attributes(ast, attribute_pattern)
+      when is_binary(attribute_pattern) and is_list(ast) do
     is_wildcard = String.ends_with?(attribute_pattern, "*")
 
     pattern_prefix =
@@ -92,6 +93,205 @@ defmodule Pyro.HeexParser do
     ast
     |> List.wrap()
     |> traverse_for_attributes(%{}, is_wildcard, pattern_prefix)
+  end
+
+  @doc """
+  Removes matching attributes from the AST and returns them with their paths.
+
+  Takes the same arguments as `tally_attributes/2` but instead of counting occurrences,
+  it removes matching attributes from the AST and returns a tuple containing the
+  modified AST and a list of removed attributes with their paths.
+
+  Each removed attribute is represented as `{path, attribute_name, attribute_value}` where:
+  - `path` is a list of integers representing the path to the element in the AST
+  - `attribute_name` is the string name of the attribute
+  - `attribute_value` is the processed attribute value (same as tally_attributes)
+
+  Supports exact attribute names or wildcard patterns ending with '*'.
+  Boolean attributes have their values processed the same way as in tally_attributes.
+  HEEx expressions in attribute values are preserved as-is.
+
+  ## Examples
+
+      iex> ast = [{:element, "div", [{"pyro-component", "button", " "}, {"class", "btn", " "}], []}]
+      iex> pop_attributes(ast, "pyro-component")
+      {[{:element, "div", [{"class", "btn", " "}], []}], [{[0], "pyro-component", "button"}]}
+
+      iex> ast = [
+      ...>   {:element, "div", [{"pyro-test", "value1", " "}], [
+      ...>     {:element, "span", [{"pyro-test", "value2", " "}, {"other", "keep", " "}], []}
+      ...>   ]}
+      ...> ]
+      iex> pop_attributes(ast, "pyro-*")
+      {[{:element, "div", [], [{:element, "span", [{"other", "keep", " "}], []}]}],
+       [{[0], "pyro-test", "value1"}, {[0, 0], "pyro-test", "value2"}]}
+
+  """
+  @spec pop_attributes([ast_node()] | ast_node(), String.t()) ::
+          {[ast_node()], [{[non_neg_integer()], String.t(), any()}]}
+  def pop_attributes(ast, attribute_pattern) when is_binary(attribute_pattern) and is_list(ast) do
+    is_wildcard = String.ends_with?(attribute_pattern, "*")
+
+    pattern_prefix =
+      if is_wildcard, do: String.slice(attribute_pattern, 0..-2//1), else: attribute_pattern
+
+    {new_ast, popped_attrs} =
+      ast
+      |> List.wrap()
+      |> pop_attributes_from_nodes([], [], is_wildcard, pattern_prefix, [])
+
+    {new_ast, popped_attrs}
+  end
+
+  defp pop_attributes_from_nodes([], acc_ast, acc_popped, _is_wildcard, _pattern_prefix, _path) do
+    {Enum.reverse(acc_ast), acc_popped}
+  end
+
+  defp pop_attributes_from_nodes(
+         [node | rest],
+         acc_ast,
+         acc_popped,
+         is_wildcard,
+         pattern_prefix,
+         path
+       ) do
+    current_path = path ++ [length(acc_ast)]
+
+    {new_node, node_popped} =
+      pop_attributes_from_node(node, is_wildcard, pattern_prefix, current_path)
+
+    pop_attributes_from_nodes(
+      rest,
+      [new_node | acc_ast],
+      node_popped ++ acc_popped,
+      is_wildcard,
+      pattern_prefix,
+      path
+    )
+  end
+
+  defp pop_attributes_from_node(
+         {:element, tag_name, attributes, children},
+         is_wildcard,
+         pattern_prefix,
+         path
+       ) do
+    {new_attributes, popped_attrs} =
+      pop_matching_attributes(attributes, [], [], is_wildcard, pattern_prefix, path)
+
+    {new_children, children_popped} =
+      pop_attributes_from_nodes(children, [], [], is_wildcard, pattern_prefix, path)
+
+    new_element = {:element, tag_name, Enum.reverse(new_attributes), new_children}
+    {new_element, Enum.reverse(popped_attrs, children_popped)}
+  end
+
+  defp pop_attributes_from_node(other_node, _is_wildcard, _pattern_prefix, _path) do
+    {other_node, []}
+  end
+
+  defp pop_matching_attributes([], acc_attrs, acc_popped, _is_wildcard, _pattern_prefix, _path) do
+    {acc_attrs, acc_popped}
+  end
+
+  defp pop_matching_attributes(
+         [{attr_name, attr_value, whitespace} | rest],
+         acc_attrs,
+         acc_popped,
+         is_wildcard,
+         pattern_prefix,
+         path
+       ) do
+    if attribute_matches?(attr_name, is_wildcard, pattern_prefix) do
+      processed_value = process_attribute_value(attr_name, attr_value)
+      popped_entry = {path, attr_name, processed_value}
+
+      pop_matching_attributes(
+        rest,
+        acc_attrs,
+        [popped_entry | acc_popped],
+        is_wildcard,
+        pattern_prefix,
+        path
+      )
+    else
+      pop_matching_attributes(
+        rest,
+        [{attr_name, attr_value, whitespace} | acc_attrs],
+        acc_popped,
+        is_wildcard,
+        pattern_prefix,
+        path
+      )
+    end
+  end
+
+  @doc """
+  Adds an attribute to an element at the specified path in the AST.
+
+  The path is a list of integers representing the location of the target element
+  in the AST tree, following the same format as used by `pop_attributes/2`.
+
+  The attribute will be added to the element's attribute list with default
+  whitespace (" ").
+
+  ## Examples
+
+      iex> ast = [{:element, "div", [{"class", "btn", " "}], []}]
+      iex> add_attribute(ast, [0], "id", "my-div")
+      [{:element, "div", [{"class", "btn", " "}, {"id", "my-div", " "}], []}]
+
+      iex> ast = [{:element, "div", [], [{:element, "span", [], []}]}]
+      iex> add_attribute(ast, [0, 0], "class", "highlight")
+      [{:element, "div", [], [{:element, "span", [{"class", "highlight", " "}], []}]}]
+
+  """
+  @spec add_attribute(
+          [ast_node()],
+          [non_neg_integer()],
+          String.t(),
+          String.t() | boolean() | heex_expr()
+        ) :: [
+          ast_node()
+        ]
+  def add_attribute(ast, path, attribute, value)
+      when is_list(ast) and is_list(path) and is_binary(attribute) do
+    add_attribute_at_path(ast, path, attribute, value)
+  end
+
+  defp add_attribute_at_path(_ast, [], _attribute, _value) do
+    raise ArgumentError, "Cannot add attribute at empty path - path must target an element"
+  end
+
+  defp add_attribute_at_path(ast, [index], attribute, value) when is_list(ast) do
+    List.update_at(ast, index, fn
+      {:element, tag_name, attributes, children} ->
+        new_attribute = {attribute, normalize_attribute_value(value), " "}
+        {:element, tag_name, attributes ++ [new_attribute], children}
+
+      other ->
+        raise ArgumentError, "Cannot add attribute to non-element node: #{inspect(other)}"
+    end)
+  end
+
+  defp add_attribute_at_path(ast, [index | rest_path], attribute, value) when is_list(ast) do
+    List.update_at(ast, index, fn
+      {:element, tag_name, attributes, children} ->
+        updated_children = add_attribute_at_path(children, rest_path, attribute, value)
+        {:element, tag_name, attributes, updated_children}
+
+      other ->
+        raise ArgumentError, "Cannot navigate through non-element node: #{inspect(other)}"
+    end)
+  end
+
+  defp normalize_attribute_value(value) when is_binary(value), do: value
+  defp normalize_attribute_value(true), do: true
+  defp normalize_attribute_value({:heex_expr, _content} = heex), do: heex
+
+  defp normalize_attribute_value(other) do
+    raise ArgumentError,
+          "Invalid attribute value type: #{inspect(other)}. Expected string, boolean, or heex_expr."
   end
 
   defp traverse_for_attributes([], acc, _is_wildcard, _pattern_prefix), do: acc
@@ -107,15 +307,12 @@ defmodule Pyro.HeexParser do
          is_wildcard,
          pattern_prefix
        ) do
-    # Process attributes for this element
     attr_acc = process_attributes(attributes, acc, is_wildcard, pattern_prefix)
 
-    # Recursively process children
     traverse_for_attributes(children, attr_acc, is_wildcard, pattern_prefix)
   end
 
   defp traverse_node_for_attributes(_other_node, acc, _is_wildcard, _pattern_prefix) do
-    # For text, comments, eex_expr, heex_expr nodes, just return the accumulator unchanged
     acc
   end
 
@@ -148,13 +345,9 @@ defmodule Pyro.HeexParser do
 
   defp process_attribute_value(attr_name, attr_value) do
     case attr_value do
-      # Boolean attribute (key == value)
       ^attr_name -> true
-      # HEEx expression - convert to string representation
       {:heex_expr, content} -> content
-      # Regular string value
       value when is_binary(value) -> value
-      # Fallback for any other type
       other -> to_string(other)
     end
   end
@@ -223,7 +416,6 @@ defmodule Pyro.HeexParser do
     end
   end
 
-  # Detect what type of node we're looking at
   defp detect_node_type("<%=" <> rest), do: {:eex_expr, "=", rest}
   defp detect_node_type("<%%" <> rest), do: {:eex_expr, "%", rest}
   defp detect_node_type("<%!--" <> rest), do: {:eex_expr, "!--", rest}
@@ -412,7 +604,6 @@ defmodule Pyro.HeexParser do
         {tag_name, []}
 
       {tag_name, remaining} ->
-        # Don't trim the leading whitespace - preserve it for the first attribute
         attributes = parse_attributes_lexer(remaining, [])
         {tag_name, attributes}
     end
@@ -443,12 +634,15 @@ defmodule Pyro.HeexParser do
             parse_attributes_lexer(remaining, [{key, value, whitespace} | acc])
 
           :error ->
-            # Skip invalid attribute and continue
-            case String.split(string_without_ws, ~r/\s+/, parts: 2) do
-              [_invalid, remaining] -> parse_attributes_lexer(remaining, acc)
-              [_] -> Enum.reverse(acc)
-            end
+            handle_invalid_attribute(string_without_ws, acc)
         end
+    end
+  end
+
+  defp handle_invalid_attribute(string_without_ws, acc) do
+    case String.split(string_without_ws, ~r/\s+/, parts: 2) do
+      [_invalid, remaining] -> parse_attributes_lexer(remaining, acc)
+      [_] -> Enum.reverse(acc)
     end
   end
 
@@ -467,14 +661,12 @@ defmodule Pyro.HeexParser do
 
   defp consume_attribute(string) do
     case consume_attribute_name(string, "") do
-      # Valued
       {key, "=" <> rest} ->
         case consume_attribute_value(rest) do
           {value, remaining} -> {key, value, remaining}
           :error -> :error
         end
 
-      # Boolean
       {key, remaining} ->
         remaining = skip_whitespace(remaining)
         {key, key, remaining}
