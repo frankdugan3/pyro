@@ -225,6 +225,96 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
     # quokka:sort
     defstruct [:args, :expr, :template]
+
+    def transform(%__MODULE__{args: args, expr: expr} = entity) do
+      if has_var?(args, :assigns) do
+        case validate_attributes(expr) do
+          :ok -> {:ok, entity}
+          {:error, reason} -> {:error, reason}
+        end
+      else
+        {:error, "~H requires a variable named \"assigns\" to exist and be set to a map"}
+      end
+    end
+
+    # TODO: These helpers need to be simplified and probably belong in a better place, since they are generally useful in transformer hooks.
+    defp has_var?(ast, var_name) when is_atom(var_name) do
+      Macro.prewalk(ast, false, fn
+        {^var_name, _, context} = node, _acc when is_atom(context) or is_nil(context) ->
+          {node, true}
+
+        node, acc ->
+          {node, acc}
+      end)
+      |> elem(1)
+    end
+
+    defp validate_attributes(ast) do
+      sigils = collect_sigil_h(ast)
+
+      if sigils == [] do
+        {:error, "No ~H sigils found in render expression"}
+      else
+        validate_all_sigils_have_exactly_one_pyro_component(sigils)
+      end
+    end
+
+    defp collect_sigil_h(ast) do
+      Macro.prewalk(ast, [], fn
+        {:sigil_H, _meta, [{:<<>>, _string_meta, [content]}, _opts]} = node, acc ->
+          {node, [content | acc]}
+
+        node, acc ->
+          {node, acc}
+      end)
+      |> elem(1)
+      |> Enum.reverse()
+    end
+
+    defp validate_all_sigils_have_exactly_one_pyro_component(sigils) do
+      results = Enum.map(sigils, &validate_single_sigil_pyro_component/1)
+
+      case Enum.find(results, &match?({:error, _}, &1)) do
+        nil -> :ok
+        error -> error
+      end
+    end
+
+    defp validate_single_sigil_pyro_component(content) when is_binary(content) do
+      case Pyro.HeexParser.parse(content) do
+        {:ok, ast} ->
+          tally = Pyro.HeexParser.tally_attributes(ast, "pyro-component")
+          validate_pyro_component_tally(tally)
+
+        {:error, reason} ->
+          {:error, "Failed to parse HEEx content: #{reason}"}
+      end
+    end
+
+    defp validate_pyro_component_tally(%{"pyro-component" => counts}) do
+      total_count = Enum.sum(Map.values(counts))
+      value_count = map_size(counts)
+
+      cond do
+        total_count == 1 and value_count == 1 ->
+          :ok
+
+        value_count > 1 ->
+          {:error,
+           "The attribute \"pyro-component\" appears with multiple different values in a single ~H sigil"}
+
+        total_count > 1 ->
+          {:error,
+           "The attribute \"pyro-component\" appears #{total_count} times in a single ~H sigil, but must appear exactly once"}
+
+        true ->
+          {:error, "Unexpected tally result for pyro-component attribute"}
+      end
+    end
+
+    defp validate_pyro_component_tally(%{}) do
+      {:error, "The attribute \"pyro-component\" must appear exactly once in each ~H sigil"}
+    end
   end
 
   @render %Spark.Dsl.Entity{
@@ -241,14 +331,14 @@ defmodule Pyro.ComponentLibrary.Dsl do
     snippet: ~S[
       render assigns do
         ~H"""
-        <div pyro-class>
+        <${1:div} pyro-component>
           ${0}
-        </div>
+        </${1}>
         """
       end
       ],
     target: __MODULE__.Render,
-    transform: {Pyro.ComponentLibrary.TemplateHelpers, :transform_component_render, []}
+    transform: {__MODULE__.Render, :transform, []}
   }
 
   defmodule Component do
@@ -258,7 +348,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
     @type t :: %__MODULE__{
             assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
-            classes: list(atom()),
             doc: String.t() | nil,
             name: atom(),
             private?: boolean(),
@@ -269,7 +358,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     # quokka:sort
     defstruct [
       :assigns,
-      :classes,
       :doc,
       :name,
       :private?,
@@ -280,7 +368,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
   # quokka:sort
   @shared_component_schema [
-    classes: [type: {:wrap_list, :atom}, doc: "list of class props", default: [:class]],
     doc: [
       type: :string,
       doc: "documentation for the component"
@@ -324,7 +411,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
     @type t :: %__MODULE__{
             assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
-            classes: list(atom()),
             components: list(Dsl.Component.t()),
             doc: binary() | nil,
             name: atom(),
@@ -334,7 +420,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     # quokka:sort
     defstruct [
       :assigns,
-      :classes,
       :components,
       :doc,
       :name,
@@ -422,8 +507,8 @@ defmodule Pyro.ComponentLibrary.Dsl do
   }
 
   @transformers [
-    Pyro.Transformer.MergeComponents,
-    Pyro.Transformer.CompileComponents
+    __MODULE__.Transformer.MergeComponents,
+    __MODULE__.Transformer.ApplyHooks
   ]
 
   @verifiers []
