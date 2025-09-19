@@ -1,1 +1,0 @@
-attr <%= i @class.name %>, :any
