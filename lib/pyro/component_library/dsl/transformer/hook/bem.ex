@@ -5,8 +5,11 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
 
   @behaviour Pyro.ComponentLibrary.Dsl.Transformer.Hook
 
+  import Pyro.ComponentLibrary.Dsl.Transformer.Hook
+
   alias Pyro.ComponentLibrary.Dsl.Component
   alias Pyro.ComponentLibrary.Dsl.LiveComponent
+  # alias Pyro.ComponentLibrary.Dsl.Render
 
   @impl true
   def transform_component(%LiveComponent{} = live_component, context) do
@@ -19,7 +22,22 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
     )
   end
 
-  def transform_component(%Component{} = component, _context) do
+  def transform_component(%Component{} = component, context) do
+    popped_renders =
+      for render <- component.render do
+        pop_render_attrs(render, "pyro-*", context)
+      end
+
+    for {_, context} <- popped_renders do
+      dbg(context.popped_attrs)
+    end
+
     component
+    # |> Map.update!(
+    #   :render,
+    #   &Enum.map(&1, fn %Render{} = render ->
+    #
+    #   end)
+    # )
   end
 end

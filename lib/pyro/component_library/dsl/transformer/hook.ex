@@ -11,39 +11,48 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
   @type component :: %Component{} | %LiveComponent{}
   @callback transform_component(component(), map()) :: component()
 
-  def transform_sigil_h_content(%{expr: expr} = entity, transformer)
-      when is_function(transformer, 1) do
-    updated_expr =
-      Macro.postwalk(expr, fn
-        {:sigil_H, meta, [{:<<>>, bin_meta, [content]}, modifiers]} when is_binary(content) ->
-          transformed_content = transformer.(content)
-          {:sigil_H, meta, [{:<<>>, bin_meta, [transformed_content]}, modifiers]}
+  def pop_render_attrs(render, pattern, context) do
+    transform_heex(
+      render,
+      fn content, context ->
+        case HeexParser.parse(content) do
+          {:ok, ast} ->
+            {ast, attrs} = HeexParser.pop_attributes(ast, pattern)
+            context =
+              Map.update(context, :popped_attrs, [attrs], fn popped_attrs ->
+                popped_attrs ++ [attrs]
+              end)
 
-        node ->
-          node
-      end)
+            {ast, context}
 
-    %{entity | expr: updated_expr}
+          {:error, error} ->
+            raise DslError.exception(
+                    module: context.module,
+                    path: context.path,
+                    message: """
+                    Unable to parse ~H for render function in component #{inspect(context.component.name)}
+
+                    #{error}
+                    """
+                  )
+        end
+      end,
+      context
+    )
   end
 
-  def transform_render(render, context) do
-    transform_sigil_h_content(render, fn content ->
-      case HeexParser.parse(content) do
-        {:ok, ast} ->
-          ast
-          |> HeexParser.pop_attributes("pyro-*")
+  def transform_heex(%{expr: expr} = entity, transformer, context)
+      when is_function(transformer, 2) do
+    {updated_expr, context} =
+      Macro.prewalk(expr, context, fn
+        {:sigil_H, meta, [{:<<>>, bin_meta, [content]}, modifiers]}, context ->
+          {transformed_content, context} = transformer.(content, context)
+          {{:sigil_H, meta, [{:<<>>, bin_meta, [transformed_content]}, modifiers]}, context}
 
-        {:error, error} ->
-          raise DslError.exception(
-                  module: context.module,
-                  path: context.path,
-                  message: """
-                  Unable to parse ~H for render function in component #{inspect(context.component.name)}
+       node, acc ->
+         {node, acc}
+      end)
 
-                  #{error}
-                  """
-                )
-      end
-    end)
+    {%{entity | expr: updated_expr}, context}
   end
 end
