@@ -2,7 +2,6 @@
 spark_locals_without_parens = [
   calc: 2,
   calc: 3,
-  classes: 1,
   component: 1,
   component: 2,
   default: 1,
@@ -17,6 +16,7 @@ spark_locals_without_parens = [
   render: 2,
   render: 3,
   required: 1,
+  skip_template_validation?: 1,
   slot: 1,
   slot: 2,
   theme: 1,
@@ -32,6 +32,7 @@ spark_locals_without_parens = [
 ]
 
 [
+  migrate: true,
   import_deps: [:phoenix],
   locals_without_parens: spark_locals_without_parens,
   export: [locals_without_parens: spark_locals_without_parens],

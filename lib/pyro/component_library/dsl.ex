@@ -34,7 +34,8 @@ defmodule Pyro.ComponentLibrary.Dsl do
       :required,
       :slot,
       :type,
-      :values
+      :values,
+      __spark_metadata__: nil
     ]
   end
 
@@ -76,14 +77,22 @@ defmodule Pyro.ComponentLibrary.Dsl do
   defmodule Global do
     @moduledoc false
     @type t :: %__MODULE__{
-            skip_template_validation?: boolean(),
+            default: any(),
             doc: String.t() | nil,
             include: list(String.t()) | nil,
-            name: atom()
+            name: atom(),
+            skip_template_validation?: boolean()
           }
 
     # quokka:sort
-    defstruct [:doc, :include, :name, :skip_template_validation?]
+    defstruct [
+      :default,
+      :doc,
+      :include,
+      :name,
+      :skip_template_validation?,
+      __spark_metadata__: nil
+    ]
   end
 
   @global %Spark.Dsl.Entity{
@@ -94,6 +103,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     name: :global,
     # quokka:sort
     schema: [
+      default: [doc: "default value for the prop", type: :any],
       doc: [doc: "documentation for the prop", type: :string],
       include: [type: {:wrap_list, :string}, doc: "extra global attributes to include"],
       name: [type: :atom, required: true, doc: "name of the prop"],
@@ -107,7 +117,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     @type t :: %__MODULE__{name: atom()}
 
     # quokka:sort
-    defstruct [:name]
+    defstruct [:name, __spark_metadata__: nil]
   end
 
   @variant %Spark.Dsl.Entity{
@@ -132,7 +142,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     @type t :: %__MODULE__{calculation: (map() -> any()), name: atom()}
 
     # quokka:sort
-    defstruct [:calculation, :name]
+    defstruct [:calculation, :name, __spark_metadata__: nil]
   end
 
   @calc %Spark.Dsl.Entity{
@@ -180,7 +190,8 @@ defmodule Pyro.ComponentLibrary.Dsl do
       :doc,
       :name,
       :required,
-      :validate_attrs
+      :validate_attrs,
+      __spark_metadata__: nil
     ]
   end
 
@@ -224,12 +235,12 @@ defmodule Pyro.ComponentLibrary.Dsl do
     @type t :: %__MODULE__{args: any(), expr: any(), template: String.t()}
 
     # quokka:sort
-    defstruct [:args, :expr, :template]
+    defstruct [:args, :expr, :template, __spark_metadata__: nil]
 
-    def transform(%__MODULE__{args: args, expr: expr} = entity) do
+    def transform(%__MODULE__{args: args, expr: [do: expr]} = entity) do
       if has_var?(args, :assigns) do
         case validate_attributes(expr) do
-          :ok -> {:ok, entity}
+          :ok -> {:ok, %{entity | expr: expr}}
           {:error, reason} -> {:error, reason}
         end
       else
@@ -281,9 +292,9 @@ defmodule Pyro.ComponentLibrary.Dsl do
     end
 
     defp validate_single_sigil_pyro_component(content) when is_binary(content) do
-      case Pyro.HeexParser.parse(content) do
+      case Pyro.HEEx.parse(content) do
         {:ok, ast} ->
-          tally = Pyro.HeexParser.tally_attributes(ast, "pyro-component")
+          tally = Pyro.HEEx.tally_attributes(ast, "pyro-component")
           validate_pyro_component_tally(tally)
 
         {:error, reason} ->
@@ -362,7 +373,8 @@ defmodule Pyro.ComponentLibrary.Dsl do
       :name,
       :private?,
       :render,
-      :slots
+      :slots,
+      __spark_metadata__: nil
     ]
   end
 
@@ -424,7 +436,8 @@ defmodule Pyro.ComponentLibrary.Dsl do
       :doc,
       :name,
       :private?,
-      :slots
+      :slots,
+      __spark_metadata__: nil
     ]
   end
 
@@ -455,7 +468,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
   defmodule ThemeProperty do
     @moduledoc false
     # quokka:sort
-    defstruct [:default, :doc, :name, :tokens, :variants]
+    defstruct [:default, :doc, :name, :tokens, :variants, __spark_metadata__: nil]
   end
 
   @token_type {:one_of, ~w[color size]a}

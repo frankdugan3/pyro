@@ -5,52 +5,64 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
 
   alias Pyro.ComponentLibrary.Dsl.Component
   alias Pyro.ComponentLibrary.Dsl.LiveComponent
-  alias Pyro.HeexParser
+  alias Pyro.ComponentLibrary.Dsl.Render
+  alias Pyro.HEEx
+  alias Pyro.HEEx.AST
   alias Spark.Error.DslError
 
   @type component :: %Component{} | %LiveComponent{}
+
   @callback transform_component(component(), map()) :: component()
 
-  def pop_render_attrs(render, pattern, context) do
+  def pop_render_attrs(%Render{} = render, pattern, context) do
     transform_heex(
       render,
-      fn content, context ->
-        case HeexParser.parse(content) do
-          {:ok, ast} ->
-            {ast, attrs} = HeexParser.pop_attributes(ast, pattern)
-            context =
-              Map.update(context, :popped_attrs, [attrs], fn popped_attrs ->
-                popped_attrs ++ [attrs]
-              end)
+      fn %AST{} = ast, context ->
+        ast = HEEx.pop_attributes(ast, pattern)
 
-            {ast, context}
+        attrs =
+          Enum.map(ast.context.popped_attributes, fn {path, key, value} ->
+            {context.sigil_H_index, path, key, value}
+          end)
 
-          {:error, error} ->
-            raise DslError.exception(
-                    module: context.module,
-                    path: context.path,
-                    message: """
-                    Unable to parse ~H for render function in component #{inspect(context.component.name)}
+        context =
+          Map.update(context, :popped_attributes, attrs, fn popped_attributes ->
+            popped_attributes ++ attrs
+          end)
 
-                    #{error}
-                    """
-                  )
-        end
+        {ast, context}
       end,
       context
     )
   end
 
-  def transform_heex(%{expr: expr} = entity, transformer, context)
+  def transform_heex(%Render{expr: expr} = entity, transformer, context)
       when is_function(transformer, 2) do
     {updated_expr, context} =
       Macro.prewalk(expr, context, fn
         {:sigil_H, meta, [{:<<>>, bin_meta, [content]}, modifiers]}, context ->
-          {transformed_content, context} = transformer.(content, context)
-          {{:sigil_H, meta, [{:<<>>, bin_meta, [transformed_content]}, modifiers]}, context}
+          context = Map.update(context, :sigil_H_index, 0, &(&1 + 1))
 
-       node, acc ->
-         {node, acc}
+          case HEEx.parse(content) do
+            {:ok, ast} ->
+              {transformed_ast, context} = transformer.(ast, context)
+              transformed_content = HEEx.encode(transformed_ast)
+              {{:sigil_H, meta, [{:<<>>, bin_meta, [transformed_content]}, modifiers]}, context}
+
+            {:error, error} ->
+              raise DslError.exception(
+                      module: context.module,
+                      path: context.path,
+                      message: """
+                      Unable to parse ~H for render function in component #{inspect(context.component.name)}
+
+                      #{error}
+                      """
+                    )
+          end
+
+        node, acc ->
+          {node, acc}
       end)
 
     {%{entity | expr: updated_expr}, context}

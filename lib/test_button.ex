@@ -6,15 +6,18 @@ defmodule TestButton do
     component_output_path: "tmp/test_components"
 
   component :button do
-    prop :normal, :boolean, default: true
+    global :rest
 
     render %{rest: rest} = assigns do
       if rest[:href] || rest[:navigate] || rest[:patch] do
         ~H"""
-        <script :type={ColocatedHook} name=".ButtonManager">
-          {mounted() {}}
-        </script>
-        <.link pyro-component pyro-variant="color" pyro-variant="size" phx-hook=".ButtonManager" {@rest}>
+        <.link
+          pyro-component
+          pyro-variant="color"
+          pyro-variant="size"
+          class={["link-only-class"]}
+          {@rest}
+        >
           {render_slot(@inner_block)}
         </.link>
         """
