@@ -18,10 +18,9 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
           "#{module |> Module.split() |> List.last() |> Macro.underscore()}_components.ex"
         )
 
-      formatted_code =
-        module
-        |> gen_module()
-        |> Code.format_string!(locals_without_parens: [attr: 2, attr: 3, slot: 2, slot: 3])
+      code = gen_module(module)
+      {formatter_fun, _formatter_opts} = Mix.Tasks.Format.formatter_for_file(generated_file)
+      formatted_code = formatter_fun.(code)
 
       File.write!(generated_file, formatted_code)
     end
@@ -33,6 +32,18 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
       attr <%= inspect @attr.name %>, <%= inspect @attr.type %><%=
         if @attr.default do %>, default: <%= inspect @attr.default %><% end %><%=
         if @attr.required do %>, required: true<% end %>
+      ''',
+      [assigns: assigns],
+      trim: true
+    )
+  end
+
+  def render_global(assigns) do
+    EEx.eval_string(
+      ~E'''
+      attr <%= inspect @attr.name %>, :global<%=
+        if @attr.default do %>, default: <%= inspect @attr.default %><%=
+        if @attr.include do %>, include: <%= inspect @attr.include %><% end %><% end %>
       ''',
       [assigns: assigns],
       trim: true
@@ -62,8 +73,9 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
       @doc type: :component<% end %>
         <%= if !component.doc && !component.private? do %>@doc false<% end%>
         <%= for %Pyro.ComponentLibrary.Dsl.Prop{} = attr <- component.assigns do %><%= render_attr(attr: attr) %><% end %>
+        <%= for %Pyro.ComponentLibrary.Dsl.Global{} = attr <- component.assigns do %><%= render_global(attr: attr) %><% end %>
         <%= for render <- component.render do %>def<%= if component.private? do %>p<% end %> <%= component.name %>(<%= Macro.to_string(render.args) %>) do
-          <%= Macro.to_string(render.expr[:do]) %>
+            <%= Macro.to_string(render.expr) %>
         end
         <% end %>
         <% end %>
