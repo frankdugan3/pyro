@@ -3,7 +3,6 @@ defmodule Pyro.ComponentLibrary do
   > Declaratively build extensible component libraries for Phoenix.
 
   - For DSL documentation, check out [Component Library DSL](dsl-pyro-componentlibrary.html).
-  ```
   """
   use Spark.Dsl,
     default_extensions: [extensions: [__MODULE__.Dsl]]

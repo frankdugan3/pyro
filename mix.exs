@@ -4,13 +4,14 @@ defmodule Pyro.MixProject do
 
   alias Pyro.Component.Helpers
   alias Pyro.Component.Template
+  alias Pyro.ComponentLibrary.Dsl
 
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.3.7"
   @description """
   Compose extensible components for Phoenix.
   """
-  @elixir_requirement "~> 1.16"
+  @elixir_requirement "~> 1.18"
   def project do
     [
       app: :pyro,
@@ -21,22 +22,31 @@ defmodule Pyro.MixProject do
       consolidate_protocols: Mix.env() != :dev,
       package: package(),
       deps: deps(),
-      docs: docs(),
+      docs: &docs/0,
       test_paths: ["test"],
       name: "Pyro",
       source_url: @source_url,
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
       compilers: [:yecc] ++ Mix.compilers(),
-      dialyzer: [plt_add_apps: [:mix]],
-      preferred_cli_env: [docs: :docs]
+      dialyzer: [plt_add_apps: [:mix]]
     ]
+  end
+
+  def cli do
+    [preferred_envs: [docs: :docs]]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   defp docs do
+    Path.wildcard("documentation/**/*.eex")
+    |> Enum.each(fn eex_path ->
+      output_path = String.replace_suffix(eex_path, ".eex", "")
+      File.write!(output_path, EEx.eval_file(eex_path))
+    end)
+
     [
       main: "about",
       assets: %{"vhs/output" => "vhs"},
@@ -80,11 +90,7 @@ defmodule Pyro.MixProject do
         Verifier: [~r/(^Pyro.Verifier)/]
       ],
       nest_modules_by_prefix: [
-        Pyro.Schema,
-        Pyro.Transformer,
-        Pyro.Verifier,
-        PyroComponents,
-        PyroComponents.Defaults
+        Dsl
       ],
       groups_for_docs: [
         Components: &(&1[:type] == :component),
@@ -118,10 +124,9 @@ defmodule Pyro.MixProject do
       licenses: ["MIT"],
       links: %{GitHub: @source_url},
       files: ~w(
-        lib documentation
+        lib
         README* CHANGELOG* LICENSE*
         mix.exs .formatter.exs
-        package.json
       )
     ]
   end
@@ -135,8 +140,8 @@ defmodule Pyro.MixProject do
   defp deps do
     [
       # Code quality tooling
-      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
-      {:quokka, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:credo, ">= 0.0.0", only: [:dev, :test, :docs], runtime: false},
+      {:quokka, ">= 0.0.0", only: [:dev, :test, :docs], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, "~> 0.15",
@@ -149,7 +154,7 @@ defmodule Pyro.MixProject do
       # Build tooling
       {:ex_doc, ">= 0.0.0", only: :docs, runtime: false},
       {:git_ops, "~> 2.6", only: :dev},
-      {:file_system, "~> 1.0", only: [:test, :dev]},
+      {:file_system, "~> 1.0", only: [:test, :dev, :docs]},
       {:makeup, ">= 0.0.0", only: :docs},
       {:makeup_eex, ">= 0.0.0", only: :docs},
       {:makeup_html, ">= 0.0.0", only: :docs},

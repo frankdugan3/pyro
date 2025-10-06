@@ -31,10 +31,10 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
       ~E'''
       attr <%= inspect @attr.name %>, <%= inspect @attr.type %><%=
         if @attr.default do %>, default: <%= inspect @attr.default %><% end %><%=
-        if @attr.required do %>, required: true<% end %>
+        if @attr.required do %>, required: true<% end %><%=
+        if @attr.doc do %>, doc: <%= inspect @attr.doc %><% end %>
       ''',
-      [assigns: assigns],
-      trim: true
+      [assigns: assigns]
     )
   end
 
@@ -42,11 +42,11 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
     EEx.eval_string(
       ~E'''
       attr <%= inspect @attr.name %>, :global<%=
-        if @attr.default do %>, default: <%= inspect @attr.default %><%=
-        if @attr.include do %>, include: <%= inspect @attr.include %><% end %><% end %>
+      if @attr.default do %>, default: <%= inspect @attr.default %><% end %><%=
+        if @attr.include do %>, include: <%= inspect @attr.include %><% end %><%=
+        if @attr.doc do %>, doc: <%= inspect @attr.doc %><% end %>
       ''',
-      [assigns: assigns],
-      trim: true
+      [assigns: assigns]
     )
   end
 
@@ -81,8 +81,7 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
         <% end %>
       end
       ''',
-      [assigns: assigns],
-      trim: true
+      [assigns: assigns]
     )
   end
 

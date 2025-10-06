@@ -14,6 +14,7 @@ defmodule Pyro do
   defmodule MyAppWeb.CoreComponents do
     use Pyro, component_libraries: [PyroComponents]
   end
+  ```
   """
 
   use Spark.Dsl,

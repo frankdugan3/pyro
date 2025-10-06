@@ -8,7 +8,6 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
   alias Pyro.ComponentLibrary.Dsl.Render
   alias Pyro.HEEx
   alias Pyro.HEEx.AST
-  alias Spark.Error.DslError
 
   @type component :: %Component{} | %LiveComponent{}
 
@@ -21,8 +20,8 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
         ast = HEEx.pop_attributes(ast, pattern)
 
         attrs =
-          Enum.map(ast.context.popped_attributes, fn {path, key, value} ->
-            {context.sigil_H_index, path, key, value}
+          Enum.map(ast.context.popped_attributes, fn {path, attr} ->
+            {context.sigil_H_index, path, attr}
           end)
 
         context =
@@ -40,26 +39,21 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
       when is_function(transformer, 2) do
     {updated_expr, context} =
       Macro.prewalk(expr, context, fn
-        {:sigil_H, meta, [{:<<>>, bin_meta, [content]}, modifiers]}, context ->
+        {:sigil_H, meta, [{:<<>>, string_meta, [content]}, modifiers]}, context ->
           context = Map.update(context, :sigil_H_index, 0, &(&1 + 1))
 
-          case HEEx.parse(content) do
-            {:ok, ast} ->
-              {transformed_ast, context} = transformer.(ast, context)
-              transformed_content = HEEx.encode(transformed_ast)
-              {{:sigil_H, meta, [{:<<>>, bin_meta, [transformed_content]}, modifiers]}, context}
+          opts = [
+            file: entity.__spark_metadata__.anno[:file],
+            line: string_meta[:line] + 1,
+            source_offset: meta[:line],
+            indentation: string_meta[:indentation] || 0
+          ]
 
-            {:error, error} ->
-              raise DslError.exception(
-                      module: context.module,
-                      path: context.path,
-                      message: """
-                      Unable to parse ~H for render function in component #{inspect(context.component.name)}
+          ast = AST.parse!(content, opts)
+          {transformed_ast, context} = transformer.(ast, context)
+          transformed_content = AST.encode(transformed_ast)
 
-                      #{error}
-                      """
-                    )
-          end
+          {{:sigil_H, meta, [{:<<>>, string_meta, [transformed_content]}, modifiers]}, context}
 
         node, acc ->
           {node, acc}

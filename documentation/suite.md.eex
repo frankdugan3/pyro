@@ -1,0 +1,5 @@
+# Pyro Suite
+
+There's a full suite of libraries that build on the foundation Pyro provides:
+
+<%= Pyro.SharedDocs.suite_list() %>
