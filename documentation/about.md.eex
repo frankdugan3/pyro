@@ -5,7 +5,7 @@
 [![hex.pm](https://img.shields.io/hexpm/dt/pyro.svg)](https://hex.pm/packages/pyro)
 [![github.com](https://img.shields.io/github/last-commit/frankdugan3/pyro.svg)](https://github.com/frankdugan3/pyro)
 
-> Compose extensible components for Phoenix.
+> <%= Pyro.SharedDocs.pyro_tagline() %>
 
 Pyro is a suite of libraries for building UI in `Phoenix`.
 
@@ -52,7 +52,4 @@ Intrigued? Go ahead, [Get Started](get-started.html) right now.
 
 In addition to the tooling for building extensible components, there is a [full suite](suite.html) of libraries that build on the foundation Pyro provides.
 
-- [Pyro](https://github.com/frankdugan3/pyro) - Compose extensible components for Phoenix.
-- [PyroComponents](https://github.com/frankdugan3/pyro_components) - Extensible Phoenix components, built with Pyro.
-- [PyroManiac](https://github.com/frankdugan3/pyro_maniac) - Extensible, declarative UI for Ash Framework. Built-in support for Phoenix LiveView and Hologram.
-
+<%= Pyro.SharedDocs.suite_list() %>

@@ -8,15 +8,15 @@
 
 > Compose extensible components for Phoenix.
 
-> [!WARNING]
-> Pyro is in early development, expect breaking changes.
-
 Pyro is a suite of libraries for building UI in Phoenix.
 
 - [Pyro](https://github.com/frankdugan3/pyro) - Compose extensible components for Phoenix.
 - [PyroComponents](https://github.com/frankdugan3/pyro_components) - Extensible Phoenix components, built with Pyro.
 - [AshPyro](https://github.com/frankdugan3/ash_pyro) - Declarative UI for Ash Framework.
 - [AshPyroComponents](https://github.com/frankdugan3/ash_pyro_components) - Automatic rendering of AshPryo DSL.
+
+> [!WARNING]
+> Pyro is in early development, expect breaking changes.
 
 ## About
 

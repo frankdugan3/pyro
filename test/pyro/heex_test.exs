@@ -2,53 +2,22 @@ defmodule Pyro.HEExTest do
   use ExUnit.Case, async: true
 
   import Pyro.HEEx
+  import Pyro.HEEx.AST
+  import Pyro.Test.Support.Helpers
 
-  alias Pyro.HEEx.AST
+  alias Pyro.HEEx.AST.{Attribute, Element}
 
   doctest Pyro.HEEx, import: true
-
-  describe "complex HEEx" do
-    test "round trip parse/encode AST" do
-      template = """
-      <!-- Note: This should stick around. -->
-      <article>
-        <header>
-          <h1>{@post.title}</h1>
-          <time><%=@post.created_at%></time>
-        </header>
-        <ul>
-          {for post <- @posts do}
-            <.card>
-              <:header class="card-header">
-                <.icon name="user" />
-                <span><%= card.title %></span>
-              </:header>
-              <:body>
-                <.post_preview pyro-class="post-preview" post={post} />
-              </:body>
-            </.card>
-          {end}
-        </ul>
-        <section class="content">
-          {@post.body}
-        </section>
-      </article>
-      """
-
-      assert encode(parse!(template)) == template
-    end
-  end
 
   describe "tally_attributes/2" do
     test "tallies specific attribute values" do
       tally =
-        """
+        ~H"""
         <div pyro-component="button">
           <span pyro-component="icon">Content</span>
           <p pyro-component="button">More content</p>
         </div>
         """
-        |> parse!()
         |> tally_attributes("pyro-component")
 
       assert tally == %{
@@ -110,9 +79,9 @@ defmodule Pyro.HEExTest do
 
       assert tally == %{
                "pyro-value" => %{
-                 "static" => 1,
-                 {:heex_expr, "@another_value"} => 1,
-                 {:heex_expr, "@dynamic_value"} => 1
+                 "@another_value" => 1,
+                 "@dynamic_value" => 1,
+                 "static" => 1
                }
              }
     end
@@ -128,18 +97,10 @@ defmodule Pyro.HEExTest do
         |> tally_attributes(~r/^pyro-/)
 
       assert tally == %{
-               "pyro-dynamic" => %{
-                 {:heex_expr, "@value"} => 1
-               },
-               "pyro-flag" => %{
-                 true => 1
-               },
-               "pyro-other" => %{
-                 "test" => 1
-               },
-               "pyro-type" => %{
-                 "static" => 2
-               }
+               "pyro-dynamic" => %{"@value" => 1},
+               "pyro-flag" => %{true => 1},
+               "pyro-other" => %{"test" => 1},
+               "pyro-type" => %{"static" => 2}
              }
     end
 

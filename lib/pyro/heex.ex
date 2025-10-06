@@ -1,24 +1,14 @@
 defmodule Pyro.HEEx do
   @moduledoc """
-  A simple parser for HEEx template strings.
+  Tooling for transforming Pyro.HEEx.AST.
 
-  The purpose is to enable Pyro to transform HTML attributes, so interpolated Elixir is not parsed. It's basically an HTML parser that can ignore and preserve HEEx/EEx interpolation.
+  The primary purpose is to enable Pyro to transform HTML attributes, so interpolated Elixir is not parsed.
 
-
-  > #### Note: {: .warning}
-  >
-  > It is not a 100% pure round trip to parse/encode. The parser and encoder will:
-  >
-  > - Downcase tag and attribute names
-  > - Normalize boolean attributes
-  > - Trim whitespace inside tags and between attributes
-  >
-  > The reason for this is to simplify the AST and also provide a better result when formatting transformed AST.
+  It's basically an HTML parser that can ignore and preserve HEEx/EEx interpolation.
   """
 
-  import __MODULE__.AST
-
   alias __MODULE__.AST
+  alias __MODULE__.AST.{Element, Component, Attribute}
 
   defp attribute_matches?(attr_name, pattern) when is_binary(pattern) do
     attr_name == pattern
@@ -41,50 +31,8 @@ defmodule Pyro.HEEx do
     end)
   end
 
-  @doc """
-  Parses a HEEx template string into an AST.
-
-  ## Examples
-
-      iex> parse("<div>Hello</div>")
-      {:ok, %AST{nodes: [{:element, "div", [], [{:text, "Hello"}]}]}}
-
-      iex> parse("<p class='bold'>{@name}</p>")
-      {:ok, %AST{nodes: [{:element, "p", [{"class", "bold"}], [{:heex_expr, "@name"}]}]}}
-  """
-  @spec parse(String.t()) :: {:ok, AST.t()} | {:error, String.t()}
-  def parse(template) when is_binary(template) do
-    ast = parse_template!(template)
-    {:ok, ast}
-  rescue
-    e -> {:error, Exception.message(e)}
-  end
-
-  @doc """
-  Parses a HEEx template string into an AST.
-
-  ## Examples
-
-      iex> parse!("<div>Hello</div>")
-      %AST{nodes: [{:element, "div", [], [{:text, "Hello"}]}]}
-
-      iex> parse!("<p class='bold'>{@name}</p>")
-      %AST{nodes: [{:element, "p", [{"class", "bold"}], [{:heex_expr, "@name"}]}]}
-  """
-  @spec parse!(String.t()) :: AST.t()
-  def parse!(template) when is_binary(template), do: parse_template!(template)
-
-  @doc """
-  Encodes an AST back into a HEEx template string.
-
-  ## Examples
-
-      iex> ast = %AST{nodes: [{:element, "div", [], [{:text, "Hello"}]}]}
-      iex> encode(ast)
-      "<div>Hello</div>"
-  """
-  @spec encode(AST.t()) :: String.t()
-  def encode(%AST{nodes: nodes}), do: encode_nodes(nodes)
+  defguard is_struct_with_attributes(type)
+           when is_struct(type, Component) or is_struct(type, Element)
 
   @doc """
   Tallies attribute values in the AST for a given attribute pattern or list of patterns.
@@ -103,20 +51,6 @@ defmodule Pyro.HEEx do
 
   ## Examples
 
-      iex> ast = %AST{nodes: [{:element, "div", [{"pyro-component", "button"}, {"disabled", true}], []}]}
-      iex> tally_attributes(ast, "pyro-component")
-      %{"pyro-component" => %{"button" => 1}}
-
-      iex> ast = %AST{nodes: [
-      ...>   {:element, "div", [{"pyro-test", "value1"}], []},
-      ...>   {:element, "span", [{"pyro-test", "value2"}, {"pyro-other", "value3"}], []}
-      ...> ]}
-      iex> tally_attributes(ast, ~r/^pyro-/)
-      %{"pyro-test" => %{"value1" => 1, "value2" => 1}, "pyro-other" => %{"value3" => 1}}
-
-      iex> ast = %AST{nodes: [{:element, "input", [{"required", true}, {"disabled", true}], []}]}
-      iex> tally_attributes(ast, ["required", "disabled"])
-      %{"required" => %{true => 1}, "disabled" => %{true => 1}}
   """
   @spec tally_attributes(
           AST.t(),
@@ -125,49 +59,38 @@ defmodule Pyro.HEEx do
           String.t() => %{any() => non_neg_integer()}
         }
   def tally_attributes(%AST{nodes: nodes}, patterns) do
-    Enum.reduce(normalize_attribute_patterns(patterns), %{}, fn pattern, acc ->
-      nodes
-      |> traverse_for_tallying(%{}, pattern)
-      |> Map.merge(acc, fn _key, v1, v2 ->
-        Map.merge(v1, v2, fn _inner_key, count1, count2 -> count1 + count2 end)
+    tally_attributes_for_nodes(nodes, %{}, normalize_attribute_patterns(patterns))
+  end
+
+  defp tally_attributes_for_nodes([], tally, _patterns) do
+    tally
+  end
+
+  defp tally_attributes_for_nodes([node | rest], tally, patterns) do
+    tally = tally_attributes_for_node(node, tally, patterns)
+    tally_attributes_for_nodes(rest, tally, patterns)
+  end
+
+  defp tally_attributes_for_node(node, tally, patterns) when is_struct_with_attributes(node) do
+    tally =
+      Enum.reduce(node.attributes, tally, fn attribute, tally ->
+        Enum.reduce(patterns, tally, &tally_match(&1, &2, attribute))
       end)
-    end)
+
+    tally_attributes_for_nodes(node.children, tally, patterns)
   end
 
-  defp traverse_for_tallying([], acc, _pattern), do: acc
+  defp tally_attributes_for_node(_node, tally, _patterns), do: tally
 
-  defp traverse_for_tallying([node | rest], acc, pattern) do
-    updated_acc = traverse_node_for_tallying(node, acc, pattern)
-    traverse_for_tallying(rest, updated_acc, pattern)
-  end
-
-  defp traverse_node_for_tallying({:element, _tag_name, attributes, children}, acc, pattern) do
-    attr_acc = tally_matching_attributes(attributes, acc, pattern)
-
-    traverse_for_tallying(children, attr_acc, pattern)
-  end
-
-  defp traverse_node_for_tallying(_other_node, acc, _pattern) do
-    acc
-  end
-
-  defp tally_matching_attributes([], acc, _pattern), do: acc
-
-  defp tally_matching_attributes([{attr_name, attr_value} | rest], acc, pattern) do
-    updated_acc =
-      if attribute_matches?(attr_name, pattern) do
-        increment_tally(acc, attr_name, attr_value)
-      else
-        acc
-      end
-
-    tally_matching_attributes(rest, updated_acc, pattern)
-  end
-
-  defp increment_tally(acc, attr_name, value) do
-    Map.update(acc, attr_name, %{value => 1}, fn attr_map ->
-      Map.update(attr_map, value, 1, &(&1 + 1))
-    end)
+  defp tally_match(pattern, tally, attribute) do
+    if attribute_matches?(attribute.name, pattern) do
+      tally
+      |> Map.update(attribute.name, %{attribute.value => 1}, fn values ->
+        Map.update(values, attribute.value, 1, &(&1 + 1))
+      end)
+    else
+      tally
+    end
   end
 
   @doc """
@@ -182,29 +105,17 @@ defmodule Pyro.HEEx do
   it removes matching attributes from the AST and returns a tuple containing the
   modified AST and a list of removed attributes with their paths.
 
-  Each removed attribute is represented as `{path, attribute_name, attribute_value}` where:
+  Each removed attribute is represented as `{path, attribute}` where:
   - `path` is a list of integers representing the path to the element in the AST
   - `attribute_name` is the string name of the attribute
   - `attribute_value` is the attribute value
 
   ## Examples
 
-      iex> ast = %AST{nodes: [{:element, "div", [{"pyro-component", "button"}, {"class", "btn"}], []}]}
-      iex> pop_attributes(ast, "pyro-component")
-      %AST{nodes: [{:element, "div", [{"class", "btn"}], []}], context: %{popped_attributes: [{[0], "pyro-component", "button"}]}}
-
-      iex> ast = %AST{nodes: [
-      ...>   {:element, "div", [{"pyro-test", "value1"}], [
-      ...>     {:element, "span", [{"pyro-test", "value2"}, {"other", "keep"}], []}
-      ...>   ]}
-      ...> ]}
-      iex> pop_attributes(ast, ~r/^pyro-/)
-      %AST{nodes: [{:element, "div", [], [{:element, "span", [{"other", "keep"}], []}]}], context: %{popped_attributes: [{[0], "pyro-test", "value1"}, {[0, 0], "pyro-test", "value2"}]}}
-
-      iex> ast = %AST{nodes: [{:element, "div", [{"id", "main"}, {"class", "btn"}, {"disabled", true}], []}]}
-      iex> pop_attributes(ast, ["id", "disabled"])
-      %AST{nodes: [{:element, "div", [{"class", "btn"}], []}], context: %{popped_attributes: [{[0], "id", "main"}, {[0], "disabled", true}]}}
-
+      iex> ast = parse!(~S(<div pyro-component="button" class="btn"></div>))
+      iex> ast = pop_attributes(ast, "pyro-component")
+      iex> [%Element{attributes: [%Attribute{name: "class"}], tag: "div"}] = ast.nodes
+      iex> [{[0], %Attribute{name: "pyro-component"}}] = ast.context.popped_attributes
   """
   @spec pop_attributes(
           AST.t(),
@@ -230,20 +141,21 @@ defmodule Pyro.HEEx do
     pop_attributes_from_nodes(rest, [node | acc], popped, patterns, path)
   end
 
-  defp pop_attributes_from_node({:element, tag, attributes, children}, popped, patterns, path) do
+  defp pop_attributes_from_node(node, popped, patterns, path)
+       when is_struct_with_attributes(node) do
     {attributes, popped} =
-      Enum.reduce(attributes, {[], popped}, fn {name, value}, {attributes, popped} ->
-        if Enum.any?(patterns, &attribute_matches?(name, &1)) do
-          {attributes, [{path, name, value} | popped]}
+      Enum.reduce(node.attributes, {[], popped}, fn attribute, {attributes, popped} ->
+        if Enum.any?(patterns, &attribute_matches?(attribute.name, &1)) do
+          {attributes, [{path, attribute} | popped]}
         else
-          {[{name, value} | attributes], popped}
+          {[attribute | attributes], popped}
         end
       end)
 
     {children, popped} =
-      pop_attributes_from_nodes(children, [], popped, patterns, path)
+      pop_attributes_from_nodes(node.children, [], popped, patterns, path)
 
-    {{:element, tag, Enum.reverse(attributes), children}, popped}
+    {%{node | attributes: Enum.reverse(attributes), children: children}, popped}
   end
 
   defp pop_attributes_from_node(node, popped, _patterns, _path) do
@@ -251,67 +163,65 @@ defmodule Pyro.HEEx do
   end
 
   @doc """
-  Adds an attribute to an element at the specified path in the AST.
+  Adds attributes to an element at the specified path in the AST.
 
   The path is a list of integers representing the location of the target element
-  in the AST tree, following the same format as used by `pop_attributes/2`.
-
+  in the AST tree.
 
   > #### Note: {: .info}
   >
-  > Attributes are prepended.
+  > Attributes are appended.
 
   ## Examples
 
-      iex> ast = %AST{nodes: [{:element, "div", [{"class", "btn"}], []}]}
-      iex> add_attribute(ast, [0], {"id", "my-div"})
-      {:ok, %AST{nodes: [{:element, "div", [{"id", "my-div"}, {"class", "btn"}], []}]}}
-
-      iex> ast = %AST{nodes: [{:element, "div", [], [{:element, "span", [], []}]}]}
-      iex> add_attribute(ast, [0, 0], {"class", "highlight"})
-      {:ok, %AST{nodes: [{:element, "div", [], [{:element, "span", [{"class", "highlight"}], []}]}]}}
+      iex> ast = parse!(~S(<input />))
+      iex> {:ok, ast} = add_attributes(ast, [0], %Attribute{name: "disabled"})
+      iex> ~S(<input disabled />) = encode(ast)
+      iex> {:ok, ast} = add_attributes(ast, [0], [%Attribute{name: "type", value: "button"}, %Attribute{name: "label", type: :expression, value: "@label"}])
+      iex> ~S(<input disabled type="button" label={@label} />) = encode(ast)
 
   """
-  @spec add_attribute(
+  @spec add_attributes(
           AST.t(),
           [non_neg_integer()],
-          AST.attribute()
+          Attribute.t() | [Attribute.t()]
         ) :: {:ok, AST.t()} | {:error, String.t()}
-  def add_attribute(ast, path, {name, value}) do
-    name = String.downcase(name)
-    {:ok, Map.update!(ast, :nodes, &add_attribute_at_path(&1, path, {name, value}))}
+  def add_attributes(ast, path, attributes) do
+    attributes = List.wrap(attributes)
+    {:ok, Map.update!(ast, :nodes, &add_attributes_at_path(&1, path, attributes))}
   rescue
     e -> {:error, Exception.message(e)}
   end
 
-  @spec add_attribute!(
+  @spec add_attributes!(
           AST.t(),
           [non_neg_integer()],
-          AST.attribute()
+          Attribute.t() | [Attribute.t()]
         ) :: AST.t()
-  def add_attribute!(ast, path, {name, value}) do
-    name = String.downcase(name)
-    Map.update!(ast, :nodes, &add_attribute_at_path(&1, path, {name, value}))
+  def add_attributes!(ast, path, attributes) do
+    attributes = List.wrap(attributes)
+    Map.update!(ast, :nodes, &add_attributes_at_path(&1, path, attributes))
   end
 
-  defp add_attribute_at_path(_ast, [], _attribute) do
+  defp add_attributes_at_path(_ast, [], _attributes) do
     raise ArgumentError, "Cannot add attribute at empty path - path must target an element"
   end
 
-  defp add_attribute_at_path(ast, [index], attribute) when is_list(ast) do
+  defp add_attributes_at_path(ast, [index], attributes) when is_list(ast) do
     List.update_at(ast, index, fn
-      {:element, tag, attributes, children} ->
-        {:element, tag, [attribute | attributes], children}
+      node when is_struct_with_attributes(node) ->
+        attributes = AST.parse_attributes(attributes)
+        %{node | attributes: node.attributes ++ attributes}
 
       other ->
         raise ArgumentError, "Cannot add attribute to non-element node: #{inspect(other)}"
     end)
   end
 
-  defp add_attribute_at_path(ast, [index | rest_path], attribute) when is_list(ast) do
+  defp add_attributes_at_path(ast, [index | rest_path], attributes) when is_list(ast) do
     List.update_at(ast, index, fn
-      {:element, tag, attributes, children} ->
-        {:element, tag, attributes, add_attribute_at_path(children, rest_path, attribute)}
+      node when is_struct_with_attributes(node) ->
+        %{node | children: add_attributes_at_path(node.children, rest_path, attributes)}
 
       other ->
         raise ArgumentError, "Cannot navigate through non-element node: #{inspect(other)}"

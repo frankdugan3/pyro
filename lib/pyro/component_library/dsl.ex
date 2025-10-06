@@ -238,18 +238,63 @@ defmodule Pyro.ComponentLibrary.Dsl do
     defstruct [:args, :expr, :template, __spark_metadata__: nil]
 
     def transform(%__MODULE__{args: args, expr: [do: expr]} = entity) do
-      if has_var?(args, :assigns) do
-        case validate_attributes(expr) do
-          :ok -> {:ok, %{entity | expr: expr}}
-          {:error, reason} -> {:error, reason}
-        end
-      else
-        {:error, "~H requires a variable named \"assigns\" to exist and be set to a map"}
+      sigils =
+        Macro.prewalk(expr, [], fn
+          {:sigil_H, meta, [{:<<>>, string_meta, [content]}, _opts]} = node, acc ->
+            {node, [{content, meta, string_meta} | acc]}
+
+          node, acc ->
+            {node, acc}
+        end)
+        |> elem(1)
+        |> Enum.reverse()
+
+      if sigils != [] && !has_assigns?(args, :assigns) do
+        raise Spark.Error.DslError,
+          message: "~H requires a variable named \"assigns\" to exist and be set to a map"
       end
+
+      file = entity.__spark_metadata__.anno[:file]
+
+      for {content, meta, string_meta} <- sigils do
+        opts = [
+          file: file,
+          line: string_meta[:line] + 1,
+          source_offset: meta[:line],
+          indentation: string_meta[:indentation] || 0
+        ]
+
+        ast = Pyro.HEEx.AST.parse!(content, opts)
+        tally = Pyro.HEEx.tally_attributes(ast, "pyro-component")
+
+        root_node =
+          ast.nodes
+          |> Enum.find(fn node ->
+            node.__struct__ in [Pyro.HEEx.AST.Component, Pyro.HEEx.AST.Element]
+          end)
+
+        total_count =
+          tally
+          |> Map.get("pyro-component", %{})
+          |> Map.values()
+          |> Enum.sum()
+
+        if total_count != 1 do
+          raise Pyro.HEEx.AST.ParseError,
+            file: opts[:file],
+            line: root_node.line,
+            column: root_node.column,
+            source: content,
+            indentation: opts[:indentation],
+            source_offset: opts[:source_offset],
+            message: "The attribute \"pyro-component\" must appear exactly once per sigil"
+        end
+      end
+
+      {:ok, %{entity | expr: expr}}
     end
 
-    # TODO: These helpers need to be simplified and probably belong in a better place, since they are generally useful in transformer hooks.
-    defp has_var?(ast, var_name) when is_atom(var_name) do
+    defp has_assigns?(ast, var_name) when is_atom(var_name) do
       Macro.prewalk(ast, false, fn
         {^var_name, _, context} = node, _acc when is_atom(context) or is_nil(context) ->
           {node, true}
@@ -258,73 +303,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
           {node, acc}
       end)
       |> elem(1)
-    end
-
-    defp validate_attributes(ast) do
-      sigils = collect_sigil_h(ast)
-
-      if sigils == [] do
-        {:error, "No ~H sigils found in render expression"}
-      else
-        validate_all_sigils_have_exactly_one_pyro_component(sigils)
-      end
-    end
-
-    defp collect_sigil_h(ast) do
-      Macro.prewalk(ast, [], fn
-        {:sigil_H, _meta, [{:<<>>, _string_meta, [content]}, _opts]} = node, acc ->
-          {node, [content | acc]}
-
-        node, acc ->
-          {node, acc}
-      end)
-      |> elem(1)
-      |> Enum.reverse()
-    end
-
-    defp validate_all_sigils_have_exactly_one_pyro_component(sigils) do
-      results = Enum.map(sigils, &validate_single_sigil_pyro_component/1)
-
-      case Enum.find(results, &match?({:error, _}, &1)) do
-        nil -> :ok
-        error -> error
-      end
-    end
-
-    defp validate_single_sigil_pyro_component(content) when is_binary(content) do
-      case Pyro.HEEx.parse(content) do
-        {:ok, ast} ->
-          tally = Pyro.HEEx.tally_attributes(ast, "pyro-component")
-          validate_pyro_component_tally(tally)
-
-        {:error, reason} ->
-          {:error, "Failed to parse HEEx content: #{reason}"}
-      end
-    end
-
-    defp validate_pyro_component_tally(%{"pyro-component" => counts}) do
-      total_count = Enum.sum(Map.values(counts))
-      value_count = map_size(counts)
-
-      cond do
-        total_count == 1 and value_count == 1 ->
-          :ok
-
-        value_count > 1 ->
-          {:error,
-           "The attribute \"pyro-component\" appears with multiple different values in a single ~H sigil"}
-
-        total_count > 1 ->
-          {:error,
-           "The attribute \"pyro-component\" appears #{total_count} times in a single ~H sigil, but must appear exactly once"}
-
-        true ->
-          {:error, "Unexpected tally result for pyro-component attribute"}
-      end
-    end
-
-    defp validate_pyro_component_tally(%{}) do
-      {:error, "The attribute \"pyro-component\" must appear exactly once in each ~H sigil"}
     end
   end
 

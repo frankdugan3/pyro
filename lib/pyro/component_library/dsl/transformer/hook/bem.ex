@@ -32,7 +32,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
     |> Map.update!(:render, fn renders ->
       for %Render{} = render <- renders do
         {render, context} = pop_render_attrs(render, [~r"^pyro-", "class"], context)
-        context.popped_attributes |> dbg()
+        context.popped_attributes
         render
       end
     end)

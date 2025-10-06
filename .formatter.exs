@@ -37,7 +37,7 @@ spark_locals_without_parens = [
   locals_without_parens: spark_locals_without_parens,
   export: [locals_without_parens: spark_locals_without_parens],
   quokka: [autosort: [:map, :defstruct, :schema]],
-  plugins: [Quokka, Phoenix.LiveView.HTMLFormatter, Pyro.Formatter, Spark.Formatter],
+  plugins: [Quokka, Phoenix.LiveView.HTMLFormatter, Spark.Formatter],
   inputs: [
     "*.{heex,ex,exs}",
     "{config,lib,vhs,test}/**/*.{heex,ex,exs}",
