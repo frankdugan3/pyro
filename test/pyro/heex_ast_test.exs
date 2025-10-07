@@ -172,12 +172,43 @@ defmodule Pyro.HEEx.ASTTest do
     # From Pyro.HEEx.AST
     assert_raise ParseError,
                  """
-                 nofile:108:13: expected closing tag </span>
+                 nofile:109:11: expected closing tag </:post_matter> (opened on 108:13)
+                 but got </div>
+                     |
+                 106 |               </header>
+                 107 |             </article>
+                 108 |             <:post_matter>
+                 109 |           </div>
+                     |           ^\
+                 """,
+                 fn ->
+                   AST.parse!(
+                     """
+                     <div>
+                       <article>
+                         <header>
+                           <h1>{@post.title}</h1>
+                           <time>{@post.created_at}</time>
+                         </header>
+                       </article>
+                       <:post_matter>
+                     </div>
+                     """,
+                     source_offset: 100,
+                     line: 101,
+                     indentation: 10
+                   )
+                 end
+
+    assert_raise ParseError,
+                 """
+                 nofile:108:13: expected closing tag </div> (opened on 101:11)
+                 but got </.post_matter>
                      |
                  105 |                 <time>{@post.created_at}</time>
                  106 |               </header>
                  107 |             </article>
-                 108 |             <span>
+                 108 |             </.post_matter>
                      |             ^\
                  """,
                  fn ->
@@ -190,7 +221,7 @@ defmodule Pyro.HEEx.ASTTest do
                            <time>{@post.created_at}</time>
                          </header>
                        </article>
-                       <span>
+                       </.post_matter>
                      </div>
                      """,
                      source_offset: 100,

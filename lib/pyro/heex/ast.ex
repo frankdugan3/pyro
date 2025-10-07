@@ -23,7 +23,7 @@ defmodule Pyro.HEEx.AST do
     @moduledoc """
     Represents plain text content in HEEx templates.
 
-    Stores text with its surrounding whitespace and position.
+    Stores text content, surrounding whitespace, and source position.
     """
     # quokka:sort
     defstruct [:column, :content, :line, :post, :pre]
@@ -39,9 +39,9 @@ defmodule Pyro.HEEx.AST do
 
   defmodule HTMLComment do
     @moduledoc """
-    Represents HTML comments (<!-- ... -->) in HEEx templates.
+    Represents HTML comments (`<!-- ... -->`) in HEEx templates.
 
-    Stores comment content with surrounding whitespace and position.
+    Stores comment content, surrounding whitespace, and source position.
     """
     # quokka:sort
     defstruct [:column, :content, :line, :post, :pre]
@@ -57,9 +57,9 @@ defmodule Pyro.HEEx.AST do
 
   defmodule EExComment do
     @moduledoc """
-    Represents EEx comments (<%!-- ... --%>) in HEEx templates.
+    Represents EEx comments (`<%!-- ... --%>`) in HEEx templates.
 
-    Stores comment content with surrounding whitespace and position.
+    Stores comment content, surrounding whitespace, and source position.
     """
     # quokka:sort
     defstruct [:column, :content, :line, :post, :pre]
@@ -75,9 +75,9 @@ defmodule Pyro.HEEx.AST do
 
   defmodule Expression do
     @moduledoc """
-    Represents HEEx expressions ({...}) for inline interpolation.
+    Represents HEEx expressions (`{...}`) for inline interpolation in HEEx templates.
 
-    Stores expression code with surrounding whitespace and position.
+    Stores expression code, surrounding whitespace, and source position.
     """
     # quokka:sort
     defstruct [:column, :expression, :line, :post, :pre]
@@ -93,18 +93,18 @@ defmodule Pyro.HEEx.AST do
 
   defmodule EExExpression do
     @moduledoc """
-    Represents EEx expressions (<%= ... %>) for template logic.
+    Represents EEx expressions (`<%= ... %>`) for HEEx template logic.
 
-    Stores expression code with opt modifier, surrounding whitespace and position.
+    Stores expression code, operator, surrounding whitespace, and source position.
     """
     # quokka:sort
-    defstruct [:column, :expression, :line, :opt, :post, :pre]
+    defstruct [:column, :expression, :line, :operator, :post, :pre]
 
     @type t :: %__MODULE__{
             column: non_neg_integer() | nil,
             expression: String.t(),
             line: non_neg_integer() | nil,
-            opt: String.t(),
+            operator: String.t(),
             post: String.t(),
             pre: String.t()
           }
@@ -114,10 +114,19 @@ defmodule Pyro.HEEx.AST do
     @moduledoc """
     Represents HTML elements in HEEx templates.
 
-    Stores tag name, attributes, children, and self-closing status with position.
+    Stores tag name, attributes, children, self-closing status, and source position.
     """
     # quokka:sort
-    defstruct [:attributes, :children, :column, :line, :post, :pre, :tag, self_closing?: false]
+    defstruct [
+      :column,
+      :line,
+      :post,
+      :pre,
+      :tag,
+      attributes: [],
+      children: [],
+      self_closing?: false
+    ]
 
     @type t :: %__MODULE__{
             attributes: [AST.Attribute.t()],
@@ -133,20 +142,20 @@ defmodule Pyro.HEEx.AST do
 
   defmodule Component do
     @moduledoc """
-    Represents Phoenix components (<.component_name>) in HEEx templates.
+    Represents Phoenix components (`<.component_name>`) in HEEx templates.
 
-    Stores component name, attributes, children, and self-closing status with position.
+    Stores component name, attributes, children, self-closing status, and source position.
     """
     # quokka:sort
     defstruct [
-      :attributes,
-      :children,
       :column,
       :line,
       :name,
       :post,
       :pre,
-      :self_closing?
+      attributes: [],
+      children: [],
+      self_closing?: false
     ]
 
     @type t :: %__MODULE__{
@@ -163,12 +172,20 @@ defmodule Pyro.HEEx.AST do
 
   defmodule Slot do
     @moduledoc """
-    Represents component slots (<:slot_name>) in HEEx templates.
+    Represents component slots (`<:slot_name>`) in HEEx templates.
 
-    Stores slot name, attributes, and children with position.
+    Stores slot name, attributes, children, and source position.
     """
     # quokka:sort
-    defstruct [:attributes, :children, :column, :line, :name, :post, :pre]
+    defstruct [
+      :column,
+      :line,
+      :name,
+      :post,
+      :pre,
+      attributes: [],
+      children: []
+    ]
 
     @type t :: %__MODULE__{
             attributes: [AST.Attribute.t()],
@@ -185,7 +202,7 @@ defmodule Pyro.HEEx.AST do
     @moduledoc """
     Represents element/component attributes in HEEx templates.
 
-    Stores attribute name, value, expression flag, delimiter, and position.
+    Stores attribute name, value, type, delimiter, and source position.
     """
     # quokka:sort
     defstruct [:column, :line, :name, :value, delimiter: ?\", type: :string]
@@ -223,21 +240,12 @@ defmodule Pyro.HEEx.AST do
 
   @doc """
   Encodes an AST back into a HEEx template string.
-
-  ## Examples
-
   """
   @spec encode(t()) :: String.t()
-  def encode(ast) do
-    ast_to_string(ast.nodes)
-  end
+  def encode(ast), do: ast_to_string(ast.nodes)
 
-  def ast_to_string(ast) when is_list(ast) do
-    ast
-    |> Enum.map_join(&node_to_string/1)
-  end
-
-  def ast_to_string(node), do: node_to_string(node)
+  defp ast_to_string(nodes) when is_list(nodes), do: Enum.map_join(nodes, &node_to_string/1)
+  defp ast_to_string(node), do: node_to_string(node)
 
   defp node_to_string(%Text{content: content, post: post, pre: pre}) do
     "#{pre}#{content}#{post}"
@@ -255,8 +263,8 @@ defmodule Pyro.HEEx.AST do
     "#{pre}{#{expr}}#{post}"
   end
 
-  defp node_to_string(%EExExpression{expression: expr, opt: opt, post: post, pre: pre}) do
-    "#{pre}<%#{opt} #{expr} %>#{post}"
+  defp node_to_string(%EExExpression{expression: expr, operator: operator, post: post, pre: pre}) do
+    "#{pre}<%#{operator} #{expr} %>#{post}"
   end
 
   defp node_to_string(%Element{
@@ -323,7 +331,7 @@ defmodule Pyro.HEEx.AST do
   defp attribute_to_string(%Attribute{delimiter: d, name: name, value: value}),
     do: " #{name}=#{<<d>>}#{value}#{<<d>>}"
 
-  defp init_parse_opts(template, opts) do
+  defp parse_opts(template, opts) do
     trailing =
       case Regex.run(~r/[^\s]([\s]*)$/s, template) do
         [_, whitespace] ->
@@ -353,7 +361,7 @@ defmodule Pyro.HEEx.AST do
           | {:error, message :: String.t(),
              metadata :: %{column: non_neg_integer(), line: non_neg_integer()}}
   def parse(template, opts \\ []) do
-    opts = init_parse_opts(template, opts)
+    opts = parse_opts(template, opts)
 
     template
     |> tokenize_eex(opts)
@@ -363,7 +371,7 @@ defmodule Pyro.HEEx.AST do
 
   @spec parse!(String.t(), opts()) :: t()
   def parse!(template, opts \\ []) do
-    opts = init_parse_opts(template, opts)
+    opts = parse_opts(template, opts)
 
     case parse(template, opts) do
       {:ok, %__MODULE__{} = ast} ->
@@ -396,14 +404,16 @@ defmodule Pyro.HEEx.AST do
       {:error, message, meta} ->
         {:error, message, meta}
     end
+  rescue
+    error in Tokenizer.ParseError ->
+      {:error, error.description, %{column: error.column, line: error.line}}
   end
 
   defp finalize({:ok, tokens, cont}, template, opts) do
     {:ok, Tokenizer.finalize(tokens, opts[:file], cont, template)}
   rescue
-    error in Phoenix.LiveView.Tokenizer.ParseError ->
-      meta = %{column: error.column, line: error.line}
-      {:error, error.description, meta}
+    error in Tokenizer.ParseError ->
+      {:error, error.description, %{column: error.column, line: error.line}}
   end
 
   defp finalize({:error, message, meta}, _template, _opts) do
@@ -448,7 +458,7 @@ defmodule Pyro.HEEx.AST do
           tokens
       end
 
-    {ast, _remaining} = parse_nodes(tokens_with_leading, [])
+    {ast, _remaining} = parse_nodes(tokens_with_leading, [], nil)
 
     nodes =
       case Keyword.get(opts, :trailing_whitespace, "") do
@@ -463,261 +473,67 @@ defmodule Pyro.HEEx.AST do
       {:error, error.message, meta}
   end
 
-  defp parse_nodes([], acc), do: {Enum.reverse(acc), []}
+  defp parse_nodes([], acc, nil), do: {Enum.reverse(acc), []}
 
-  defp parse_nodes([{:text, content, meta} | rest], acc) do
-    {pre, trimmed, post} = extract_whitespace(content)
-
-    if String.starts_with?(trimmed, "<!--") and String.ends_with?(trimmed, "-->") do
-      comment_content =
-        trimmed
-        |> String.trim_leading("<!--")
-        |> String.trim_trailing("-->")
-
-      node = %HTMLComment{
-        column: meta[:column],
-        content: comment_content,
-        line: meta[:line],
-        post: post,
-        pre: pre
-      }
-
-      parse_nodes(rest, [node | acc])
-    else
-      node = %Text{
-        column: meta[:column],
-        content: trimmed,
-        line: meta[:line],
-        post: post,
-        pre: pre
-      }
-
-      parse_nodes(rest, [node | acc])
-    end
-  end
-
-  defp parse_nodes([{:eex_comment, content, meta} | rest], acc) do
-    node = %EExComment{
-      column: meta[:column],
-      content: content,
+  defp parse_nodes([], _acc, {type, name, meta}) do
+    raise ParseError,
       line: meta[:line],
-      post: "",
-      pre: ""
-    }
-
-    parse_nodes(rest, [node | acc])
-  end
-
-  defp parse_nodes([{:eex, _type, expr, meta} | rest], acc) do
-    node = %EExExpression{
       column: meta[:column],
-      expression: expr,
-      line: meta[:line],
-      opt: meta[:opt] || "",
-      post: "",
-      pre: ""
-    }
-
-    parse_nodes(rest, [node | acc])
+      message: "expected closing tag #{format_close_tag(type, name)}"
   end
 
-  defp parse_nodes([{:body_expr, expr, meta} | rest], acc) do
-    node = %Expression{
-      column: meta[:column],
-      expression: expr,
-      line: meta[:line],
-      post: "",
-      pre: ""
-    }
+  defp parse_nodes([{:close, close_type, close_name, close_meta} | rest], acc, expected_close) do
+    case expected_close do
+      nil ->
+        raise ParseError,
+          line: close_meta[:line],
+          column: close_meta[:column],
+          message: "expected opening tag #{format_open_tag(close_type, close_name)}"
 
-    parse_nodes(rest, [node | acc])
-  end
-
-  defp parse_nodes([{:tag, tag_name, attrs, %{closing: closing} = meta} | rest], acc)
-       when closing in [:void, :self] do
-    tag_name = String.downcase(tag_name)
-
-    node = tag_node_with_whitespace(tag_name, attrs, [], meta)
-    parse_nodes(rest, [node | acc])
-  end
-
-  defp parse_nodes([{:tag, tag_name, attrs, meta} | rest], acc) do
-    tag_name = String.downcase(tag_name)
-
-    {children, remaining} = parse_children_until_close(rest, tag_name)
-
-    remaining =
-      case remaining do
-        [{:close, :tag, close_name, close_meta} | rest] ->
-          if String.downcase(close_name) == tag_name do
-            rest
-          else
-            raise ParseError,
-              line: close_meta[:line],
-              column: close_meta[:column],
-              message:
-                "expected closing tag </#{tag_name}> (opened at line #{meta[:line]}) but found </#{String.downcase(close_name)}>"
-          end
-
-        [] ->
-          raise ParseError,
-            line: meta[:line],
-            column: meta[:column],
-            message: "expected closing tag </#{tag_name}>"
-
-        other ->
-          other
-      end
-
-    node = tag_node_with_whitespace(tag_name, attrs, children, meta)
-    parse_nodes(remaining, [node | acc])
-  end
-
-  defp parse_nodes([{:local_component, component_name, attrs, meta} | rest], acc) do
-    case meta[:closing] do
-      :self ->
-        node = component_node_with_whitespace(component_name, attrs, [], meta)
-        parse_nodes(rest, [node | acc])
-
-      _ ->
-        {children, remaining} = parse_children_until_close(rest, component_name, :local_component)
-
-        remaining =
-          case remaining do
-            [{:close, :local_component, ^component_name, _} | rest] ->
-              rest
-
-            [{:close, :local_component, close_name, close_meta} | _rest] ->
-              raise ParseError,
-                line: close_meta[:line],
-                column: close_meta[:column],
-                message:
-                  "expected closing tag </.#{component_name}> (opened at line #{meta[:line]}) but found </.#{close_name}>"
-
-            [] ->
-              raise ParseError,
-                line: meta[:line],
-                column: meta[:column],
-                message: "expected closing tag </.#{component_name}>"
-
-            other ->
-              other
-          end
-
-        node = component_node_with_whitespace(component_name, attrs, children, meta)
-        parse_nodes(remaining, [node | acc])
-    end
-  end
-
-  defp parse_nodes([{:slot, slot_name, attrs, meta} | rest], acc) do
-    {children, remaining} = parse_children_until_close(rest, slot_name, :slot)
-
-    remaining =
-      case remaining do
-        [{:close, :slot, ^slot_name, _} | rest] ->
-          rest
-
-        [{:close, :slot, close_name, close_meta} | _rest] ->
+      {exp_type, exp_name, exp_meta} ->
+        if tags_match?(close_type, close_name, exp_type, exp_name) do
+          {Enum.reverse(acc), rest}
+        else
           raise ParseError,
             line: close_meta[:line],
             column: close_meta[:column],
             message:
-              "expected closing tag </:#{slot_name}> (opened at line #{meta[:line]}) but found </:#{close_name}>"
-
-        [] ->
-          raise ParseError,
-            line: meta[:line],
-            column: meta[:column],
-            message: "expected closing tag </:#{slot_name}>"
-
-        other ->
-          other
-      end
-
-    node = %Slot{
-      attributes: parse_attributes(attrs),
-      children: children,
-      column: meta[:column],
-      line: meta[:line],
-      name: slot_name,
-      post: "",
-      pre: ""
-    }
-
-    parse_nodes(remaining, [node | acc])
-  end
-
-  defp parse_nodes([{:close, _type, _name, _meta} | rest], acc) do
-    {Enum.reverse(acc), rest}
-  end
-
-  defp parse_children_until_close(tokens, target_name, type \\ :tag) do
-    parse_children_until_close(tokens, target_name, type, [])
-  end
-
-  defp parse_children_until_close([], _target_name, _type, acc) do
-    {Enum.reverse(acc), []}
-  end
-
-  defp parse_children_until_close(
-         [{:close, :tag, name, _meta} | rest] = tokens,
-         target_name,
-         :tag,
-         acc
-       )
-       when is_binary(name) and is_binary(target_name) do
-    if String.downcase(name) == target_name do
-      {Enum.reverse(acc), tokens}
-    else
-      parse_children_until_close(rest, target_name, :tag, acc)
+              "expected closing tag #{format_close_tag(exp_type, exp_name)} (opened on #{exp_meta[:line]}:#{exp_meta[:column]})\nbut got #{format_close_tag(close_type, close_name)}"
+        end
     end
   end
 
-  defp parse_children_until_close([{:close, type, name, _meta} | _rest] = tokens, name, type, acc) do
-    {Enum.reverse(acc), tokens}
-  end
-
-  defp parse_children_until_close(
-         [{:close, _type, _name, _meta} = close | rest],
-         target_name,
-         :tag,
-         acc
-       ) do
-    parse_children_until_close(rest, target_name, :tag, [close | acc])
-  end
-
-  defp parse_children_until_close([{:text, content, meta} | rest], target_name, type, acc) do
+  defp parse_nodes([{:text, content, meta} | rest], acc, expected_close) do
     {pre, trimmed, post} = extract_whitespace(content)
 
-    if String.starts_with?(trimmed, "<!--") and String.ends_with?(trimmed, "-->") do
-      comment_content =
-        trimmed
-        |> String.trim_leading("<!--")
-        |> String.trim_trailing("-->")
+    node =
+      if String.starts_with?(trimmed, "<!--") and String.ends_with?(trimmed, "-->") do
+        comment_content =
+          trimmed
+          |> String.trim_leading("<!--")
+          |> String.trim_trailing("-->")
 
-      node = %HTMLComment{
-        column: meta[:column],
-        content: comment_content,
-        line: meta[:line],
-        post: post,
-        pre: pre
-      }
+        %HTMLComment{
+          column: meta[:column],
+          content: comment_content,
+          line: meta[:line],
+          post: post,
+          pre: pre
+        }
+      else
+        %Text{
+          column: meta[:column],
+          content: trimmed,
+          line: meta[:line],
+          post: post,
+          pre: pre
+        }
+      end
 
-      parse_children_until_close(rest, target_name, type, [node | acc])
-    else
-      node = %Text{
-        column: meta[:column],
-        content: trimmed,
-        line: meta[:line],
-        post: post,
-        pre: pre
-      }
-
-      parse_children_until_close(rest, target_name, type, [node | acc])
-    end
+    parse_nodes(rest, [node | acc], expected_close)
   end
 
-  defp parse_children_until_close([{:eex_comment, content, meta} | rest], target_name, type, acc) do
+  defp parse_nodes([{:eex_comment, content, meta} | rest], acc, expected_close) do
     node = %EExComment{
       column: meta[:column],
       content: content,
@@ -726,23 +542,23 @@ defmodule Pyro.HEEx.AST do
       pre: ""
     }
 
-    parse_children_until_close(rest, target_name, type, [node | acc])
+    parse_nodes(rest, [node | acc], expected_close)
   end
 
-  defp parse_children_until_close([{:eex, _type, expr, meta} | rest], target_name, type, acc) do
+  defp parse_nodes([{:eex, _type, expr, meta} | rest], acc, expected_close) do
     node = %EExExpression{
       column: meta[:column],
       expression: expr,
       line: meta[:line],
-      opt: meta[:opt] || "",
+      operator: meta[:opt] || "",
       post: "",
       pre: ""
     }
 
-    parse_children_until_close(rest, target_name, type, [node | acc])
+    parse_nodes(rest, [node | acc], expected_close)
   end
 
-  defp parse_children_until_close([{:body_expr, expr, meta} | rest], target_name, type, acc) do
+  defp parse_nodes([{:body_expr, expr, meta} | rest], acc, expected_close) do
     node = %Expression{
       column: meta[:column],
       expression: expr,
@@ -751,127 +567,45 @@ defmodule Pyro.HEEx.AST do
       pre: ""
     }
 
-    parse_children_until_close(rest, target_name, type, [node | acc])
+    parse_nodes(rest, [node | acc], expected_close)
   end
 
-  defp parse_children_until_close(
-         [{:tag, tag_name, attrs, %{closing: closing} = meta} | rest],
-         target_name,
-         type,
-         acc
-       )
-       when closing in [:void, :self] do
-    tag_name = String.downcase(tag_name)
-    node = tag_node_with_whitespace(tag_name, attrs, [], meta)
-    parse_children_until_close(rest, target_name, type, [node | acc])
-  end
+  defp parse_nodes([{:tag, tag, attrs, meta} | rest], acc, expected_close) do
+    tag = String.downcase(tag)
+    self_closing? = meta[:closing] in [:void, :self]
 
-  defp parse_children_until_close([{:tag, tag_name, attrs, meta} | rest], target_name, type, acc) do
-    tag_name = String.downcase(tag_name)
-    {children, remaining} = parse_children_until_close(rest, tag_name)
-
-    remaining =
-      case remaining do
-        [{:close, :tag, close_name, close_meta} | rest] ->
-          if String.downcase(close_name) == tag_name do
-            rest
-          else
-            [{:close, :tag, close_name, close_meta} | rest]
-          end
-
-        [] ->
-          raise ParseError,
-            line: meta[:line],
-            column: meta[:column],
-            message: "expected closing tag </#{tag_name}>"
-
-        other ->
-          other
+    {children, rest} =
+      if self_closing? do
+        {[], rest}
+      else
+        parse_nodes(rest, [], {:tag, tag, meta})
       end
 
-    node = tag_node_with_whitespace(tag_name, attrs, children, meta)
-    parse_children_until_close(remaining, target_name, type, [node | acc])
-  end
-
-  defp parse_children_until_close(
-         [{:local_component, component_name, attrs, %{closing: :self} = meta} | rest],
-         target_name,
-         type,
-         acc
-       ) do
-    node = component_node_with_whitespace(component_name, attrs, [], meta)
-    parse_children_until_close(rest, target_name, type, [node | acc])
-  end
-
-  defp parse_children_until_close(
-         [{:local_component, component_name, attrs, meta} | rest],
-         target_name,
-         type,
-         acc
-       ) do
-    {children, remaining} = parse_children_until_close(rest, component_name, :local_component)
-
-    remaining =
-      case remaining do
-        [{:close, :local_component, ^component_name, _} | rest] ->
-          rest
-
-        [] ->
-          raise ParseError,
-            line: meta[:line],
-            column: meta[:column],
-            message: "expected closing tag </.#{component_name}>"
-
-        other ->
-          other
-      end
-
-    node = component_node_with_whitespace(component_name, attrs, children, meta)
-    parse_children_until_close(remaining, target_name, type, [node | acc])
-  end
-
-  defp parse_children_until_close(
-         [{:slot, slot_name, attrs, meta} | rest],
-         target_name,
-         type,
-         acc
-       ) do
-    {children, remaining} = parse_children_until_close(rest, slot_name, :slot)
-
-    remaining =
-      case remaining do
-        [{:close, :slot, ^slot_name, _} | rest] -> rest
-        other -> other
-      end
-
-    node = %Slot{
-      attributes: parse_attributes(attrs),
-      children: children,
-      column: meta[:column],
-      line: meta[:line],
-      name: slot_name,
-      post: "",
-      pre: ""
-    }
-
-    parse_children_until_close(remaining, target_name, type, [node | acc])
-  end
-
-  defp tag_node_with_whitespace(name, attrs, children, meta) do
-    %Element{
+    node = %Element{
       attributes: parse_attributes(attrs),
       children: children,
       column: meta[:column],
       line: meta[:line],
       post: "",
       pre: "",
-      self_closing?: meta[:closing] in [:void, :self],
-      tag: name
+      self_closing?: self_closing?,
+      tag: tag
     }
+
+    parse_nodes(rest, [node | acc], expected_close)
   end
 
-  defp component_node_with_whitespace(name, attrs, children, meta) do
-    %Component{
+  defp parse_nodes([{:local_component, name, attrs, meta} | rest], acc, expected_close) do
+    self_closing? = meta[:closing] in [:void, :self]
+
+    {children, rest} =
+      if self_closing? do
+        {[], rest}
+      else
+        parse_nodes(rest, [], {:local_component, name, meta})
+      end
+
+    node = %Component{
       attributes: parse_attributes(attrs),
       children: children,
       column: meta[:column],
@@ -879,9 +613,42 @@ defmodule Pyro.HEEx.AST do
       name: name,
       post: "",
       pre: "",
-      self_closing?: meta[:closing] == :self
+      self_closing?: self_closing?
     }
+
+    parse_nodes(rest, [node | acc], expected_close)
   end
+
+  defp parse_nodes([{:slot, slot_name, attrs, meta} | rest], acc, expected_close) do
+    {children, remaining} = parse_nodes(rest, [], {:slot, slot_name, meta})
+
+    node = %Slot{
+      attributes: parse_attributes(attrs),
+      children: children,
+      column: meta[:column],
+      line: meta[:line],
+      name: slot_name,
+      post: "",
+      pre: ""
+    }
+
+    parse_nodes(remaining, [node | acc], expected_close)
+  end
+
+  defp tags_match?(:tag, close_name, :tag, open_name) do
+    String.downcase(close_name) == open_name
+  end
+
+  defp tags_match?(type, name, type, name), do: true
+  defp tags_match?(_, _, _, _), do: false
+
+  defp format_close_tag(:tag, name), do: "</#{name}>"
+  defp format_close_tag(:local_component, name), do: "</.#{name}>"
+  defp format_close_tag(:slot, name), do: "</:#{name}>"
+
+  defp format_open_tag(:tag, name), do: "<#{name}>"
+  defp format_open_tag(:local_component, name), do: "<.#{name}>"
+  defp format_open_tag(:slot, name), do: "<:#{name}>"
 
   defp extract_whitespace(content) do
     trimmed = String.trim(content)
@@ -895,6 +662,9 @@ defmodule Pyro.HEEx.AST do
     end
   end
 
+  @doc """
+  Parse and/or normalize attributes into AST.
+  """
   def parse_attributes(attributes) when is_list(attributes) do
     attributes
     |> Enum.reduce([], fn attribute, acc ->
@@ -909,6 +679,9 @@ defmodule Pyro.HEEx.AST do
     |> Enum.reverse()
   end
 
+  @doc """
+  Parse and/or normalize an attribute into AST.
+  """
   def parse_attribute(%Attribute{name: name} = attribute),
     do: normalize_attribute(%{attribute | name: String.downcase(name)})
 

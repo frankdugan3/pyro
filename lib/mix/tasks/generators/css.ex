@@ -29,7 +29,7 @@ defmodule Mix.Tasks.Pyro.Generators.CSS do
       <%= class.template.rendered %>
       <% end %>
       ''',
-      [assigns: assigns]
+      assigns: assigns
     )
   end
 
