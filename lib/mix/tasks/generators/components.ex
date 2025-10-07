@@ -34,7 +34,7 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
         if @attr.required do %>, required: true<% end %><%=
         if @attr.doc do %>, doc: <%= inspect @attr.doc %><% end %>
       ''',
-      [assigns: assigns]
+      assigns: assigns
     )
   end
 
@@ -46,7 +46,7 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
         if @attr.include do %>, include: <%= inspect @attr.include %><% end %><%=
         if @attr.doc do %>, doc: <%= inspect @attr.doc %><% end %>
       ''',
-      [assigns: assigns]
+      assigns: assigns
     )
   end
 
@@ -81,7 +81,7 @@ defmodule Mix.Tasks.Pyro.Generators.Components do
         <% end %>
       end
       ''',
-      [assigns: assigns]
+      assigns: assigns
     )
   end
 
