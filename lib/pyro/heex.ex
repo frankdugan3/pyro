@@ -10,6 +10,9 @@ defmodule Pyro.HEEx do
   alias __MODULE__.AST
   alias __MODULE__.AST.{Element, Component, Attribute}
 
+  @type patterns :: String.t() | Regex.t() | [String.t() | Regex.t()]
+  @type popped_attributes :: %{(ast_path :: list(non_neg_integer)) => list(Attribute.t())}
+
   defp attribute_matches?(attr_name, pattern) when is_binary(pattern) do
     attr_name == pattern
   end
@@ -52,12 +55,7 @@ defmodule Pyro.HEEx do
   ## Examples
 
   """
-  @spec tally_attributes(
-          AST.t(),
-          String.t() | Regex.t() | [String.t() | Regex.t()]
-        ) :: %{
-          String.t() => %{any() => non_neg_integer()}
-        }
+  @spec tally_attributes(AST.t(), patterns()) :: %{String.t() => %{any() => non_neg_integer()}}
   def tally_attributes(%AST{nodes: nodes}, patterns) do
     tally_attributes_for_nodes(nodes, %{}, normalize_attribute_patterns(patterns))
   end
@@ -112,23 +110,20 @@ defmodule Pyro.HEEx do
 
   ## Examples
 
-      iex> ast = parse!(~S(<div pyro-component="button" class="btn"></div>))
-      iex> ast = pop_attributes(ast, "pyro-component")
+      iex> ast = parse!(~S(<div pyro-block="button" class="btn"></div>))
+      iex> ast = pop_attributes(ast, "pyro-block")
       iex> [%Element{attributes: [%Attribute{name: "class"}], tag: "div"}] = ast.nodes
-      iex> [{[0], %Attribute{name: "pyro-component"}}] = ast.context.popped_attributes
+      iex> %{[0] => [%Attribute{name: "pyro-block"}]} = ast.context.popped_attributes
   """
-  @spec pop_attributes(
-          AST.t(),
-          String.t() | Regex.t() | [String.t() | Regex.t()]
-        ) :: AST.t()
+  @spec pop_attributes(AST.t(), patterns()) :: AST.t()
   def pop_attributes(%AST{} = ast, patterns) do
     patterns = normalize_attribute_patterns(patterns)
-    {nodes, popped} = pop_attributes_from_nodes(ast.nodes, [], [], patterns, [])
+    {nodes, popped} = pop_attributes_from_nodes(ast.nodes, [], %{}, patterns, [])
 
     ast
     |> Map.put(:nodes, nodes)
     |> Map.update!(:context, fn context ->
-      Map.put(context, :popped_attributes, Enum.reverse(popped))
+      Map.put(context, :popped_attributes, popped)
     end)
   end
 
@@ -146,7 +141,7 @@ defmodule Pyro.HEEx do
     {attributes, popped} =
       Enum.reduce(node.attributes, {[], popped}, fn attribute, {attributes, popped} ->
         if Enum.any?(patterns, &attribute_matches?(attribute.name, &1)) do
-          {attributes, [{path, attribute} | popped]}
+          {attributes, Map.update(popped, path, [attribute], &(&1 ++ [attribute]))}
         else
           {[attribute | attributes], popped}
         end
@@ -201,6 +196,10 @@ defmodule Pyro.HEEx do
   def add_attributes!(ast, path, attributes) do
     attributes = List.wrap(attributes)
     Map.update!(ast, :nodes, &add_attributes_at_path(&1, path, attributes))
+  end
+
+  defp add_attributes_at_path(ast, _path, []) do
+    ast
   end
 
   defp add_attributes_at_path(_ast, [], _attributes) do

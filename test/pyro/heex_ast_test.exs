@@ -135,7 +135,8 @@ defmodule Pyro.HEEx.ASTTest do
                      """,
                      source_offset: 100,
                      line: 101,
-                     indentation: 10
+                     indentation: 10,
+                     pretty_errors?: false
                    )
                  end
 
@@ -165,7 +166,8 @@ defmodule Pyro.HEEx.ASTTest do
                      """,
                      source_offset: 100,
                      line: 101,
-                     indentation: 10
+                     indentation: 10,
+                     pretty_errors?: false
                    )
                  end
 
@@ -196,7 +198,8 @@ defmodule Pyro.HEEx.ASTTest do
                      """,
                      source_offset: 100,
                      line: 101,
-                     indentation: 10
+                     indentation: 10,
+                     pretty_errors?: false
                    )
                  end
 
@@ -226,7 +229,8 @@ defmodule Pyro.HEEx.ASTTest do
                      """,
                      source_offset: 100,
                      line: 101,
-                     indentation: 10
+                     indentation: 10,
+                     pretty_errors?: false
                    )
                  end
   end

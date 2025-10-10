@@ -53,4 +53,10 @@ _Generic tooling for building DSLs_
 
 @deps/spark/usage-rules.md
 <!-- spark-end -->
+<!-- autumn-start -->
+## autumn usage
+_Syntax highlighter powered by Tree-sitter and Neovim themes._
+
+@deps/autumn/usage-rules.md
+<!-- autumn-end -->
 <!-- usage-rules-end -->

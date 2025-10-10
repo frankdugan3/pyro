@@ -6,6 +6,13 @@ defmodule Pyro.Info do
   alias Spark.Dsl.Extension
 
   @doc """
+  Returns the statically configured transformer hook.
+  """
+  def transformer_hook(pyro) do
+    Extension.get_persisted(pyro, :transformer_hook)
+  end
+
+  @doc """
   Returns the statically configured component output path.
   """
   def component_output_path(pyro) do
@@ -59,5 +66,12 @@ defmodule Pyro.Info do
     for %LiveComponent{} = component <- Extension.get_entities(pyro, [:components]) do
       component
     end
+  end
+
+  @doc """
+  Get the CSS prefix.
+  """
+  def css_prefix(pyro) do
+    pyro |> Extension.get_opt([:css], :prefix, "")
   end
 end

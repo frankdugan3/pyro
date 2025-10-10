@@ -6,7 +6,7 @@ defmodule Pyro do
   - Add your own components
   - For a summary about what Pyro is, check out the [About](about.html) page.
   - To install and learn how it all fits together, follow the [Get Started](get-started.html) guide.
-  - For DSL documentation, check out [Component Library DSL](dsl-pyro-componentlibrary.html).
+  - For DSL documentation, check out [Component Library DSL](dsl-pyro-blocklibrary.html).
 
   #### Examples
 
@@ -26,6 +26,11 @@ defmodule Pyro do
       component_libraries: {:wrap_list, {:spark, Pyro.ComponentLibrary}}
     ],
     opt_schema: [
+      debug?: [
+        type: :boolean,
+        default: false,
+        doc: "If true, will output debug information for components."
+      ],
       transformer_hook: [
         type: {:behaviour, __MODULE__.ComponentLibrary.Dsl.Transformer.Hook},
         required: true,
@@ -76,7 +81,7 @@ defmodule Pyro do
 
   @doc false
   @impl Spark.Dsl
-  def handle_before_compile(_opts) do
+  def handle_before_compile(opts) do
     quote do
       @external_resource "lib/mix/tasks/generators/components.ex"
       @external_resource "lib/mix/tasks/generators/css.ex"
@@ -85,13 +90,16 @@ defmodule Pyro do
 
       def __generate_templates__(env, _bytecode) do
         Mix.Tasks.Pyro.Generators.CSS.generate(env.module)
-        Mix.Tasks.Pyro.Generators.Components.generate(env.module)
+        component_code = Mix.Tasks.Pyro.Generators.Components.generate(env.module)
 
         if !Pyro.Info.component_output_path(env.module) do
-          component_code =
-            env.module
-            |> Mix.Tasks.Pyro.Generators.Components.gen_module(embedded?: true)
-            |> Code.eval_string()
+          Code.eval_string(component_code)
+        end
+
+        if unquote(opts[:debug?]) do
+          ("\n" <> component_code)
+          |> Autumn.highlight!(language: "elixir", formatter: :terminal)
+          |> IO.puts()
         end
       end
 

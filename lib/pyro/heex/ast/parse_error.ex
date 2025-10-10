@@ -9,6 +9,7 @@ defmodule Pyro.HEEx.AST.ParseError do
     file: "nofile",
     indentation: 0,
     line: 0,
+    pretty?: true,
     source_offset: 0
   ]
 
@@ -18,6 +19,7 @@ defmodule Pyro.HEEx.AST.ParseError do
           column: column,
           indentation: indentation,
           line: line,
+          pretty?: pretty?,
           snippet: nil,
           source: source,
           source_offset: source_offset
@@ -38,13 +40,13 @@ defmodule Pyro.HEEx.AST.ParseError do
         arrow = String.duplicate(" ", column - 1) <> "^"
 
         acc =
-          "#{line_number + source_offset} | #{indentation}#{expr}\n #{number_padding}| #{arrow}"
+          "#{line_number + source_offset} | #{indentation}#{highlight(expr, pretty?)}\n #{number_padding}| #{arrow}"
 
         {acc, line_number + 1}
 
       expr, line_number ->
         line_number_padding = String.pad_leading("#{line_number + source_offset}", digits)
-        {"#{line_number_padding} | #{indentation}#{expr}", line_number + 1}
+        {"#{line_number_padding} | #{indentation}#{highlight(expr, pretty?)}", line_number + 1}
     end)
     |> case do
       {[], _} ->
@@ -64,4 +66,7 @@ defmodule Pyro.HEEx.AST.ParseError do
 
     "#{location} #{exception.message}#{exception.snippet}"
   end
+
+  defp highlight(code, false), do: code
+  defp highlight(code, true), do: Autumn.highlight!(code, language: "heex", formatter: :terminal)
 end

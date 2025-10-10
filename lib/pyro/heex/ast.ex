@@ -350,6 +350,7 @@ defmodule Pyro.HEEx.AST do
     |> Keyword.put_new(:indentation, 0)
     |> Keyword.put_new(:source_offset, 0)
     |> Keyword.put_new(:tag_handler, HTMLEngine)
+    |> Keyword.put_new(:pretty_errors?, true)
     |> Keyword.put(:trailing_whitespace, trailing)
   end
 
@@ -385,7 +386,8 @@ defmodule Pyro.HEEx.AST do
           source: template,
           line: meta.line,
           column: meta.column,
-          message: message
+          message: message,
+          pretty?: opts[:pretty_errors?]
     end
   end
 

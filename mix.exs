@@ -49,7 +49,6 @@ defmodule Pyro.MixProject do
 
     [
       main: "about",
-      assets: %{"vhs/output" => "vhs"},
       source_ref: "v#{@version}",
       output: "doc",
       source_url: @source_url,
@@ -147,7 +146,6 @@ defmodule Pyro.MixProject do
       {:ex_check, "~> 0.15",
        [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
       {:faker, "~> 0.17", only: [:test, :dev]},
-      {:floki, ">= 0.30.0", only: :test},
       {:usage_rules, ">= 0.0.0", only: :dev},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
       {:mix_test_interactive, ">= 0.0.0", only: :dev, runtime: false},
@@ -160,6 +158,7 @@ defmodule Pyro.MixProject do
       {:makeup_html, ">= 0.0.0", only: :docs},
       {:makeup_elixir, ">= 0.0.0", only: :docs},
       # Core dependencies
+      {:autumn, "~> 0.5"},
       {:igniter, "~> 0.5"},
       {:sourceror, "~> 1.7"},
       {:phoenix_live_view, "~> 1.0"},

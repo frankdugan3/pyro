@@ -29,7 +29,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
       :default,
       :doc,
       :examples,
-      :include,
       :name,
       :required,
       :slot,
@@ -53,7 +52,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
         type: {:wrap_list, :any},
         doc: "document a non-exhaustive list of accepted values"
       ],
-      include: [type: {:wrap_list, :string}, doc: "extra global attributes to include"],
       name: [type: :atom, required: true, doc: "name of the prop"],
       required: [type: :boolean, doc: "marks prop as required"],
       type: [
@@ -114,27 +112,124 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
   defmodule Variant do
     @moduledoc false
-    @type t :: %__MODULE__{name: atom()}
+    @type t :: %__MODULE__{
+            default: any(),
+            doc: binary() | nil,
+            examples: list() | nil,
+            name: atom(),
+            hook: module(),
+            required: boolean(),
+            slot: atom() | nil,
+            type:
+              :any
+              | :string
+              | :atom
+              | :boolean
+              | :integer
+              | :float
+              | :list
+              | :map
+              | module(),
+            values: list() | nil,
+            meta: map()
+          }
 
     # quokka:sort
-    defstruct [:name, __spark_metadata__: nil]
+    defstruct [
+      :default,
+      :doc,
+      :examples,
+      :hook,
+      :name,
+      :required,
+      :slot,
+      :type,
+      :values,
+      __spark_metadata__: nil,
+      meta: %{}
+    ]
   end
 
   @variant %Spark.Dsl.Entity{
-    args: [:name],
+    args: [:name, :type, {:optional, :hook}],
     describe: """
     Declare a prop constrained to a theme variant.
     """,
     name: :variant,
     # quokka:sort
     schema: [
+      default: [doc: "default value for the prop", type: :any],
+      doc: [type: :string, doc: "documentation for the vairant"],
+      examples: [
+        type: {:wrap_list, :any},
+        doc: "document a non-exhaustive list of accepted values"
+      ],
+      hook: [
+        doc: "hook module",
+        type:
+          {:or,
+           [
+             {:list, {:behaviour, __MODULE__.ComponentLibrary.Dsl.Transformer.Hook}},
+             {:behaviour, __MODULE__.ComponentLibrary.Dsl.Transformer.Hook}
+           ]},
+        required: true
+      ],
+      map: [type: :map, doc: "metadata for transformer"],
       name: [
         doc: "name of the prop",
         required: true,
         type: :atom
-      ]
+      ],
+      required: [type: :boolean, doc: "marks variant as required"],
+      type: [
+        type:
+          {:or,
+           [
+             :module,
+             {
+               :one_of,
+               [:any, :string, :atom, :boolean, :integer, :float, :list, :map, :global]
+             }
+           ]},
+        required: true,
+        doc: "type of the variant"
+      ],
+      values: [type: {:list, :any}, doc: "exhaustive list of accepted values"]
     ],
     target: __MODULE__.Variant
+  }
+  defmodule Block do
+    @moduledoc false
+    @type t :: %__MODULE__{hook: module(), meta: map()}
+
+    # quokka:sort
+    defstruct [:hook, __spark_metadata__: nil, meta: %{}]
+  end
+
+  @block %Spark.Dsl.Entity{
+    args: [:hook],
+    describe: """
+    Configure block for a given transformer hook.
+    """,
+    name: :block,
+    # quokka:sort
+    schema: [
+      hook: [
+        doc: "hook module",
+        required: true,
+        type: {:behaviour, __MODULE__.ComponentLibrary.Dsl.Transformer.Hook}
+      ],
+      meta: [
+        type: :map,
+        doc: "block metadata for hook"
+      ]
+    ],
+    snippet: """
+    hook ${1} do
+      meta %{${0}}
+    end
+    """,
+    target: __MODULE__.Block
   }
 
   defmodule Calc do
@@ -265,7 +360,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
         ]
 
         ast = Pyro.HEEx.AST.parse!(content, opts)
-        tally = Pyro.HEEx.tally_attributes(ast, "pyro-component")
+        tally = Pyro.HEEx.tally_attributes(ast, "pyro-block")
 
         root_node =
           ast.nodes
@@ -275,7 +370,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
         total_count =
           tally
-          |> Map.get("pyro-component", %{})
+          |> Map.get("pyro-block", %{})
           |> Map.values()
           |> Enum.sum()
 
@@ -287,7 +382,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
             source: content,
             indentation: opts[:indentation],
             source_offset: opts[:source_offset],
-            message: "The attribute \"pyro-component\" must appear exactly once per sigil"
+            message: "The attribute \"pyro-block\" must appear exactly once per sigil"
         end
       end
 
@@ -320,7 +415,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     snippet: ~S[
       render assigns do
         ~H"""
-        <${1:div} pyro-component>
+        <${1:div} pyro-block>
           ${0}
         </${1}>
         """
@@ -338,6 +433,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     @type t :: %__MODULE__{
             assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
             doc: String.t() | nil,
+            blocks: list(Dsl.Block.t()),
             name: atom(),
             private?: boolean(),
             render: list(Dsl.Render.t()),
@@ -347,6 +443,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     # quokka:sort
     defstruct [
       :assigns,
+      :blocks,
       :doc,
       :name,
       :private?,
@@ -372,6 +469,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
   # quokka:sort
   @shared_component_entities [
     assigns: [@calc, @global, @prop, @variant],
+    blocks: [@block],
     render: [@render],
     slots: [@slot]
   ]
@@ -400,6 +498,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     alias Pyro.ComponentLibrary.Dsl
 
     @type t :: %__MODULE__{
+            blocks: list(Dsl.Block.t()),
             assigns: list(Dsl.Prop.t() | Dsl.Global.t() | Dsl.Calc.t() | Dsl.Variant.t()),
             components: list(Dsl.Component.t()),
             doc: binary() | nil,
@@ -410,6 +509,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     # quokka:sort
     defstruct [
       :assigns,
+      :blocks,
       :components,
       :doc,
       :name,
@@ -450,12 +550,12 @@ defmodule Pyro.ComponentLibrary.Dsl do
   end
 
   @token_type {:one_of, ~w[color size]a}
-  @theme_property %Spark.Dsl.Entity{
+  @css_property %Spark.Dsl.Entity{
     args: [:name, {:optional, :type}],
     describe: """
     Declare/extend a theme property.
     """,
-    name: :theme,
+    name: :property,
     # quokka:sort
     schema: [
       default: [
@@ -480,31 +580,35 @@ defmodule Pyro.ComponentLibrary.Dsl do
         default: :color,
         doc: "default type of tokens"
       ],
-      variants: [
-        type: {:list, :atom},
-        doc: "variants of this property"
-      ]
+      variants: [type: {:list, :atom}, doc: "variants of this property"]
     ],
     target: __MODULE__.ThemeProperty
   }
 
-  @theme_properties %Spark.Dsl.Section{
+  @css %Spark.Dsl.Section{
     describe: """
     List of theme properties to declare/extend.
     """,
-    entities: [@theme_property],
-    name: :theme_properties,
-    top_level?: true
+    entities: [@css_property],
+    name: :css,
+    schema: [
+      prefix: [
+        type: :string,
+        doc: "The CSS prefix to namespace the components."
+      ]
+    ]
   }
 
   @transformers [
+    __MODULE__.Transformer.MergeCSS,
     __MODULE__.Transformer.MergeComponents,
-    __MODULE__.Transformer.ApplyHooks
+    __MODULE__.Transformer.ApplyHooks,
+    __MODULE__.Transformer.BuildComponents
   ]
 
   @verifiers []
 
-  @sections [@theme_properties, @components]
+  @sections [@css, @components]
 
   use Spark.Dsl.Extension,
     sections: @sections,

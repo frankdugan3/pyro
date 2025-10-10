@@ -1,10 +1,11 @@
-defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
+defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
   @moduledoc """
-  A component transformer that applies standard BEM classes.
+  A component transformer that applies DaisyUI styles.
   """
 
   use Pyro.ComponentLibrary.Dsl.Transformer.Hook
 
+  alias Pyro.ComponentLibrary.Dsl.Block
   alias Pyro.ComponentLibrary.Dsl.Component
   alias Pyro.ComponentLibrary.Dsl.LiveComponent
   alias Pyro.ComponentLibrary.Dsl.Render
@@ -30,12 +31,12 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
 
   defp do_transform(component, context) do
     prefix = Pyro.Info.css_prefix(context.dsl)
-    component_name = bem_component_name(component, prefix)
+    base_class = get_base_class(component, prefix)
 
     context =
       context
       |> Map.put(:component, component)
-      |> Map.put(:component_name, component_name)
+      |> Map.put(:base_class, base_class)
 
     component
     |> Map.update!(:render, fn renders ->
@@ -59,7 +60,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
           [inspect(value) | acc]
 
         %Attribute{name: "pyro-block"}, acc ->
-          [inspect(context.component_name) | acc]
+          [inspect(context.base_class) | acc]
 
         %Attribute{name: "pyro-variant", type: :string, value: value} = attr, acc ->
           name = String.to_existing_atom(value)
@@ -69,16 +70,16 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
                  &(&1.name == name && __MODULE__ == &1.hook)
                ) do
             %Variant{default: nil, type: :atom} ->
-              [~s[@#{value} && "#{context.component_name}--\#{@#{value}}"] | acc]
+              [~s[@#{value} && "#{context.base_class}-\#{@#{value}}"] | acc]
 
             %Variant{default: default, type: :atom} when is_atom(default) ->
-              [~s["#{context.component_name}--\#{@#{value}}"] | acc]
+              [~s["#{context.base_class}-\#{@#{value}}"] | acc]
 
             %Variant{default: nil, type: :string} ->
-              ["@#{value} && #{inspect(context.component_name <> "--")} <> @#{value}" | acc]
+              ["@#{value} && #{inspect(context.base_class <> "-")} <> @#{value}" | acc]
 
             %Variant{default: default, type: :string} when is_binary(default) ->
-              ["#{inspect(context.component_name <> "--")} <> @#{value}" | acc]
+              ["#{inspect(context.base_class <> "-")} <> @#{value}" | acc]
 
             nil ->
               opts = context.ast.opts
@@ -109,9 +110,10 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
     ]
   end
 
-  defp bem_component_name(%Component{} = component, prefix) do
-    "#{prefix}#{component.name}"
-    |> String.downcase()
-    |> String.replace("_", "-")
+  defp get_base_class(component, prefix) do
+    case Enum.find(component.blocks, &(&1.hook == __MODULE__)) do
+      %Block{meta: %{base_class: base_class}} -> "#{prefix}#{base_class}"
+      _ -> "#{prefix}#{component.name}"
+    end
   end
 end

@@ -2,14 +2,20 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
   @moduledoc false
   use Spark.Dsl.Transformer
 
+  alias Pyro.ComponentLibrary.Dsl.Block
   alias Pyro.ComponentLibrary.Dsl.Calc
   alias Pyro.ComponentLibrary.Dsl.Component
   alias Pyro.ComponentLibrary.Dsl.Global
   alias Pyro.ComponentLibrary.Dsl.LiveComponent
   alias Pyro.ComponentLibrary.Dsl.Prop
+  alias Pyro.ComponentLibrary.Dsl.Transformer.MergeCSS
+  alias Pyro.ComponentLibrary.Dsl.Variant
   alias Spark.Dsl.Extension
   alias Spark.Dsl.Transformer
   alias Spark.Error.DslError
+
+  @impl true
+  def after?(module), do: module in [MergeCSS]
 
   @impl true
   def transform(dsl) do
@@ -80,6 +86,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
 
       old_live_component
       |> merge_doc(live_component)
+      |> Map.update!(:blocks, &merge_blocks(&1, live_component.blocks, context))
       |> Map.update!(:assigns, &merge_assigns(&1, live_component.assigns, context))
       |> Map.update!(:slots, &merge_slots(&1, live_component.slots, context))
       |> Map.update!(:components, fn old_components ->
@@ -99,9 +106,25 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
       old_component
       |> maybe_override(:private?, component)
       |> merge_doc(component)
+      |> Map.update!(:blocks, &merge_blocks(&1, component.blocks, context))
       |> Map.update!(:assigns, &merge_assigns(&1, component.assigns, context))
       |> Map.update!(:slots, &merge_slots(&1, component.slots, context))
     end)
+  end
+
+  defp merge_blocks(old_blocks, new_blocks, _context) do
+    (old_blocks ++
+       new_blocks)
+    |> Enum.reduce(%{}, fn
+      %Block{} = block, blocks ->
+        blocks
+        |> Map.put_new(block.hook, block)
+        |> Map.update!(block.hook, fn old_block ->
+          old_block
+          |> Map.update!(:meta, &Map.merge(&1, block.meta))
+        end)
+    end)
+    |> Map.values()
   end
 
   defp merge_assigns(old_assigns, new_assigns, context) do
@@ -117,6 +140,17 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
           |> maybe_override(:skip_template_validation?, global)
           |> merge_doc(global)
         end)
+
+      %Variant{} = variant, assigns ->
+        if is_list(variant.hook) do
+          Enum.reduce(
+            variant.hook,
+            assigns,
+            &merge_variant(%{variant | hook: &1}, &2, context)
+          )
+        else
+          merge_variant(variant, assigns, context)
+        end
 
       %Calc{} = calc, assigns ->
         assigns
@@ -142,6 +176,21 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
         end)
     end)
     |> Map.values()
+  end
+
+  defp merge_variant(%Variant{} = variant, assigns, _context) do
+    assigns
+    |> Map.put_new({variant.name, variant.hook}, variant)
+    |> Map.update!({variant.name, variant.hook}, fn old_variant ->
+      old_variant
+      |> Map.update!(:meta, &Map.merge(&1, variant.meta))
+      |> maybe_override(:type, variant)
+      |> maybe_override(:required, variant)
+      |> maybe_override(:default, variant)
+      |> maybe_override(:examples, variant)
+      |> maybe_override(:values, variant)
+      |> merge_doc(variant)
+    end)
   end
 
   defp merge_slots(old_slots, new_slots, context) do
@@ -179,6 +228,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
     Map.update!(old, key, &maybe_override(&1, Map.get(new, key)))
   end
 
+  defp maybe_override(_old, :pyro_force_nil), do: nil
   defp maybe_override(_old, new) when not is_nil(new), do: new
   defp maybe_override(old, _new), do: old
   defp maybe_trim(value) when is_binary(value), do: String.trim(value)

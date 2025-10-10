@@ -13,15 +13,15 @@ defmodule Pyro.HEExTest do
     test "tallies specific attribute values" do
       tally =
         ~H"""
-        <div pyro-component="button">
-          <span pyro-component="icon">Content</span>
-          <p pyro-component="button">More content</p>
+        <div pyro-block="button">
+          <span pyro-block="icon">Content</span>
+          <p pyro-block="button">More content</p>
         </div>
         """
-        |> tally_attributes("pyro-component")
+        |> tally_attributes("pyro-block")
 
       assert tally == %{
-               "pyro-component" => %{
+               "pyro-block" => %{
                  "button" => 2,
                  "icon" => 1
                }
@@ -33,14 +33,14 @@ defmodule Pyro.HEExTest do
         """
         <div pyro-test="value1" pyro-other="value2">
           <span pyro-test="value3" regular-attr="ignored">Content</span>
-          <p pyro-component="button" pyro-test="value1">More content</p>
+          <p pyro-block="button" pyro-test="value1">More content</p>
         </div>
         """
         |> parse!()
         |> tally_attributes(~r/^pyro-/)
 
       assert tally == %{
-               "pyro-component" => %{
+               "pyro-block" => %{
                  "button" => 1
                },
                "pyro-other" => %{
@@ -112,7 +112,7 @@ defmodule Pyro.HEExTest do
         </div>
         """
         |> parse!()
-        |> tally_attributes("pyro-component")
+        |> tally_attributes("pyro-block")
 
       assert tally == %{}
     end
@@ -147,14 +147,14 @@ defmodule Pyro.HEExTest do
     test "tallies complex real-world template" do
       tally =
         """
-        <article pyro-component="post">
-          <header pyro-component="post-header">
+        <article pyro-block="post">
+          <header pyro-block="post-header">
             <h1 pyro-element="title">{@post.title}</h1>
             <time pyro-element="timestamp"><%=@post.created_at%></time>
           </header>
-          <section pyro-component="post-body" pyro-enhanced>
+          <section pyro-block="post-body" pyro-enhanced>
             <p pyro-element="content">{@post.body}</p>
-            <div pyro-component="actions">
+            <div pyro-block="actions">
               <button pyro-action="like" pyro-enhanced>Like</button>
               <button pyro-action="share">Share</button>
             </div>
@@ -169,7 +169,7 @@ defmodule Pyro.HEExTest do
                  "like" => 1,
                  "share" => 1
                },
-               "pyro-component" => %{
+               "pyro-block" => %{
                  "actions" => 1,
                  "post" => 1,
                  "post-body" => 1,

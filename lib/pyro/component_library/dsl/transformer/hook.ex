@@ -1,6 +1,10 @@
 defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
   @moduledoc """
   Behaviour for implementing component transformers.
+
+  The appropriate way to use this feature is to make small transformations to attributes in `~H` templates and validate the required DSL options (like prop variants).
+
+  While this hook empowers you to modify anything in the DSL, it is *strongly* recommended that you excercise restraint, especially in the render functions, as debugging errors caused by transformations will be very opaque to the end user.
   """
 
   alias Pyro.ComponentLibrary.Dsl.Component
@@ -10,23 +14,60 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
   alias Pyro.HEEx.AST
 
   @type component :: %Component{} | %LiveComponent{}
+  @type context :: map()
 
   @callback transform_component(component(), map()) :: component()
 
-  def pop_render_attrs(%Render{} = render, pattern, context) do
+  defmacro __using__(_) do
+    quote do
+      @behaviour unquote(__MODULE__)
+
+      import unquote(__MODULE__)
+    end
+  end
+
+  @doc """
+  Pops matching attributes from all `~H` blocks in a render function. Popped attributes are returned in the context as a nested map:
+
+  ```elixir
+  %{
+    popped_attributes => %{
+      sigil_H_index => %{
+        ast_path => popped_attributes
+      }
+    }
+  }
+  ```
+  """
+  @spec pop_render_attrs(Render.t(), HEEx.patterns(), context()) :: {Render.t(), context()}
+  def pop_render_attrs(%Render{} = render, patterns, context) do
     transform_heex(
       render,
       fn %AST{} = ast, context ->
-        ast = HEEx.pop_attributes(ast, pattern)
+        ast = HEEx.pop_attributes(ast, patterns)
+        attrs = ast.context.popped_attributes
+        context = merge_popped_attributes(context, attrs)
+        {ast, context}
+      end,
+      context
+    )
+  end
 
-        attrs =
-          Enum.map(ast.context.popped_attributes, fn {path, attr} ->
-            {context.sigil_H_index, path, attr}
-          end)
+  @spec transform_render_attrs(
+          Render.t(),
+          HEEx.patterns(),
+          transformer :: (list(Attribute.t()), context() -> list(Attribute.t())),
+          context()
+        ) :: {Render.t(), context()}
+  def transform_render_attrs(%Render{} = render, patterns, transformer, context) do
+    transform_heex(
+      render,
+      fn %AST{} = ast, context ->
+        ast = HEEx.pop_attributes(ast, patterns)
 
-        context =
-          Map.update(context, :popped_attributes, attrs, fn popped_attributes ->
-            popped_attributes ++ attrs
+        ast =
+          Enum.reduce(ast.context.popped_attributes, ast, fn {path, attrs}, ast ->
+            HEEx.add_attributes!(ast, path, transformer.(attrs, Map.put(context, :ast, ast)))
           end)
 
         {ast, context}
@@ -35,6 +76,24 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
     )
   end
 
+  defp merge_popped_attributes(%{popped_attributes: _} = context, attrs) do
+    Map.update(
+      context,
+      context.sigil_H_index,
+      attrs,
+      &Map.merge(&1, attrs, fn v1, v2 -> v1 ++ v2 end)
+    )
+  end
+
+  defp merge_popped_attributes(context, attrs) do
+    Map.put(context, :popped_attributes, %{context.sigil_H_index => attrs})
+  end
+
+  @spec transform_heex(
+          Render.t(),
+          transformer :: (AST.t(), context() -> {AST.t(), context()}),
+          context()
+        ) :: {Render.t(), context()}
   def transform_heex(%Render{expr: expr} = entity, transformer, context)
       when is_function(transformer, 2) do
     {updated_expr, context} =
@@ -59,6 +118,6 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
           {node, acc}
       end)
 
-    {%{entity | expr: updated_expr}, context}
+    {%{entity | expr: updated_expr}, context |> Map.delete(:sigil_H_index)}
   end
 end
