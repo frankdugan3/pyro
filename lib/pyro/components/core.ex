@@ -1,52 +1,61 @@
 defmodule Pyro.Components.Core do
   @moduledoc """
   A core set of functional `.heex` components for building web apps. It is similar to (and often API-compatible with) Phoenix's generated `core_components.ex`.
-
-  Compared to Phoenix's generated components, Pyro's implementation adds:
-
-  - Maintenance/bugfixes/new features, since it's a library
-  - A powerful DSL for customization
-  - Inputs
-    - `autofocus` prop for reliable focus on mount
-    - `hidden` input type with a slot for custom content
-  - A rich flash experience
-    - Auto-remove after (configurable) timeout
-    - Progress bar for auto-removed flash messages
-    - Define which flashes are included in which trays (supports multiple trays)
-  - Slightly cleaner, more semantic markup
-  - Extra components
-
-  There are more complex components outside the `Core` module, be sure to check those out as well.
   """
   use Pyro.ComponentLibrary
 
   alias Pyro.ComponentLibrary.Dsl.Transformer.Hook.{BEM, DaisyUI}
 
-  @nav_include ~w(href navigate patch method download target rel)
+  @nav_include ~w[href navigate patch method download target rel]
+  @daisy_ui_colors ~w[neutral primary secondary accent info success warning error]
+  @daisy_ui_default_color "neutral"
+  @daisy_ui_sizes ~w[xs sm md lg xl]
+  @daisy_ui_default_size "md"
+
+  component :badge do
+    doc """
+    A badge.
+    """
+
+    variant :color, :string, [BEM, DaisyUI] do
+      values @daisy_ui_colors
+      default @daisy_ui_default_color
+    end
+
+    variant :size, :string, [BEM, DaisyUI] do
+      values @daisy_ui_sizes
+      default @daisy_ui_default_size
+    end
+
+    global :rest
+    slot :inner_block, required: true
+
+    render assigns do
+      ~H"""
+      <div pyro-block="badge" pyro-variant="color" pyro-variant="size" {@rest}>
+        {render_slot(@inner_block)}
+      </div>
+      """
+    end
+  end
 
   component :button do
     doc """
     Renders a button with navigation support.
-
-    ## Examples
-
-        <.button>Send!</.button>
-        <.button phx-click="go" color="primary" size="lg">Send!</.button>
-        <.button navigate={~p"/"}>Home</.button>
     """
 
     block DaisyUI do
-      meta %{base_class: "btn"}
+      meta %{component_class: "btn"}
     end
 
     variant :color, :string, [BEM, DaisyUI] do
-      values ~w[neutral primary secondary accent info success warning error]
-      default "neutral"
+      values @daisy_ui_colors
+      default @daisy_ui_default_color
     end
 
     variant :size, :string, [BEM, DaisyUI] do
-      values ~w[xs sm md lg xl]
-      default "md"
+      values @daisy_ui_sizes
+      default @daisy_ui_default_size
     end
 
     global :rest, include: @nav_include ++ ~w(value disabled name)

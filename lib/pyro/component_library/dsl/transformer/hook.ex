@@ -17,12 +17,24 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
   @type context :: map()
 
   @callback transform_component(component(), map()) :: component()
+  @callback config_module() :: module()
+  @callback(validate_config(struct()) :: {:ok, struct()}, {:error, String.t()})
+
+  def validate_config(config), do: {:ok, config}
 
   defmacro __using__(_) do
     quote do
       @behaviour unquote(__MODULE__)
 
       import unquote(__MODULE__)
+
+      @impl true
+      def config_module, do: __MODULE__.Config
+
+      @impl true
+      def validate_config(config), do: {:ok, config}
+
+      defoverridable config_module: 0, validate_config: 1
     end
   end
 

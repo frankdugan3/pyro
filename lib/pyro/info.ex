@@ -1,6 +1,7 @@
 defmodule Pyro.Info do
   @moduledoc "Introspection for pyro."
 
+  alias Pyro.ComponentLibrary.Dsl.Block
   alias Pyro.ComponentLibrary.Dsl.Component
   alias Pyro.ComponentLibrary.Dsl.LiveComponent
   alias Spark.Dsl.Extension
@@ -73,5 +74,15 @@ defmodule Pyro.Info do
   """
   def css_prefix(pyro) do
     pyro |> Extension.get_opt([:css], :prefix, "")
+  end
+
+  @doc """
+  Get the component block config for transformer hook.
+  """
+  def component_block(%module{} = component, hook) when module in [Component, LiveComponent] do
+    case Enum.find(component.blocks, &(&1.hook == hook)) do
+      %Block{} = block -> block
+      _ -> nil
+    end
   end
 end

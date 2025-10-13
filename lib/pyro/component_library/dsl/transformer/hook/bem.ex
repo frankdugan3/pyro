@@ -2,7 +2,6 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
   @moduledoc """
   A component transformer that applies standard BEM classes.
   """
-
   use Pyro.ComponentLibrary.Dsl.Transformer.Hook
 
   alias Pyro.ComponentLibrary.Dsl.Component
@@ -11,6 +10,16 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
   alias Pyro.ComponentLibrary.Dsl.Variant
   alias Pyro.HEEx.AST.Attribute
   alias Pyro.HEEx.AST.ParseError
+
+  defmodule Config do
+    @moduledoc """
+    Configure the BEM transformer hook.
+    """
+    @type t :: %__MODULE__{}
+
+    # quokka:sort
+    defstruct []
+  end
 
   @impl true
   def transform_component(%LiveComponent{} = live_component, context) do

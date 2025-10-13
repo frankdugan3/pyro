@@ -151,7 +151,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
   end
 
   @variant %Spark.Dsl.Entity{
-    args: [:name, :type, {:optional, :hook}],
+    args: [:name, :type, :hook],
     describe: """
     Declare a prop constrained to a theme variant.
     """,
@@ -543,7 +543,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     top_level?: true
   }
 
-  defmodule ThemeProperty do
+  defmodule CSSProperty do
     @moduledoc false
     # quokka:sort
     defstruct [:default, :doc, :name, :tokens, :variants, __spark_metadata__: nil]
@@ -582,9 +582,8 @@ defmodule Pyro.ComponentLibrary.Dsl do
       ],
       variants: [type: {:list, :atom}, doc: "variants of this property"]
     ],
-    target: __MODULE__.ThemeProperty
+    target: __MODULE__.CSSProperty
   }
-
   @css %Spark.Dsl.Section{
     describe: """
     List of theme properties to declare/extend.
@@ -594,9 +593,43 @@ defmodule Pyro.ComponentLibrary.Dsl do
     schema: [
       prefix: [
         type: :string,
-        doc: "The CSS prefix to namespace the components."
+        doc: "The prefix to apply globally to managed CSS classes."
       ]
     ]
+  }
+  defmodule HookConfig do
+    @moduledoc false
+    # quokka:sort
+    defstruct [:hook, :opts, __spark_metadata__: nil]
+  end
+
+  @hook_config %Spark.Dsl.Entity{
+    args: [:hook, {:optional, :opts}],
+    describe: """
+    Configure hook options.
+    """,
+    name: :hook,
+    # quokka:sort
+    schema: [
+      hook: [
+        doc: "hook to configure",
+        type: {:behaviour, __MODULE__.ComponentLibrary.Dsl.Transformer.Hook}
+      ],
+      opts: [
+        type: :struct,
+        doc: "options for hook"
+      ]
+    ],
+    target: __MODULE__.HookConfig
+  }
+
+  @hooks %Spark.Dsl.Section{
+    describe: """
+    List of hooks to configure.
+    """,
+    entities: [@hook_config],
+    name: :hooks,
+    top_level?: true
   }
 
   @transformers [
@@ -608,7 +641,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
   @verifiers []
 
-  @sections [@css, @components]
+  @sections [@css, @hooks, @components]
 
   use Spark.Dsl.Extension,
     sections: @sections,

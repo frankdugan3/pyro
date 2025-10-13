@@ -6,7 +6,7 @@ defmodule Pyro.Component.CoreTest do
 
   defmodule CoreBEM do
     use Pyro,
-      debug?: true,
+      # debug?: true,
       component_libraries: Core,
       transformer_hook: BEM
 
@@ -21,8 +21,6 @@ defmodule Pyro.Component.CoreTest do
       component_libraries: Core,
       transformer_hook: DaisyUI
 
-    css do
-      prefix ""
-    end
+    hook DaisyUI, %DaisyUI.Config{prefix: "d-", tailwind_prefix: "tw"}
   end
 end
