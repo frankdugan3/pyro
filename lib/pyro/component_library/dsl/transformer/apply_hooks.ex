@@ -60,8 +60,8 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.ApplyHooks do
     Enum.map(renders, &apply_ast/1)
   end
 
-  defp apply_ast(%Render{} = render) do
-    expr =
+  defp apply_ast(%Render{sigils: %{}} = render) do
+    {expr, _} =
       Macro.prewalk(render.expr, 0, fn
         {:sigil_H, meta, [{:<<>>, string_meta, [content]}, modifiers]}, index ->
           content =
@@ -78,6 +78,8 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.ApplyHooks do
 
     %{render | expr: expr}
   end
+
+  defp apply_ast(render), do: render
 
   def get_config(dsl, hook) do
     case dsl

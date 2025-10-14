@@ -328,7 +328,11 @@ defmodule Pyro.ComponentLibrary.Dsl do
     alias Pyro.ComponentLibrary.Dsl
     alias Pyro.HEEx
 
-    @type t :: %__MODULE__{args: any(), expr: any(), sigils: %{non_neg_integer => HEEx.AST.t()}}
+    @type t :: %__MODULE__{
+            args: any(),
+            expr: any(),
+            sigils: %{non_neg_integer => HEEx.AST.t()} | nil
+          }
 
     # quokka:sort
     defstruct [:args, :expr, :sigils, __spark_metadata__: nil]
