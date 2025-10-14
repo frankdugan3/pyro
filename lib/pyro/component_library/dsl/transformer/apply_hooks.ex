@@ -5,7 +5,9 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.ApplyHooks do
   alias Pyro.ComponentLibrary.Dsl.Component
   alias Pyro.ComponentLibrary.Dsl.HookConfig
   alias Pyro.ComponentLibrary.Dsl.LiveComponent
+  alias Pyro.ComponentLibrary.Dsl.Render
   alias Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents
+  alias Pyro.HEEx.AST
   alias Spark.Dsl.Entity
   alias Spark.Dsl.Transformer
   alias Spark.Error.DslError
@@ -36,7 +38,9 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.ApplyHooks do
       components =
         for %module{} = component when module in [Component, LiveComponent] <-
               Transformer.get_entities(dsl, [:components]) do
-          hook.transform_component(component, context)
+          component
+          |> hook.transform_component(context)
+          |> Map.update!(:render, &apply_ast/1)
         end
 
       dsl =
@@ -50,6 +54,29 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.ApplyHooks do
 
       {:ok, dsl}
     end
+  end
+
+  defp apply_ast(renders) when is_list(renders) do
+    Enum.map(renders, &apply_ast/1)
+  end
+
+  defp apply_ast(%Render{} = render) do
+    expr =
+      Macro.prewalk(render.expr, 0, fn
+        {:sigil_H, meta, [{:<<>>, string_meta, [content]}, modifiers]}, index ->
+          content =
+            case Map.get(render.sigils, index) do
+              %AST{} = ast -> AST.encode(ast)
+              _ -> content
+            end
+
+          {{:sigil_H, meta, [{:<<>>, string_meta, [content]}, modifiers]}, index + 1}
+
+        node, acc ->
+          {node, acc}
+      end)
+
+    %{render | expr: expr}
   end
 
   def get_config(dsl, hook) do

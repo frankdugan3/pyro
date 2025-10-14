@@ -326,67 +326,67 @@ defmodule Pyro.ComponentLibrary.Dsl do
     @moduledoc false
 
     alias Pyro.ComponentLibrary.Dsl
+    alias Pyro.HEEx
 
-    @type t :: %__MODULE__{args: any(), expr: any(), template: String.t()}
+    @type t :: %__MODULE__{args: any(), expr: any(), sigils: %{non_neg_integer => HEEx.AST.t()}}
 
     # quokka:sort
-    defstruct [:args, :expr, :template, __spark_metadata__: nil]
+    defstruct [:args, :expr, :sigils, __spark_metadata__: nil]
 
     def transform(%__MODULE__{args: args, expr: [do: expr]} = entity) do
-      sigils =
-        Macro.prewalk(expr, [], fn
+      file = entity.__spark_metadata__.anno[:file]
+
+      {_, sigils} =
+        Macro.prewalk(expr, %{}, fn
           {:sigil_H, meta, [{:<<>>, string_meta, [content]}, _opts]} = node, acc ->
-            {node, [{content, meta, string_meta} | acc]}
+            opts = [
+              file: file,
+              line: string_meta[:line] + 1,
+              source_offset: meta[:line],
+              indentation: string_meta[:indentation] || 0
+            ]
+
+            ast = Pyro.HEEx.AST.parse!(content, opts)
+            i = map_size(acc)
+            {node, Map.put(acc, i, ast)}
 
           node, acc ->
             {node, acc}
         end)
-        |> elem(1)
-        |> Enum.reverse()
 
       if sigils != [] && !has_assigns?(args, :assigns) do
         raise Spark.Error.DslError,
           message: "~H requires a variable named \"assigns\" to exist and be set to a map"
       end
 
-      file = entity.__spark_metadata__.anno[:file]
+      # for {_index, ast} <- sigils do
+      # tally = Pyro.HEEx.tally_attributes(ast, "pyro-block")
 
-      for {content, meta, string_meta} <- sigils do
-        opts = [
-          file: file,
-          line: string_meta[:line] + 1,
-          source_offset: meta[:line],
-          indentation: string_meta[:indentation] || 0
-        ]
+      # root_node =
+      #   ast.nodes
+      #   |> Enum.find(fn node ->
+      #     node.__struct__ in [Pyro.HEEx.AST.Component, Pyro.HEEx.AST.Element]
+      #   end)
 
-        ast = Pyro.HEEx.AST.parse!(content, opts)
-        tally = Pyro.HEEx.tally_attributes(ast, "pyro-block")
+      # total_count =
+      #   tally
+      #   |> Map.get("pyro-block", %{})
+      #   |> Map.values()
+      #   |> Enum.sum()
 
-        root_node =
-          ast.nodes
-          |> Enum.find(fn node ->
-            node.__struct__ in [Pyro.HEEx.AST.Component, Pyro.HEEx.AST.Element]
-          end)
+      # if total_count != 1 do
+      #   raise Pyro.HEEx.AST.ParseError,
+      #     file: file,
+      #     line: root_node.line,
+      #     column: root_node.column,
+      #     source: content,
+      #     indentation: opts[:indentation],
+      #     source_offset: opts[:source_offset],
+      #     message: "The attribute \"pyro-block\" must appear exactly once per sigil"
+      # end
+      # end
 
-        total_count =
-          tally
-          |> Map.get("pyro-block", %{})
-          |> Map.values()
-          |> Enum.sum()
-
-        if total_count != 1 do
-          raise Pyro.HEEx.AST.ParseError,
-            file: opts[:file],
-            line: root_node.line,
-            column: root_node.column,
-            source: content,
-            indentation: opts[:indentation],
-            source_offset: opts[:source_offset],
-            message: "The attribute \"pyro-block\" must appear exactly once per sigil"
-        end
-      end
-
-      {:ok, %{entity | expr: expr}}
+      {:ok, %{entity | expr: expr, sigils: sigils}}
     end
 
     defp has_assigns?(ast, var_name) when is_atom(var_name) do
@@ -597,6 +597,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
       ]
     ]
   }
+
   defmodule HookConfig do
     @moduledoc false
     # quokka:sort

@@ -218,10 +218,9 @@ defmodule Pyro.HEEx.AST do
   end
 
   # quokka:sort
-  defstruct [:source, context: %{}, nodes: [], opts: []]
+  defstruct [:source, nodes: [], opts: []]
 
   @type t :: %__MODULE__{
-          context: map(),
           nodes: [ast_node()],
           opts: opts(),
           source: String.t()

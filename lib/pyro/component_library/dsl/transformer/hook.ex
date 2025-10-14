@@ -44,7 +44,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
   ```elixir
   %{
     popped_attributes => %{
-      sigil_H_index => %{
+      sigil_h_index => %{
         ast_path => popped_attributes
       }
     }
@@ -56,8 +56,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
     transform_heex(
       render,
       fn %AST{} = ast, context ->
-        ast = HEEx.pop_attributes(ast, patterns)
-        attrs = ast.context.popped_attributes
+        {ast, attrs} = HEEx.pop_attributes(ast, patterns)
         context = merge_popped_attributes(context, attrs)
         {ast, context}
       end,
@@ -75,10 +74,10 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
     transform_heex(
       render,
       fn %AST{} = ast, context ->
-        ast = HEEx.pop_attributes(ast, patterns)
+        {ast, popped} = HEEx.pop_attributes(ast, patterns)
 
         ast =
-          Enum.reduce(ast.context.popped_attributes, ast, fn {path, attrs}, ast ->
+          Enum.reduce(popped, ast, fn {path, attrs}, ast ->
             HEEx.add_attributes!(ast, path, transformer.(attrs, Map.put(context, :ast, ast)))
           end)
 
@@ -91,14 +90,14 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
   defp merge_popped_attributes(%{popped_attributes: _} = context, attrs) do
     Map.update(
       context,
-      context.sigil_H_index,
+      context.sigil_h_index,
       attrs,
       &Map.merge(&1, attrs, fn v1, v2 -> v1 ++ v2 end)
     )
   end
 
   defp merge_popped_attributes(context, attrs) do
-    Map.put(context, :popped_attributes, %{context.sigil_H_index => attrs})
+    Map.put(context, :popped_attributes, %{context.sigil_h_index => attrs})
   end
 
   @spec transform_heex(
@@ -106,30 +105,15 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook do
           transformer :: (AST.t(), context() -> {AST.t(), context()}),
           context()
         ) :: {Render.t(), context()}
-  def transform_heex(%Render{expr: expr} = entity, transformer, context)
+  def transform_heex(%Render{sigils: sigils} = render, transformer, context)
       when is_function(transformer, 2) do
-    {updated_expr, context} =
-      Macro.prewalk(expr, context, fn
-        {:sigil_H, meta, [{:<<>>, string_meta, [content]}, modifiers]}, context ->
-          context = Map.update(context, :sigil_H_index, 0, &(&1 + 1))
-
-          opts = [
-            file: entity.__spark_metadata__.anno[:file],
-            line: string_meta[:line] + 1,
-            source_offset: meta[:line],
-            indentation: string_meta[:indentation] || 0
-          ]
-
-          ast = AST.parse!(content, opts)
-          {transformed_ast, context} = transformer.(ast, context)
-          transformed_content = AST.encode(transformed_ast)
-
-          {{:sigil_H, meta, [{:<<>>, string_meta, [transformed_content]}, modifiers]}, context}
-
-        node, acc ->
-          {node, acc}
+    {sigils, context} =
+      Enum.reduce(sigils, {sigils, context}, fn {sigil_h_index, ast}, {sigils, context} ->
+        context = Map.update(context, :sigil_h_index, 0, &(&1 + 1))
+        {ast, context} = transformer.(ast, context)
+        {Map.put(sigils, sigil_h_index, ast), context}
       end)
 
-    {%{entity | expr: updated_expr}, context |> Map.delete(:sigil_H_index)}
+    {%{render | sigils: sigils}, context |> Map.delete(:sigil_h_index)}
   end
 end

@@ -11,7 +11,6 @@ defmodule Pyro.HEEx do
   alias __MODULE__.AST.{Element, Component, Attribute}
 
   @type patterns :: String.t() | Regex.t() | [String.t() | Regex.t()]
-  @type popped_attributes :: %{(ast_path :: list(non_neg_integer)) => list(Attribute.t())}
 
   defp attribute_matches?(attr_name, pattern) when is_binary(pattern) do
     attr_name == pattern
@@ -111,20 +110,17 @@ defmodule Pyro.HEEx do
   ## Examples
 
       iex> ast = parse!(~S(<div pyro-block="button" class="btn"></div>))
-      iex> ast = pop_attributes(ast, "pyro-block")
+      iex> {ast, popped} = pop_attributes(ast, "pyro-block")
       iex> [%Element{attributes: [%Attribute{name: "class"}], tag: "div"}] = ast.nodes
-      iex> %{[0] => [%Attribute{name: "pyro-block"}]} = ast.context.popped_attributes
+      iex> %{[0] => [%Attribute{name: "pyro-block"}]} = popped
   """
-  @spec pop_attributes(AST.t(), patterns()) :: AST.t()
+  @type popped_attributes :: %{(ast_path :: list(non_neg_integer)) => list(Attribute.t())}
+  @spec pop_attributes(AST.t(), patterns()) :: {AST.t(), popped_attributes()}
   def pop_attributes(%AST{} = ast, patterns) do
     patterns = normalize_attribute_patterns(patterns)
     {nodes, popped} = pop_attributes_from_nodes(ast.nodes, [], %{}, patterns, [])
 
-    ast
-    |> Map.put(:nodes, nodes)
-    |> Map.update!(:context, fn context ->
-      Map.put(context, :popped_attributes, popped)
-    end)
+    {%{ast | nodes: nodes}, popped}
   end
 
   defp pop_attributes_from_nodes([], acc, popped, _patterns, _path) do
