@@ -4,13 +4,16 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
   """
   use Pyro.ComponentLibrary.Dsl.Transformer.Hook
 
-  alias Pyro.ComponentLibrary.Dsl.Block
+  alias Pyro.ComponentLibrary.Dsl.Block, as: DslBlock
   alias Pyro.ComponentLibrary.Dsl.Component
   alias Pyro.ComponentLibrary.Dsl.LiveComponent
   alias Pyro.ComponentLibrary.Dsl.Render
   alias Pyro.ComponentLibrary.Dsl.Variant
   alias Pyro.HEEx.AST.Attribute
   alias Pyro.HEEx.AST.ParseError
+  alias Spark.Dsl.Entity
+  alias Spark.Dsl.Transformer
+  alias Spark.Error.DslError
 
   defmodule Config do
     @moduledoc """
@@ -23,6 +26,18 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
 
     # quokka:sort
     defstruct [:tailwind_prefix, prefix: ""]
+  end
+
+  defmodule Block do
+    @moduledoc """
+    Configure component block for DaisyUI transformer hook.
+    """
+    @type t :: %__MODULE__{
+            component_class: String.t() | nil
+          }
+
+    # quokka:sort
+    defstruct [:component_class]
   end
 
   @impl true
@@ -42,14 +57,44 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
   end
 
   defp do_transform(component, context) do
-    block_config = Pyro.Info.component_block(component, __MODULE__)
-    component_class = get_component_class(component, context.config, block_config)
+    tailwind_prefix =
+      (context.config.tailwind_prefix && context.config.tailwind_prefix <> ":") || ""
+
+    block_config =
+      case Pyro.Info.component_block(component, __MODULE__) do
+        %DslBlock{meta: %Block{} = meta} ->
+          meta
+
+        %DslBlock{meta: meta} = entity ->
+          file = Transformer.get_persisted(context.dsl, :file)
+          location = Entity.anno(entity)
+
+          raise DslError,
+            file: file,
+            location: location,
+            path: context.path,
+            message: "%#{__MODULE__.Block}{} required for Block.meta, got #{inspect(meta)}"
+
+        nil ->
+          %Block{}
+      end
+      |> Map.update!(:component_class, fn
+        class when is_binary(class) and class != "" ->
+          tailwind_prefix <> context.config.prefix <> class
+
+        _ ->
+          class =
+            component.name
+            |> Atom.to_string()
+            |> String.replace("_", "-")
+
+          tailwind_prefix <> context.config.prefix <> class
+      end)
 
     context =
       context
       |> Map.put(:component, component)
       |> Map.put(:block_config, block_config)
-      |> Map.put(:component_class, component_class)
 
     component
     |> Map.update!(:render, fn renders ->
@@ -73,7 +118,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
           [inspect(value) | acc]
 
         %Attribute{name: "pyro-block"}, acc ->
-          [inspect(context.component_class) | acc]
+          [inspect(context.block_config.component_class) | acc]
 
         %Attribute{name: "pyro-variant", type: :string, value: value} = attr, acc ->
           name = String.to_existing_atom(value)
@@ -83,16 +128,19 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
                  &(&1.name == name && __MODULE__ == &1.hook)
                ) do
             %Variant{default: nil, type: :atom} ->
-              [~s[@#{value} && "#{context.component_class}-\#{@#{value}}"] | acc]
+              [~s[@#{value} && "#{context.block_config.component_class}-\#{@#{value}}"] | acc]
 
             %Variant{default: default, type: :atom} when is_atom(default) ->
-              [~s["#{context.component_class}-\#{@#{value}}"] | acc]
+              [~s["#{context.block_config.component_class}-\#{@#{value}}"] | acc]
 
             %Variant{default: nil, type: :string} ->
-              ["@#{value} && #{inspect(context.component_class <> "-")} <> @#{value}" | acc]
+              [
+                "@#{value} && #{inspect(context.block_config.component_class <> "-")} <> @#{value}"
+                | acc
+              ]
 
             %Variant{default: default, type: :string} when is_binary(default) ->
-              ["#{inspect(context.component_class <> "-")} <> @#{value}" | acc]
+              ["#{inspect(context.block_config.component_class <> "-")} <> @#{value}" | acc]
 
             nil ->
               opts = context.ast.opts
@@ -121,17 +169,5 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
         value: "[" <> expr <> "]"
       }
     ]
-  end
-
-  defp get_component_class(component, %__MODULE__.Config{} = config, block_config) do
-    base =
-      case block_config do
-        %Block{meta: %{component_class: class}} when is_binary(class) and class != "" -> class
-        _ -> Atom.to_string(component.name)
-      end
-
-    tailwind_prefix = (config.tailwind_prefix && config.tailwind_prefix <> ":") || ""
-
-    tailwind_prefix <> config.prefix <> base
   end
 end

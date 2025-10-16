@@ -131,7 +131,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
               | :map
               | module(),
             values: list() | nil,
-            meta: map()
+            meta: struct() | nil
           }
 
     # quokka:sort
@@ -140,13 +140,13 @@ defmodule Pyro.ComponentLibrary.Dsl do
       :doc,
       :examples,
       :hook,
+      :meta,
       :name,
       :required,
       :slot,
       :type,
       :values,
-      __spark_metadata__: nil,
-      meta: %{}
+      __spark_metadata__: nil
     ]
   end
 
@@ -200,14 +200,14 @@ defmodule Pyro.ComponentLibrary.Dsl do
   }
   defmodule Block do
     @moduledoc false
-    @type t :: %__MODULE__{hook: module(), meta: map()}
+    @type t :: %__MODULE__{hook: module(), meta: struct() | nil}
 
     # quokka:sort
-    defstruct [:hook, __spark_metadata__: nil, meta: %{}]
+    defstruct [:hook, :meta, __spark_metadata__: nil]
   end
 
   @block %Spark.Dsl.Entity{
-    args: [:hook],
+    args: [:hook, :meta],
     describe: """
     Configure block for a given transformer hook.
     """,
@@ -220,8 +220,9 @@ defmodule Pyro.ComponentLibrary.Dsl do
         type: {:behaviour, __MODULE__.ComponentLibrary.Dsl.Transformer.Hook}
       ],
       meta: [
-        type: :map,
-        doc: "block metadata for hook"
+        type: :struct,
+        doc: "block metadata for hook",
+        required: true
       ]
     ],
     snippet: """
@@ -328,11 +329,7 @@ defmodule Pyro.ComponentLibrary.Dsl do
     alias Pyro.ComponentLibrary.Dsl
     alias Pyro.HEEx
 
-    @type t :: %__MODULE__{
-            args: any(),
-            expr: any(),
-            sigils: %{non_neg_integer => HEEx.AST.t()} | nil
-          }
+    @type t :: %__MODULE__{args: any(), expr: any(), sigils: %{non_neg_integer => HEEx.AST.t()}}
 
     # quokka:sort
     defstruct [:args, :expr, :sigils, __spark_metadata__: nil]

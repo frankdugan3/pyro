@@ -32,7 +32,7 @@ defmodule Pyro.Components.Core do
 
     render assigns do
       ~H"""
-      <div pyro-block="badge" pyro-variant="color" pyro-variant="size" {@rest}>
+      <div pyro-block pyro-variant="color" pyro-variant="size" {@rest}>
         {render_slot(@inner_block)}
       </div>
       """
@@ -44,9 +44,7 @@ defmodule Pyro.Components.Core do
     Renders a button with navigation support.
     """
 
-    block DaisyUI do
-      meta %{component_class: "btn"}
-    end
+    block DaisyUI, %DaisyUI.Block{component_class: "btn"}
 
     variant :color, :string, [BEM, DaisyUI] do
       values @daisy_ui_colors

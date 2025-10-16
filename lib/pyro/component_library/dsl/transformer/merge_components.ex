@@ -120,8 +120,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
         blocks
         |> Map.put_new(block.hook, block)
         |> Map.update!(block.hook, fn old_block ->
-          old_block
-          |> Map.update!(:meta, &Map.merge(&1, block.meta))
+          old_block |> merge_meta(block)
         end)
     end)
     |> Map.values()
@@ -183,7 +182,7 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
     |> Map.put_new({variant.name, variant.hook}, variant)
     |> Map.update!({variant.name, variant.hook}, fn old_variant ->
       old_variant
-      |> Map.update!(:meta, &Map.merge(&1, variant.meta))
+      |> merge_meta(variant)
       |> maybe_override(:type, variant)
       |> maybe_override(:required, variant)
       |> maybe_override(:default, variant)
@@ -218,6 +217,13 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.MergeComponents do
 
   defp merge_context(context, _old_entity, _new_entity) do
     context
+  end
+
+  defp merge_meta(old, new) do
+    Map.update!(old, :meta, fn
+      nil -> new.meta
+      meta -> Map.merge(meta, new.meta)
+    end)
   end
 
   defp merge_doc(old, new) do

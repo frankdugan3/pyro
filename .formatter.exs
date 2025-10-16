@@ -1,7 +1,7 @@
 # Used by "mix format"
 spark_locals_without_parens = [
-  block: 1,
   block: 2,
+  block: 3,
   calc: 2,
   calc: 3,
   component: 1,
@@ -16,7 +16,6 @@ spark_locals_without_parens = [
   hook: 3,
   include: 1,
   map: 1,
-  meta: 1,
   opts: 1,
   prefix: 1,
   private?: 1,

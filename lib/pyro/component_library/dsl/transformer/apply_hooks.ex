@@ -76,10 +76,10 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.ApplyHooks do
           {node, acc}
       end)
 
-    %{render | expr: expr}
+    %{render | expr: expr, sigils: nil}
   end
 
-  defp apply_ast(render), do: render
+  defp apply_ast(%Render{} = render), do: render
 
   def get_config(dsl, hook) do
     case dsl
