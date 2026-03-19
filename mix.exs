@@ -1,3 +1,5 @@
+if String.to_integer(System.otp_release()) < 28, do: Mix.raise("Pyro requires OTP 28+")
+
 defmodule Pyro.MixProject do
   @moduledoc false
   use Mix.Project
@@ -11,7 +13,7 @@ defmodule Pyro.MixProject do
   @description """
   Compose extensible components for Phoenix.
   """
-  @elixir_requirement "~> 1.18"
+  @elixir_requirement "~> 1.19"
   def project do
     [
       app: :pyro,
@@ -29,12 +31,20 @@ defmodule Pyro.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
       compilers: [:yecc] ++ Mix.compilers(),
-      dialyzer: [plt_add_apps: [:mix]]
+      dialyzer: [plt_add_apps: [:mix]],
+      usage_rules: usage_rules()
     ]
   end
 
   def cli do
     [preferred_envs: [docs: :docs]]
+  end
+
+  defp usage_rules do
+    [
+      file: "CLAUDE.md",
+      usage_rules: [{~r/.*/, link: :markdown}]
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
@@ -158,13 +168,13 @@ defmodule Pyro.MixProject do
       {:makeup_html, ">= 0.0.0", only: :docs},
       {:makeup_elixir, ">= 0.0.0", only: :docs},
       # Core dependencies
-      {:autumn, "~> 0.5"},
+      {:color, "~> 0.3.0"},
+      {:lumis, "~> 0.1"},
       {:igniter, "~> 0.5"},
       {:sourceror, "~> 1.7"},
-      {:phoenix_live_view, "~> 1.0"},
-      {:phoenix, "~> 1.8-rc.0", override: true},
       {:spark, "~> 2.1"},
       # These dependencies add optional features if installed
+      {:phoenix_live_view, "~> 1.0", optional: true},
       {:tzdata, "~> 1.1", optional: true},
       {:tz_extra, "~> 0.26", optional: true}
     ]
@@ -172,12 +182,7 @@ defmodule Pyro.MixProject do
 
   defp aliases do
     [
-      usage: """
-      usage_rules.sync CLAUDE.md --all \
-        --yes --remove-missing \
-        --link-style at \
-        --link-to-folder deps \
-      """,
+      usage: "usage_rules.sync --yes",
       update: [
         "deps.update --all",
         "usage"

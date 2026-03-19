@@ -68,5 +68,5 @@ defmodule Pyro.HEEx.AST.ParseError do
   end
 
   defp highlight(code, false), do: code
-  defp highlight(code, true), do: Autumn.highlight!(code, language: "heex", formatter: :terminal)
+  defp highlight(code, true), do: Lumis.highlight!(code, language: "heex", formatter: :terminal)
 end

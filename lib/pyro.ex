@@ -98,7 +98,7 @@ defmodule Pyro do
 
         if unquote(opts[:debug?]) do
           ("\n" <> component_code)
-          |> Autumn.highlight!(language: "elixir", formatter: :terminal)
+          |> Lumis.highlight!(language: "elixir", formatter: :terminal)
           |> IO.puts()
         end
       end

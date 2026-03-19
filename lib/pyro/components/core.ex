@@ -12,6 +12,22 @@ defmodule Pyro.Components.Core do
   @daisy_ui_sizes ~w[xs sm md lg xl]
   @daisy_ui_default_size "md"
 
+  component :icon do
+    doc """
+    An icon.
+    """
+
+    # TODO: Better encapsulate this pattern. It will be common.
+    prop :class, :any, default: "size-4"
+
+    # TODO: This should be configurable for the common icon libs, plus custom svg.
+    render %{name: "hero-" <> _} = assigns do
+      ~H"""
+      <span pyro-block class={[@name, @class]} />
+      """
+    end
+  end
+
   component :badge do
     doc """
     A badge.
@@ -32,7 +48,7 @@ defmodule Pyro.Components.Core do
 
     render assigns do
       ~H"""
-      <div pyro-block pyro-variant="color" pyro-variant="size" {@rest}>
+      <div pyro-block pyro-variant="colorsadf" pyro-variant="size" {@rest}>
         {render_slot(@inner_block)}
       </div>
       """
