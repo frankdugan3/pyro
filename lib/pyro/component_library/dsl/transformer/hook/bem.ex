@@ -17,7 +17,6 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.BEM do
     """
     @type t :: %__MODULE__{}
 
-    # quokka:sort
     defstruct []
   end
 

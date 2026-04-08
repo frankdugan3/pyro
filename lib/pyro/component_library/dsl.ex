@@ -1,4 +1,3 @@
-# quokka:skip-module-reordering
 defmodule Pyro.ComponentLibrary.Dsl do
   @moduledoc false
 
@@ -24,7 +23,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
             values: list() | nil
           }
 
-    # quokka:sort
     defstruct [
       :default,
       :doc,
@@ -44,7 +42,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Declare/extend a component prop.
     """,
     name: :prop,
-    # quokka:sort
     schema: [
       default: [doc: "default value for the prop", type: :any],
       doc: [type: :string, doc: "documentation for the prop"],
@@ -82,7 +79,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
             skip_template_validation?: boolean()
           }
 
-    # quokka:sort
     defstruct [
       :default,
       :doc,
@@ -99,7 +95,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Declare/extend a global attribute prop.
     """,
     name: :global,
-    # quokka:sort
     schema: [
       default: [doc: "default value for the prop", type: :any],
       doc: [doc: "documentation for the prop", type: :string],
@@ -134,7 +129,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
             meta: struct() | nil
           }
 
-    # quokka:sort
     defstruct [
       :default,
       :doc,
@@ -156,7 +150,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Declare a prop constrained to a theme variant.
     """,
     name: :variant,
-    # quokka:sort
     schema: [
       default: [doc: "default value for the prop", type: :any],
       doc: [type: :string, doc: "documentation for the vairant"],
@@ -202,7 +195,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     @moduledoc false
     @type t :: %__MODULE__{hook: module(), meta: struct() | nil}
 
-    # quokka:sort
     defstruct [:hook, :meta, __spark_metadata__: nil]
   end
 
@@ -212,7 +204,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Configure block for a given transformer hook.
     """,
     name: :block,
-    # quokka:sort
     schema: [
       hook: [
         doc: "hook module",
@@ -237,7 +228,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     @moduledoc false
     @type t :: %__MODULE__{calculation: (map() -> any()), name: atom()}
 
-    # quokka:sort
     defstruct [:calculation, :name, __spark_metadata__: nil]
   end
 
@@ -247,7 +237,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Declare a calculation.
     """,
     name: :calc,
-    # quokka:sort
     schema: [
       calculation: [
         doc: "arity-1 function that recieves `assigns`, setting the value on render",
@@ -280,7 +269,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
             validate_attrs: boolean()
           }
 
-    # quokka:sort
     defstruct [
       :attrs,
       :doc,
@@ -300,7 +288,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
       attrs: [@prop]
     ],
     name: :slot,
-    # quokka:sort
     schema: [
       doc: [
         doc: "documentation for the slot",
@@ -331,7 +318,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
     @type t :: %__MODULE__{args: any(), expr: any(), sigils: %{non_neg_integer => HEEx.AST.t()}}
 
-    # quokka:sort
     defstruct [:args, :expr, :sigils, __spark_metadata__: nil]
 
     def transform(%__MODULE__{args: args, expr: [do: expr]} = entity) do
@@ -408,7 +394,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     """,
     imports: [Pyro.ComponentLibrary.TemplateHelpers],
     name: :render,
-    # quokka:sort
     schema: [
       args: [required: true, type: :quoted],
       expr: [type: :quoted, required: true]
@@ -441,7 +426,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
             slots: list(Dsl.Slot.t())
           }
 
-    # quokka:sort
     defstruct [
       :assigns,
       :blocks,
@@ -454,7 +438,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     ]
   end
 
-  # quokka:sort
   @shared_component_schema [
     doc: [
       type: :string,
@@ -467,7 +450,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     ]
   ]
 
-  # quokka:sort
   @shared_component_entities [
     assigns: [@calc, @global, @prop, @variant],
     blocks: [@block],
@@ -507,7 +489,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
             slots: list(Dsl.Slot.t())
           }
 
-    # quokka:sort
     defstruct [
       :assigns,
       :blocks,
@@ -546,7 +527,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
   defmodule CSSProperty do
     @moduledoc false
-    # quokka:sort
     defstruct [:default, :doc, :name, :tokens, :variants, __spark_metadata__: nil]
   end
 
@@ -557,7 +537,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Declare/extend a theme property.
     """,
     name: :property,
-    # quokka:sort
     schema: [
       default: [
         doc: "default variant",
@@ -601,7 +580,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
 
   defmodule HookConfig do
     @moduledoc false
-    # quokka:sort
     defstruct [:hook, :opts, __spark_metadata__: nil]
   end
 
@@ -611,7 +589,6 @@ defmodule Pyro.ComponentLibrary.Dsl do
     Configure hook options.
     """,
     name: :hook,
-    # quokka:sort
     schema: [
       hook: [
         doc: "hook to configure",

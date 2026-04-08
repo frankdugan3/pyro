@@ -25,7 +25,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores text content, surrounding whitespace, and source position.
     """
-    # quokka:sort
     defstruct [:column, :content, :line, :post, :pre]
 
     @type t :: %__MODULE__{
@@ -43,7 +42,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores comment content, surrounding whitespace, and source position.
     """
-    # quokka:sort
     defstruct [:column, :content, :line, :post, :pre]
 
     @type t :: %__MODULE__{
@@ -61,7 +59,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores comment content, surrounding whitespace, and source position.
     """
-    # quokka:sort
     defstruct [:column, :content, :line, :post, :pre]
 
     @type t :: %__MODULE__{
@@ -79,7 +76,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores expression code, surrounding whitespace, and source position.
     """
-    # quokka:sort
     defstruct [:column, :expression, :line, :post, :pre]
 
     @type t :: %__MODULE__{
@@ -97,7 +93,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores expression code, operator, surrounding whitespace, and source position.
     """
-    # quokka:sort
     defstruct [:column, :expression, :line, :operator, :post, :pre]
 
     @type t :: %__MODULE__{
@@ -116,7 +111,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores tag name, attributes, children, self-closing status, and source position.
     """
-    # quokka:sort
     defstruct [
       :column,
       :line,
@@ -146,7 +140,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores component name, attributes, children, self-closing status, and source position.
     """
-    # quokka:sort
     defstruct [
       :column,
       :line,
@@ -176,7 +169,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores slot name, attributes, children, and source position.
     """
-    # quokka:sort
     defstruct [
       :column,
       :line,
@@ -204,7 +196,6 @@ defmodule Pyro.HEEx.AST do
 
     Stores attribute name, value, type, delimiter, and source position.
     """
-    # quokka:sort
     defstruct [:column, :line, :name, :value, delimiter: ?\", type: :string]
     @type attr_type :: :string | :root | :boolean | :expression
     @type t :: %__MODULE__{
@@ -217,7 +208,6 @@ defmodule Pyro.HEEx.AST do
           }
   end
 
-  # quokka:sort
   defstruct [:source, nodes: [], opts: []]
 
   @type t :: %__MODULE__{

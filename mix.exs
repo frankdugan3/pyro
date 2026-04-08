@@ -150,7 +150,6 @@ defmodule Pyro.MixProject do
     [
       # Code quality tooling
       {:credo, ">= 0.0.0", only: [:dev, :test, :docs], runtime: false},
-      {:quokka, ">= 0.0.0", only: [:dev, :test, :docs], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
       {:ex_check, "~> 0.15",

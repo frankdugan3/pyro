@@ -24,7 +24,6 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
             tailwind_prefix: String.t() | nil
           }
 
-    # quokka:sort
     defstruct [:tailwind_prefix, prefix: ""]
   end
 
@@ -36,7 +35,6 @@ defmodule Pyro.ComponentLibrary.Dsl.Transformer.Hook.DaisyUI do
             component_class: String.t() | nil
           }
 
-    # quokka:sort
     defstruct [:component_class]
   end
 

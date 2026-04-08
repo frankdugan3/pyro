@@ -1,6 +1,5 @@
 defmodule Pyro.HEEx.AST.ParseError do
   @moduledoc false
-  # quokka:sort
   defexception [
     :message,
     :snippet,
