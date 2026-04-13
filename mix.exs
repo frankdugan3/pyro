@@ -78,8 +78,7 @@ defmodule Pyro.MixProject do
       ],
       groups_for_modules: [
         Design: [
-          ~r/^Pyro\.Design/,
-          ~r/^Pyro\.Theme/
+          ~r/^Pyro\.Design/
         ],
         "Component DSL": [
           Pyro.ComponentLibrary,
@@ -114,8 +113,6 @@ defmodule Pyro.MixProject do
          search_data: Spark.Docs.search_data_for(Pyro.ComponentLibrary.Dsl)},
         {"documentation/dsls/DSL-Pyro.Design.md",
          search_data: Spark.Docs.search_data_for(Pyro.Design.Dsl)},
-        {"documentation/dsls/DSL-Pyro.Theme.md",
-         search_data: Spark.Docs.search_data_for(Pyro.Theme.Dsl)},
         {"documentation/dsls/DSL-Pyro.Framework.LiveView.md",
          search_data: Spark.Docs.search_data_for(Pyro.Framework.LiveView)}
       ]
@@ -183,7 +180,6 @@ defmodule Pyro.MixProject do
                 Pyro.Component.Dsl,
                 Pyro.ComponentLibrary.Dsl,
                 Pyro.Design.Dsl,
-                Pyro.Theme.Dsl,
                 Pyro.Framework.LiveView
               ]
               |> Enum.map_join(",", &inspect/1)

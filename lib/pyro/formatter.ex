@@ -5,9 +5,6 @@ defmodule Pyro.Formatter do
   Formats `~JS` sigils inline, and `.css`, `.json`,
   `.html`, `.js`, `.ts`, `.md` files via Prettier.
 
-  Components use `var(--pyro-token-*)` syntax which is valid CSS,
-  so no token swapping is needed.
-
   ## Configuration
 
       # .formatter.exs

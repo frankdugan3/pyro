@@ -1,4 +1,12 @@
-# Formatter
+# Formatting
+
+## Pyro.Formatter
+
+Pyro provides an optional formatter that uses [Prettier](https://prettier.io) to handle formatting supported files/sigils (e.g. `~JS`).
+
+See `Pyro.Formatter` for setup instructions.
+
+## Spark.Formatter
 
 Since Pyro is built on `Spark`, its formatter can be configured to:
 
@@ -24,11 +32,31 @@ Configure the formatter in `config/config.exs`:
 ```elixir
 config :spark, :formatter,
   remove_parens?: true,
+  "Pyro.Design": [
+    section_order: [
+      :design,
+      :icons,
+      :config
+    ]
+  ],
   "Pyro.Component": [
     section_order: [
-      :components
+      :design,
+      :component,
+      :live_view,
+      :hologram
     ]
-  ]
+  ],
+  "Pyro.ComponentLibrary": [
+    section_order: [
+      :design,
+      :components,
+      :live_view,
+      :hologram
+    ]
+  ],
+  "Pyro.Framework.LiveView": [],
+  "Pyro.Framework.Hologram": []
 ```
 
 For more advanced uses, check out the upstream `Spark.Formatter` docs.
