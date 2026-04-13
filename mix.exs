@@ -4,16 +4,13 @@ defmodule Pyro.MixProject do
   @moduledoc false
   use Mix.Project
 
-  alias Pyro.Component.Helpers
-  alias Pyro.Component.Template
-  alias Pyro.ComponentLibrary.Dsl
-
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.3.7"
   @description """
   Compose extensible components for Phoenix.
   """
   @elixir_requirement "~> 1.19"
+
   def project do
     [
       app: :pyro,
@@ -37,7 +34,7 @@ defmodule Pyro.MixProject do
   end
 
   def cli do
-    [preferred_envs: [docs: :docs]]
+    [preferred_envs: [docs: :docs, "docs.watch": :docs]]
   end
 
   defp usage_rules do
@@ -65,6 +62,7 @@ defmodule Pyro.MixProject do
       before_closing_head_tag: fn type ->
         if type == :html do
           """
+          <meta name="exdoc:autocomplete-limit" content="50">
           <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
           <script>mermaid.initialize({startOnLoad: true})</script>
           """
@@ -74,32 +72,26 @@ defmodule Pyro.MixProject do
       extras: extras(),
       groups_for_extras: [
         Tutorials: [~r'documentation/tutorials'],
-        Reference: [~r'documentation/dsls'],
+        "DSL Reference": [~r'documentation/dsls'],
         Cheatsheets: [~r'documentation/cheatsheets'],
         LiveBooks: [~r'documentation/livebooks']
       ],
       groups_for_modules: [
-        Extension: [
-          Pyro,
-          Pyro.Info
+        Design: [
+          ~r/^Pyro\.Design/,
+          ~r/^Pyro\.Theme/
         ],
-        "Component Bundles": [
-          PyroComponents,
-          ~r/(^PyroComponents.Defaults)/
+        "Component DSL": [
+          Pyro.ComponentLibrary,
+          Pyro.Expr,
+          ~r/^Pyro\.Component/
         ],
-        "Individual Components": [
-          ~r/(^PyroComponents)/
-        ],
-        "Component Tooling": [
-          Helpers,
-          Template
-        ],
-        Schema: [~r/(^Pyro.Schema)/],
-        Transformer: [~r/(^Pyro.Transformer)/],
-        Verifier: [~r/(^Pyro.Verifier)/]
+        Frameworks: [~r/^Pyro\.Framework/],
+        Tooling: [Pyro.Formatter]
       ],
       nest_modules_by_prefix: [
-        Dsl
+        Pyro.Component.Dsl,
+        Pyro.Framework
       ],
       groups_for_docs: [
         Components: &(&1[:type] == :component),
@@ -115,7 +107,17 @@ defmodule Pyro.MixProject do
         {"documentation/about.md", [default: true]},
         "documentation/suite.md",
         "CHANGELOG.md",
-        "documentation/tutorials/get-started.md"
+        "documentation/tutorials/get-started.md",
+        {"documentation/dsls/DSL-Pyro.Component.md",
+         search_data: Spark.Docs.search_data_for(Pyro.Component.Dsl)},
+        {"documentation/dsls/DSL-Pyro.ComponentLibrary.md",
+         search_data: Spark.Docs.search_data_for(Pyro.ComponentLibrary.Dsl)},
+        {"documentation/dsls/DSL-Pyro.Design.md",
+         search_data: Spark.Docs.search_data_for(Pyro.Design.Dsl)},
+        {"documentation/dsls/DSL-Pyro.Theme.md",
+         search_data: Spark.Docs.search_data_for(Pyro.Theme.Dsl)},
+        {"documentation/dsls/DSL-Pyro.Framework.LiveView.md",
+         search_data: Spark.Docs.search_data_for(Pyro.Framework.LiveView)}
       ]
 
     unordered = Path.wildcard("documentation/**/*.{md,cheatmd,livemd}")
@@ -129,7 +131,7 @@ defmodule Pyro.MixProject do
   defp package do
     [
       name: :pyro,
-      maintainers: ["Frank Dugan III"],
+      maintainers: ["Frank Polasek Dugan III"],
       licenses: ["MIT"],
       links: %{GitHub: @source_url},
       files: ~w(
@@ -140,34 +142,32 @@ defmodule Pyro.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [extra_applications: [:logger]]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       # Code quality tooling
       {:credo, ">= 0.0.0", only: [:dev, :test, :docs], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
-      {:ex_check, "~> 0.15",
+      {:ex_check, ">= 0.0.0",
        [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
-      {:faker, "~> 0.17", only: [:test, :dev]},
+      {:faker, ">= 0.0.0", only: [:test, :dev]},
       {:usage_rules, ">= 0.0.0", only: :dev},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
       {:mix_test_interactive, ">= 0.0.0", only: :dev, runtime: false},
       # Build tooling
       {:ex_doc, ">= 0.0.0", only: :docs, runtime: false},
-      {:git_ops, "~> 2.6", only: :dev},
-      {:file_system, "~> 1.0", only: [:test, :dev, :docs]},
+      {:mix_watch_docs, ">= 0.0.0", only: :docs, runtime: false},
+      {:git_ops, ">= 0.0.0", only: :dev},
       {:makeup, ">= 0.0.0", only: :docs},
       {:makeup_eex, ">= 0.0.0", only: :docs},
       {:makeup_html, ">= 0.0.0", only: :docs},
       {:makeup_elixir, ">= 0.0.0", only: :docs},
       # Core dependencies
-      {:color, "~> 0.3.0"},
+      {:color, "~> 0.4"},
       {:lumis, "~> 0.1"},
       {:igniter, "~> 0.5"},
       {:sourceror, "~> 1.7"},
@@ -179,40 +179,37 @@ defmodule Pyro.MixProject do
     ]
   end
 
+  @extensions [
+                Pyro.Component.Dsl,
+                Pyro.ComponentLibrary.Dsl,
+                Pyro.Design.Dsl,
+                Pyro.Theme.Dsl,
+                Pyro.Framework.LiveView
+              ]
+              |> Enum.map_join(",", &inspect/1)
+
   defp aliases do
     [
       usage: "usage_rules.sync --yes",
-      update: [
-        "deps.update --all",
-        "usage"
-      ],
+      update: ["deps.update --all", "usage"],
       test_and_lint: ["test", "credo"],
-      build: [
-        "spark.formatter",
-        "format"
-      ],
+      build: ["spark.formatter", "format"],
       setup: ["deps.get", "compile", "docs"],
-      # until we hit 1.0, we will ensure no major release!
+      # Until we hit 1.0, ensure no major release!
       release: ["git_ops.release --no-major"],
       publish: ["hex.publish"],
-      docs: [
-        "spark.cheat_sheets",
-        "docs",
-        "spark.replace_doc_links"
-        # "spark.cheat_sheets_in_search"
-      ],
-      "spark.cheat_sheets_in_search":
-        "spark.cheat_sheets_in_search --extensions Pyro.ComponentLibrary.Dsl",
-      "spark.formatter": "spark.formatter --extensions Pyro.ComponentLibrary.Dsl",
-      "spark.cheat_sheets": "spark.cheat_sheets --extensions Pyro.ComponentLibrary.Dsl",
-      "archive.build": &raise_on_archive_build/1
+      docs: ["spark.cheat_sheets", "docs", "spark.replace_doc_links"],
+      "spark.cheat_sheets_in_search": "spark.cheat_sheets_in_search --extensions #{@extensions}",
+      "spark.formatter": "spark.formatter --extensions #{@extensions}",
+      "spark.cheat_sheets": "spark.cheat_sheets --extensions #{@extensions}"
+      # "archive.build": &raise_on_archive_build/1
     ]
   end
 
-  defp raise_on_archive_build(_) do
-    Mix.raise("""
-    You are trying to install "pyro" as an archive, which is not supported. \
-    You probably meant to install "pyro_cli" instead
-    """)
-  end
+  # defp raise_on_archive_build(_) do
+  #   Mix.raise("""
+  #   You are trying to install "pyro" as an archive, which is not supported. \
+  #   You probably meant to install "pyro_cli" instead
+  #   """)
+  # end
 end
