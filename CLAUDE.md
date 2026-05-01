@@ -5,12 +5,6 @@ _A code generation and project patching framework_
 
 [igniter usage rules](deps/igniter/usage-rules.md)
 <!-- igniter-end -->
-<!-- lumis-start -->
-## lumis usage
-_Syntax highlighter powered by Tree-sitter and Neovim themes._
-
-[lumis usage rules](deps/lumis/usage-rules.md)
-<!-- lumis-end -->
 <!-- spark-start -->
 ## spark usage
 _Generic tooling for building DSLs_

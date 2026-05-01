@@ -36,3 +36,5 @@ pyro-*.tar
 # Secret files
 *.env
 
+/out.css
+/out.json

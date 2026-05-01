@@ -7,7 +7,7 @@ defmodule Pyro.MixProject do
   @source_url "https://github.com/frankdugan3/pyro"
   @version "0.3.7"
   @description """
-  Compose extensible components for Phoenix.
+  A DTCG-conformant design system DSL for Elixir.
   """
   @elixir_requirement "~> 1.19"
 
@@ -34,7 +34,7 @@ defmodule Pyro.MixProject do
   end
 
   def cli do
-    [preferred_envs: [docs: :docs, "docs.watch": :docs]]
+    [preferred_envs: [docs: :docs, "docs.watch": :docs, "test.watch": :test]]
   end
 
   defp usage_rules do
@@ -80,20 +80,9 @@ defmodule Pyro.MixProject do
         Design: [
           ~r/^Pyro\.Design/
         ],
-        "Component DSL": [
-          Pyro.ComponentLibrary,
-          Pyro.Expr,
-          ~r/^Pyro\.Component/
-        ],
-        Frameworks: [~r/^Pyro\.Framework/],
         Tooling: [Pyro.Formatter]
       ],
-      nest_modules_by_prefix: [
-        Pyro.Component.Dsl,
-        Pyro.Framework
-      ],
       groups_for_docs: [
-        Components: &(&1[:type] == :component),
         Macros: &(&1[:type] == :macro),
         "DSL Schemas": &(&1[:type] == :dsl_schema)
       ]
@@ -107,14 +96,8 @@ defmodule Pyro.MixProject do
         "documentation/suite.md",
         "CHANGELOG.md",
         "documentation/tutorials/get-started.md",
-        {"documentation/dsls/DSL-Pyro.Component.md",
-         search_data: Spark.Docs.search_data_for(Pyro.Component.Dsl)},
-        {"documentation/dsls/DSL-Pyro.ComponentLibrary.md",
-         search_data: Spark.Docs.search_data_for(Pyro.ComponentLibrary.Dsl)},
         {"documentation/dsls/DSL-Pyro.Design.md",
-         search_data: Spark.Docs.search_data_for(Pyro.Design.Dsl)},
-        {"documentation/dsls/DSL-Pyro.Framework.LiveView.md",
-         search_data: Spark.Docs.search_data_for(Pyro.Framework.LiveView)}
+         search_data: Spark.Docs.search_data_for(Pyro.Design.Dsl)}
       ]
 
     unordered = Path.wildcard("documentation/**/*.{md,cheatmd,livemd}")
@@ -149,46 +132,33 @@ defmodule Pyro.MixProject do
       {:credo, ">= 0.0.0", only: [:dev, :test, :docs], runtime: false},
       {:dialyxir, ">= 0.0.0", only: :dev, runtime: false},
       {:doctor, ">= 0.0.0", only: :dev, runtime: false},
-      {:ex_check, ">= 0.0.0",
-       [env: :prod, hex: "ex_check", only: :dev, runtime: false, repo: "hexpm"]},
-      {:faker, ">= 0.0.0", only: [:test, :dev]},
+      {:ex_check, ">= 0.0.0", only: :dev, runtime: false},
       {:usage_rules, ">= 0.0.0", only: :dev},
       {:mix_audit, ">= 0.0.0", only: :dev, runtime: false},
-      {:mix_test_interactive, ">= 0.0.0", only: :dev, runtime: false},
+      {:mix_test_watch, ">= 0.0.0", only: :test, runtime: false},
       # Build tooling
       {:ex_doc, ">= 0.0.0", only: :docs, runtime: false},
       {:mix_watch_docs, ">= 0.0.0", only: :docs, runtime: false},
-      {:git_ops, ">= 0.0.0", only: :dev},
       {:makeup, ">= 0.0.0", only: :docs},
       {:makeup_eex, ">= 0.0.0", only: :docs},
       {:makeup_html, ">= 0.0.0", only: :docs},
       {:makeup_elixir, ">= 0.0.0", only: :docs},
+      {:git_ops, ">= 0.0.0", only: :dev},
       # Core dependencies
-      {:color, "~> 0.4"},
-      {:lumis, "~> 0.1"},
+      {:color, "~> 0.6"},
       {:igniter, "~> 0.5"},
-      {:sourceror, "~> 1.7"},
       {:spark, "~> 2.1"},
-      # These dependencies add optional features if installed
-      {:phoenix_live_view, "~> 1.0", optional: true},
-      {:tzdata, "~> 1.1", optional: true},
-      {:tz_extra, "~> 0.26", optional: true}
+      # Optional integrations
+      {:phoenix_live_view, "~> 1.2.0-rc.0", optional: true}
     ]
   end
 
-  @extensions [
-                Pyro.Component.Dsl,
-                Pyro.ComponentLibrary.Dsl,
-                Pyro.Design.Dsl,
-                Pyro.Framework.LiveView
-              ]
-              |> Enum.map_join(",", &inspect/1)
+  @extensions [Pyro.Design.Dsl] |> Enum.map_join(",", &inspect/1)
 
   defp aliases do
     [
       usage: "usage_rules.sync --yes",
       update: ["deps.update --all", "usage"],
-      test_and_lint: ["test", "credo"],
       build: ["spark.formatter", "format"],
       setup: ["deps.get", "compile", "docs"],
       # Until we hit 1.0, ensure no major release!
@@ -198,14 +168,6 @@ defmodule Pyro.MixProject do
       "spark.cheat_sheets_in_search": "spark.cheat_sheets_in_search --extensions #{@extensions}",
       "spark.formatter": "spark.formatter --extensions #{@extensions}",
       "spark.cheat_sheets": "spark.cheat_sheets --extensions #{@extensions}"
-      # "archive.build": &raise_on_archive_build/1
     ]
   end
-
-  # defp raise_on_archive_build(_) do
-  #   Mix.raise("""
-  #   You are trying to install "pyro" as an archive, which is not supported. \
-  #   You probably meant to install "pyro_cli" instead
-  #   """)
-  # end
 end

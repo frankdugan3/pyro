@@ -5,54 +5,22 @@
 [![hex.pm](https://img.shields.io/hexpm/dt/pyro.svg)](https://hex.pm/packages/pyro)
 [![github.com](https://img.shields.io/github/last-commit/frankdugan3/pyro.svg)](https://github.com/frankdugan3/pyro)
 
-> Compose extensible components for Phoenix.
+> A DTCG-conformant design system DSL for Elixir.
 
-Pyro is a suite of libraries for building UI in `Phoenix`.
+Pyro is a [suite of libraries](suite.md) for building UI in Elixir.
 
-To install Pyro and learn how it works, start at the [Get Started](get-started.html) guide and work your way through the tutorials. They are ordered in a sensible way to explain the various features Pyro offers, and point toward other tools in the Pyro suite when appropriate.
+- **Design** declares design tokens and modifiers as a [DTCG](https://www.designtokens.org/tr/2025.10/format)-conformant token tree. Design modules layer through the `:sources` option, following DTCG Resolver semantics — each Design merges the tokens of its listed sources before applying its own.
 
-> #### Experimental Library {: .warning}
+To install Pyro and learn how it works, start at the [Get Started](get-started.html) guide.
+
+> #### Experimental {: .warning}
 >
 > Pyro is in early development, expect breaking changes.
 
-## What "problem" is it solving?
-
-Component libraries generally suffer from a lack of extensibility. Because of this, there tends to be a substantial churn to add features and configuration options that leads to bloat and maintenance pain. On the other hand, minimalist libraries tend to leave a lot of boilerplate work for the consumer. Symptoms like this are why `phx.new` opts to generate a `core_components.ex` file for you customize. It's a great start, but requires a ton of customization to do much of anything.
-
-Pyro aims to provide a middle ground: Components that can be _extended_. It leverages a DSL to describe how a component should be built (it's a superset of `Phoenix.Component`'s DSL), and wraps it with "transformers" that merge component libraries together with your customizations to produce a bespoke component library.
-
-Here's a quick example.
-
-Let's say we found this little button component library:
-
-```elixir
-```
-
-That should look really familiar if you've written a `Phoenix.Component` before, aside from a few interesting additions. But why bother with creating a DSL to write components that are already declarative?
-
-_Extensibility._ We won't get into the details here, but you may have noticed:
-
-- This button library gave several "strategies" for generating CSS
-- There were _variables_ and _templates_.
-
-So let's go ahead and use this component, changing up a few things:
-
-```elixir
-```
-
-Did you notice that the DSL is the same both for library author and library consumer? This makes it trivial to contribute back to libraries.
-
-And if you're wondering if the `class` DSL gets turned into an `attr` at compile time, and maybe even the `variants` function is passed `assigns` at runtime, I like the way you think. It does. Variants made easy-peasy!
-
-That's just scratching the surface: There are tons of options and tooling that help you create and use deeply extensible components and libraries.
-
-Intrigued? Go ahead, [Get Started](get-started.html) right now.
-
 ## But wait, there's more!
 
-In addition to the tooling for building extensible components, there is a [full suite](suite.html) of libraries that build on the foundation Pyro provides.
+In addition to the Design DSL, there is a [full suite](suite.html) of libraries that build on the foundation Pyro provides.
 
-- [Pyro](https://github.com/frankdugan3/pyro) - Compose extensible components for Phoenix.
-- [PyroComponents](https://github.com/frankdugan3/pyro_components) - Extensible Phoenix components, built with Pyro.
-- [PyroManiac](https://github.com/frankdugan3/pyro_maniac) - Extensible, declarative UI for Ash Framework. Built-in support for Phoenix LiveView and Hologram.
+- [Pyro](https://github.com/frankdugan3/pyro) - A DTCG-conformant design system DSL for Elixir.
+- [PyroManiac](https://github.com/frankdugan3/pyro_maniac) - Declarative, framework-agnostic UI for Ash resources. Automatically render with PyroComponents.
 

@@ -54,46 +54,52 @@ defmodule Pyro.Formatter do
     if sigil && opts[:modifiers] === ~c"noformat" do
       contents
     else
-      parser =
-        cond do
-          sigil -> Map.fetch!(@sigil_parsers, sigil)
-          ext = opts[:extension] -> Map.fetch!(@file_extensions, ext)
-        end
-
-      path =
-        if opts[:file] do
-          opts[:file]
-          |> Path.relative_to(Path.dirname(Mix.Project.project_file()))
-          |> Kernel.<>(if(opts[:line], do: ":#{opts[:line]}", else: ""))
-        else
-          "stdin.#{parser}"
-        end
-
-      heredoc = """
-      <<'EOF'
-      #{contents}
-      EOF
-      """
-
-      command =
-        "#{prettier} --log-level warn --stdin-filepath #{path} --parser #{parser} #{heredoc}"
-
-      port = Port.open({:spawn, command}, [:binary])
-
-      result =
-        receive do
-          {^port, {:data, data}} -> data
-          _ -> contents
-        after
-          5_000 -> contents
-        end
-
-      if sigil do
-        ensure_trailing_newline(result)
-      else
-        result
-      end
+      do_format(contents, opts, prettier, sigil)
     end
+  end
+
+  defp do_format(contents, opts, prettier, sigil) do
+    parser = parser_for(sigil, opts)
+    path = path_for(opts, parser)
+    command = build_command(prettier, path, parser, contents)
+
+    port = Port.open({:spawn, command}, [:binary])
+
+    result =
+      receive do
+        {^port, {:data, data}} -> data
+        _ -> contents
+      after
+        5_000 -> contents
+      end
+
+    if sigil, do: ensure_trailing_newline(result), else: result
+  end
+
+  defp parser_for(sigil, _opts) when not is_nil(sigil), do: Map.fetch!(@sigil_parsers, sigil)
+  defp parser_for(_sigil, opts), do: Map.fetch!(@file_extensions, opts[:extension])
+
+  defp path_for(opts, parser) do
+    case opts[:file] do
+      nil -> "stdin.#{parser}"
+      file -> file_path(file, opts[:line])
+    end
+  end
+
+  defp file_path(file, line) do
+    file
+    |> Path.relative_to(Path.dirname(Mix.Project.project_file()))
+    |> Kernel.<>(if(line, do: ":#{line}", else: ""))
+  end
+
+  defp build_command(prettier, path, parser, contents) do
+    heredoc = """
+    <<'EOF'
+    #{contents}
+    EOF
+    """
+
+    "#{prettier} --log-level warn --stdin-filepath #{path} --parser #{parser} #{heredoc}"
   end
 
   defp ensure_trailing_newline(str) do

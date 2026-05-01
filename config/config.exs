@@ -15,11 +15,6 @@ if Mix.env() == :dev do
     manage_readme_version: ["README.md", "documentation/tutorials/get-started.md"],
     version_tag_prefix: "v"
 
-  config :mix_test_interactive,
-    timestamp: true,
-    clear: true,
-    task: "test_and_lint"
-
   config :spark, :formatter,
     remove_parens?: true,
     "Pyro.Design": [
@@ -28,23 +23,9 @@ if Mix.env() == :dev do
         :icons,
         :config
       ]
-    ],
-    "Pyro.Component": [
-      section_order: [
-        :design,
-        :component,
-        :live_view,
-        :hologram
-      ]
-    ],
-    "Pyro.ComponentLibrary": [
-      section_order: [
-        :design,
-        :components,
-        :live_view,
-        :hologram
-      ]
-    ],
-    "Pyro.Framework.LiveView": [],
-    "Pyro.Framework.Hologram": []
+    ]
+end
+
+if Mix.env() == :test do
+  config :mix_test_watch, tasks: ["test", "credo"], clear: true
 end

@@ -20,9 +20,9 @@ Add the formatter to `.formatter.exs`
 ```elixir
 [
   # Add :pyro to the list of import deps:
-  import_deps: [:ecto, :ecto_sql, :phoenix, :pyro],
+  import_deps: [:pyro],
   # Add Spark.Formatter to the list of plugins:
-  plugins: [Phoenix.LiveView.HTMLFormatter, Spark.Formatter],
+  plugins: [Spark.Formatter],
   # ...
 ]
 ```
@@ -38,25 +38,7 @@ config :spark, :formatter,
       :icons,
       :config
     ]
-  ],
-  "Pyro.Component": [
-    section_order: [
-      :design,
-      :component,
-      :live_view,
-      :hologram
-    ]
-  ],
-  "Pyro.ComponentLibrary": [
-    section_order: [
-      :design,
-      :components,
-      :live_view,
-      :hologram
-    ]
-  ],
-  "Pyro.Framework.LiveView": [],
-  "Pyro.Framework.Hologram": []
+  ]
 ```
 
 For more advanced uses, check out the upstream `Spark.Formatter` docs.

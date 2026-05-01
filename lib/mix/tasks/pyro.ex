@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Pyro do
   defp general do
     Application.ensure_all_started(:pyro)
     Mix.shell().info("Pyro v#{Application.spec(:pyro, :vsn)}")
-    Mix.shell().info("Component tooling for Phoenix.")
+    Mix.shell().info("Design system tooling for Elixir.")
     Mix.shell().info("\n## Options\n")
     Mix.shell().info("-v, --version        # Prints Pyro version\n")
     Mix.Tasks.Help.run(["--search", "pyro."])

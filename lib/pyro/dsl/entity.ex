@@ -48,22 +48,7 @@ defmodule Pyro.Dsl.Entity do
     entities = Module.get_attribute(env.module, :pyro_entity_entities)
     schema_fields = Spark.Options.Docs.schema_specs(schema)
 
-    entity_fields =
-      Enum.map(entities, fn {key, mods} ->
-        inner =
-          case Enum.map(mods, fn mod -> quote(do: unquote(mod).t()) end) do
-            [] ->
-              quote(do: term())
-
-            [type] ->
-              type
-
-            [first | rest] ->
-              Enum.reduce(rest, first, fn t, acc -> quote(do: unquote(acc) | unquote(t)) end)
-          end
-
-        {key, quote(do: [unquote(inner)])}
-      end)
+    entity_fields = Enum.map(entities, &entity_field_typespec/1)
 
     fields = [
       {:__spark_metadata__, quote(do: Spark.Dsl.Entity.spark_meta())}
@@ -73,5 +58,17 @@ defmodule Pyro.Dsl.Entity do
     quote do
       @type t :: %__MODULE__{unquote_splicing(fields)}
     end
+  end
+
+  defp entity_field_typespec({key, mods}) do
+    inner = entity_inner_type(Enum.map(mods, fn mod -> quote(do: unquote(mod).t()) end))
+    {key, quote(do: [unquote(inner)])}
+  end
+
+  defp entity_inner_type([]), do: quote(do: term())
+  defp entity_inner_type([type]), do: type
+
+  defp entity_inner_type([first | rest]) do
+    Enum.reduce(rest, first, fn t, acc -> quote(do: unquote(acc) | unquote(t)) end)
   end
 end
