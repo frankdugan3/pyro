@@ -61,6 +61,12 @@ defmodule Pyro.Design do
         default: false,
         doc:
           "When `true`, the (future) CSS generator emits a `@layer base` block from the `config > base_layer` section."
+      ],
+      generate_skills?: [
+        type: :boolean,
+        default: false,
+        doc:
+          "When `true`, emits a Claude Code skill for this design under `.claude/skills/<namespace>-design/` describing its vocabulary, colocated-CSS usage, and DSL customisation."
       ]
     ],
     default_extensions: [extensions: [Pyro.Design.Dsl]]
@@ -74,13 +80,15 @@ defmodule Pyro.Design do
     json_output = opts[:json_output]
     support_tailwind? = opts[:support_tailwind?]
     manage_base_layer? = opts[:manage_base_layer?]
+    generate_skills? = opts[:generate_skills?]
 
     quote bind_quoted: [
             sources: sources,
             css_output: css_output,
             json_output: json_output,
             support_tailwind?: support_tailwind?,
-            manage_base_layer?: manage_base_layer?
+            manage_base_layer?: manage_base_layer?,
+            generate_skills?: generate_skills?
           ] do
       @persist {:design_sources_raw, sources}
 
@@ -92,6 +100,7 @@ defmodule Pyro.Design do
       @persist {:json_output, json_output}
       @persist {:support_tailwind?, support_tailwind?}
       @persist {:manage_base_layer?, manage_base_layer?}
+      @persist {:generate_skills?, generate_skills?}
     end
   end
 
@@ -121,6 +130,7 @@ defmodule Pyro.Design do
   def __write_outputs__(env, _bytecode) do
     Pyro.Design.JSON.Writer.write(env.module)
     Pyro.Design.CSS.Writer.write(env.module)
+    Pyro.Design.Skill.Writer.write(env.module)
     :ok
   end
 end

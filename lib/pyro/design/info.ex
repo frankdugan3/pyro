@@ -88,6 +88,11 @@ defmodule Pyro.Design.Info do
   def manage_base_layer?(design),
     do: Spark.Dsl.Extension.get_persisted(design, :manage_base_layer?, false)
 
+  @doc "Whether the writer should emit a Claude Code skill for this design under `.claude/skills/`."
+  @spec generate_skills?(module()) :: boolean()
+  def generate_skills?(design),
+    do: Spark.Dsl.Extension.get_persisted(design, :generate_skills?, false)
+
   @doc "All declared icons."
   @spec icons(module()) :: [Icon.t()]
   def icons(design), do: Spark.Dsl.Extension.get_entities(design, [:icons])

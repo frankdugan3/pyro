@@ -13,23 +13,23 @@ defmodule Pyro.MixProject do
 
   def project do
     [
-      app: :pyro,
-      version: @version,
-      description: @description,
-      elixir: @elixir_requirement,
-      start_permanent: Mix.env() == :prod,
-      consolidate_protocols: Mix.env() != :dev,
-      package: package(),
-      deps: deps(),
-      docs: &docs/0,
-      test_paths: ["test"],
-      name: "Pyro",
-      source_url: @source_url,
-      elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
+      app: :pyro,
       compilers: [:yecc] ++ Mix.compilers(),
+      consolidate_protocols: Mix.env() not in [:dev, :test],
+      deps: deps(),
+      description: @description,
       dialyzer: [plt_add_apps: [:mix]],
-      usage_rules: usage_rules()
+      docs: &docs/0,
+      elixir: @elixir_requirement,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      name: "Pyro",
+      package: package(),
+      source_url: @source_url,
+      start_permanent: Mix.env() == :prod,
+      test_paths: ["test"],
+      usage_rules: usage_rules(),
+      version: @version
     ]
   end
 
@@ -115,8 +115,9 @@ defmodule Pyro.MixProject do
       licenses: ["MIT"],
       links: %{GitHub: @source_url},
       files: ~w(
-        lib
+        lib documentation
         README* CHANGELOG* LICENSE*
+        usage_rules.md
         mix.exs .formatter.exs
       )
     ]
